@@ -18,6 +18,11 @@ export const PRODUCTS = [
     rating: 4.9,
     reviewCount: 48,
     image: "./images/cat-notebooks.jpg",
+    variantImages: [
+      "./images/cat-notebooks.jpg",
+      "./images/var-nb-sand.jpg",
+      "./images/var-nb-bordeaux.jpg",
+    ],
     swatches: ["#1F4E3D", "#D9CBB8", "#7A2E25"],
     fa: {
       title: "دفتر بولت‌ژورنال کتان «ورسا» A5",
@@ -44,7 +49,11 @@ export const PRODUCTS = [
     price: 1150000,
     rating: 4.8,
     reviewCount: 24,
-    image: "./images/hero-boutique.jpg",
+    image: "./images/prod-planner-pine.jpg",
+    variantImages: [
+      "./images/prod-planner-pine.jpg",
+      "./images/var-planner-champagne.jpg",
+    ],
     swatches: ["#2E473B", "#C8A97E"],
     fa: {
       title: "پلنر ۶ ماهه «لُارگانیزه» طلاکوب",
@@ -71,15 +80,20 @@ export const PRODUCTS = [
     price: 740000,
     rating: 5.0,
     reviewCount: 31,
-    image: "./images/cat-decorative-paper.jpg",
-    swatches: ["#C89D54", "#1F4E3D", "#B84A39"],
+    image: "./images/prod-florentine-pine.jpg",
+    variantImages: [
+      "./images/prod-florentine-pine.jpg",
+      "./images/var-paper-azure.jpg",
+      "./images/var-paper-vermilion.jpg",
+    ],
+    swatches: ["#C89D54", "#1F4E5F", "#B84A39"],
     fa: {
       title: "کلکسیون کاغذ تزیینی فلورانس (بسته ۵ برگ)",
       subtitle: "طرح‌های کلاسیک رنسانس با طلاکوب برجسته ۵۰×۷۰",
       origin: "واردات ایتالیا · کتان ۸۵ گرم",
       description:
         "کاغذهای هنری دست‌چاپ با نقوش گیاهی و هندسی فلورانس؛ ایده‌آل برای کادوپیچی خاص، جلدسازی دست‌ساز، اوریگامی و قاب‌بندی دکوراتیو.",
-      variants: ["موتیف طلایی و کاج", "گیاهی ورملیون"],
+      variants: ["موتیف طلایی و کاج", "ابروباد لاجوردی و طلا", "گیاهی ورملیون"],
     },
     en: {
       title: "Florentine Decorative Paper Set (5 Sheets)",
@@ -87,7 +101,7 @@ export const PRODUCTS = [
       origin: "Florence Heritage Stock · 85gsm Cotton",
       description:
         "Signature archival decorative sheets embellished with metallic gold accents, tailored for heirloom wrapping, bookbinding, and framing.",
-      variants: ["Gold & Botanical Pine", "Vermilion Floral"],
+      variants: ["Gold & Botanical Pine", "Azure & Gold Marble", "Vermilion Floral"],
     },
   },
   {
@@ -96,7 +110,11 @@ export const PRODUCTS = [
     category: "papers",
     badge: null,
     price: 580000,
-    image: "./images/cat-decorative-paper.jpg",
+    image: "./images/prod-letter-ivory.jpg",
+    variantImages: [
+      "./images/prod-letter-ivory.jpg",
+      "./images/var-letter-cream.jpg",
+    ],
     swatches: ["#FAF5EB", "#E8DEC8"],
     fa: {
       title: "ست نامه و پاکت کتان لبه‌پَرز دار «مدیوالیس»",
@@ -124,6 +142,11 @@ export const PRODUCTS = [
     rating: 4.9,
     reviewCount: 62,
     image: "./images/cat-pens.jpg",
+    variantImages: [
+      "./images/cat-pens.jpg",
+      "./images/var-pen-brass.jpg",
+      "./images/var-pen-graphite.jpg",
+    ],
     swatches: ["#1F4E3D", "#B8965A", "#1C1E1D"],
     fa: {
       title: "خودکار مهندسی شش‌ضلعی «ژنو ۸۴۹»",
@@ -148,7 +171,11 @@ export const PRODUCTS = [
     category: "pens",
     badge: "new",
     price: 3850000,
-    image: "./images/cat-pens.jpg",
+    image: "./images/prod-fountain-brass.jpg",
+    variantImages: [
+      "./images/prod-fountain-brass.jpg",
+      "./images/var-fountain-pine.jpg",
+    ],
     swatches: ["#B8965A", "#1F4E3D"],
     fa: {
       title: "خودنویس برنجی آتلیه با سرقلم طلایی M",
@@ -156,7 +183,7 @@ export const PRODUCTS = [
       origin: "مهندسی دقیق · مناسب تحریر و امضا",
       description:
         "بدنه برنج خالص که به‌مرور پتینه شخصی شما را می‌گیرد، همراه با سرقلم استیل روکش طلا برای جریان روان و یکنواخت جوهر.",
-      variants: ["برنج خالص", "لاجوردی و طلا"],
+      variants: ["برنج خالص", "سبز کاج و طلا"],
     },
     en: {
       title: "Atelier Solid Brass Fountain Pen",
@@ -173,8 +200,12 @@ export const PRODUCTS = [
     category: "stickers",
     badge: "new",
     price: 295000,
-    image: "./images/cat-stickers-washi.jpg",
-    swatches: ["#749982", "#D98A6C", "#D6B77A"],
+    image: "./images/prod-stickers-botanical.jpg",
+    variantImages: [
+      "./images/prod-stickers-botanical.jpg",
+      "./images/var-stickers-warm.jpg",
+    ],
+    swatches: ["#749982", "#D98A6C"],
     fa: {
       title: "پکیج ۶ برگه استیکر بوتانیکال و برش لیزری",
       subtitle: "کاغذ واشی مات و برچسب ضدآب برای پلنر و لپ‌تاپ",
@@ -198,8 +229,12 @@ export const PRODUCTS = [
     category: "stickers",
     badge: "bestseller",
     price: 360000,
-    image: "./images/cat-stickers-washi.jpg",
-    swatches: ["#1F4E3D", "#C89D54", "#E6DCD0"],
+    image: "./images/prod-washi-forest.jpg",
+    variantImages: [
+      "./images/prod-washi-forest.jpg",
+      "./images/var-washi-terracotta.jpg",
+    ],
+    swatches: ["#1F4E3D", "#D98A6C"],
     fa: {
       title: "سه‌گانه واشی‌تیپ طلاکوب «پاپتری»",
       subtitle: "عرض ۱۵ میلی‌متر · طول ۱۰ متر · چسبندگی ملایم بدون رد",
@@ -226,7 +261,11 @@ export const PRODUCTS = [
     rating: 4.9,
     reviewCount: 39,
     image: "./images/cat-gift-packaging.jpg",
-    swatches: ["#1F4E3D", "#C83E2B", "#D8CFC0"],
+    variantImages: [
+      "./images/cat-gift-packaging.jpg",
+      "./images/var-box-ivory.jpg",
+    ],
+    swatches: ["#1F4E3D", "#D8CFC0"],
     fa: {
       title: "باکس هدیه هاردباکس + ست مهر موم لاکی",
       subtitle: "شامل جعبه کتان، روبان گروگرین، مهر برنجی و ۳ شمع موم",
@@ -250,15 +289,19 @@ export const PRODUCTS = [
     category: "packaging",
     badge: null,
     price: 490000,
-    image: "./images/cat-gift-packaging.jpg",
-    swatches: ["#C5AC8B", "#1F4E3D"],
+    image: "./images/prod-bags-kraft.jpg",
+    variantImages: [
+      "./images/prod-bags-kraft.jpg",
+      "./images/var-bags-ivory.jpg",
+    ],
+    swatches: ["#C5AC8B", "#D8CFC0"],
     fa: {
       title: "پک ۱۰ عددی ساک دستی بوتیک کرافت و کتان",
       subtitle: "مقوای ۲۵۰ گرم سوئدی با بند نخی بافته",
       origin: "مقاوم و بازیافت‌پذیر · بدون چاپ یا آماده برندینگ",
       description:
         "ساک‌های دستی خوش‌فرم برای هدایای ویژه و برندهای بوتیک؛ در بخش خدماتی امکان چاپ طلاکوب و سیلک اختصاصی روی آن‌ها فراهم است.",
-      variants: ["کرافت طبیعی", "سبز یشمی"],
+      variants: ["کرافت و سبز کاج", "کرم عاجی و طلا"],
     },
     en: {
       title: "Swedish Kraft Boutique Carry Bags (10-Pack)",
@@ -266,7 +309,7 @@ export const PRODUCTS = [
       origin: "Eco Boutique Stock · Custom Foil Compatible",
       description:
         "Crisp upright gift bags built from 250gsm Swedish board. Ready as clean minimalist stock or customizable in our Print Atelier.",
-      variants: ["Natural Kraft", "Deep Pine"],
+      variants: ["Kraft & Pine", "Ivory & Gold"],
     },
   },
   {
@@ -276,14 +319,18 @@ export const PRODUCTS = [
     badge: "limited",
     price: 1980000,
     image: "./images/cat-printmaking.jpg",
-    swatches: ["#1F4E3D", "#C83E2B"],
+    variantImages: [
+      "./images/cat-printmaking.jpg",
+      "./images/var-linocut-crimson.jpg",
+    ],
+    swatches: ["#1F4E3D", "#7A2E25"],
     fa: {
       title: "ست کامل چاپ دستی و حکاکی لینولئوم آتلیه",
       subtitle: "۵ مغار فولادی، غلطک لاستیکی، مرکب ایتالیایی و ۲ لوح لینو",
       origin: "استاندارد دانشگاهی و کارگاه‌های گرافیک",
       description:
         "مجموعه تخصصی چاپ دستی برای خلق کارت‌پستال، اکس‌لیبریس (نشان کتاب) و پوسترهای لترپرس محدود با مرکب پایه آب باکیفیت.",
-      variants: ["ست پایه ۵ تکه + مرکب مشکی و سبز"],
+      variants: ["مرکب سبز و مشکی", "مرکب زرشکی فلورانس"],
     },
     en: {
       title: "Studio Linocut & Relief Printmaking Kit",
@@ -291,7 +338,7 @@ export const PRODUCTS = [
       origin: "Fine Art Studio Grade",
       description:
         "Everything needed to carve and hand-pull custom ex-libris stamps, greeting cards, and artisanal relief editions at home or studio.",
-      variants: ["Master Set (Black & Pine Ink)"],
+      variants: ["Pine & Black Ink", "Crimson Atelier Ink"],
     },
   },
   {
@@ -300,15 +347,19 @@ export const PRODUCTS = [
     category: "printmaking",
     badge: null,
     price: 680000,
-    image: "./images/cat-printmaking.jpg",
-    swatches: ["#FAF7F2"],
+    image: "./images/prod-cotton-pad.jpg",
+    variantImages: [
+      "./images/prod-cotton-pad.jpg",
+      "./images/var-cotton-pad-warm.jpg",
+    ],
+    swatches: ["#FAF7F2", "#E8DEC8"],
     fa: {
       title: "بلوک کاغذ چاپ دستی و آبرنگ ۳۰۰ گرم کتان",
       subtitle: "۱۵ برگ A4 · پرس سرد · بدون اسید (Acid-Free)",
       origin: "تضمین ماندگاری رنگ و مرکب",
       description:
         "بافت نیمه‌زبر طبیعی که هم برای چاپ لینو و مهرسازی و هم برای آبرنگ، گواش و اسکچ‌های معماری عملکردی بی‌نقص دارد.",
-      variants: ["سفید طبیعی ۱۰۰٪ کتان"],
+      variants: ["سفید طبیعی ۱۰۰٪ کتان", "کرم آرشیوی گرم"],
     },
     en: {
       title: "300gsm Cold-Press Cotton Printmaking Pad",
@@ -316,7 +367,7 @@ export const PRODUCTS = [
       origin: "Archival Fine Art Stock",
       description:
         "Heavyweight cold-press cotton sheets engineered to absorb dense relief inks, gouache, and architectural ink washes without buckling.",
-      variants: ["Natural White 100% Cotton"],
+      variants: ["Natural White 100% Cotton", "Warm Archival Cream"],
     },
   },
 ];

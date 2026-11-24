@@ -282,6 +282,9 @@ export default function BoutiqueStorefront({
         <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
           {favorites.map((product) => {
             const loc = product[lang];
+            const activeVariantIdx = cardVariants[product.id] || 0;
+            const activeImage =
+              product.variantImages?.[activeVariantIdx] || product.image;
             return (
               <div
                 key={product.id}
@@ -289,14 +292,14 @@ export default function BoutiqueStorefront({
               >
                 <div className="relative w-full aspect-square overflow-hidden rounded-[22px] border border-[var(--border-subtle)] bg-[var(--bg-soft)] shadow-2xs transition duration-300 group-hover:-translate-y-1 group-hover:border-[var(--accent-gold)]">
                   <img
-                    src={product.image}
+                    src={activeImage}
                     alt={loc.title}
-                    onClick={() => onQuickView(product, 0)}
+                    onClick={() => onQuickView(product, activeVariantIdx)}
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-105 cursor-pointer"
                   />
                   <button
                     type="button"
-                    onClick={() => onAddToBag(product, 0, 1)}
+                    onClick={() => onAddToBag(product, activeVariantIdx, 1)}
                     className="hidden sm:inline-flex absolute inset-x-4 bottom-3 translate-y-2 opacity-0 items-center justify-center gap-1.5 rounded-full bg-[var(--accent-deep)]/92 py-2 text-[11px] font-bold text-[#FAF6EE] backdrop-blur-md transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 cursor-pointer border border-[#D6B36A]/40"
                   >
                     <Plus className="h-3.5 w-3.5 text-[#E7D19F]" />
@@ -304,9 +307,34 @@ export default function BoutiqueStorefront({
                   </button>
                 </div>
 
+                {product.swatches?.length > 1 && (
+                  <div className="mt-2.5 flex items-center justify-center gap-1.5">
+                    {product.swatches.map((hex, idx) => (
+                      <button
+                        key={hex + idx}
+                        type="button"
+                        onClick={() =>
+                          setCardVariants((prev) => ({
+                            ...prev,
+                            [product.id]: idx,
+                          }))
+                        }
+                        aria-label={loc.variants[idx] || hex}
+                        title={loc.variants[idx] || hex}
+                        className={`h-3.5 w-3.5 rounded-full border transition cursor-pointer ${
+                          activeVariantIdx === idx
+                            ? "scale-110 border-[var(--ink-main)] ring-2 ring-[var(--accent-gold)]/60"
+                            : "border-black/20 hover:scale-105"
+                        }`}
+                        style={{ backgroundColor: hex }}
+                      />
+                    ))}
+                  </div>
+                )}
+
                 <h3
-                  onClick={() => onQuickView(product, 0)}
-                  className="mt-3 text-xs sm:text-sm font-bold text-[var(--ink-main)] hover:text-[var(--accent-gold)] cursor-pointer line-clamp-1"
+                  onClick={() => onQuickView(product, activeVariantIdx)}
+                  className="mt-2 text-xs sm:text-sm font-bold text-[var(--ink-main)] hover:text-[var(--accent-gold)] cursor-pointer line-clamp-1"
                 >
                   {loc.title}
                 </h3>
@@ -621,12 +649,8 @@ export default function BoutiqueStorefront({
                     product.swatches[activeVariantIdx] || product.swatches[0];
                   const activeVariantName =
                     loc.variants[activeVariantIdx] || loc.variants[0];
-                  const swatchToneFilter =
-                    activeVariantIdx === 1
-                      ? "sepia-[0.14] brightness-[1.03]"
-                      : activeVariantIdx === 2
-                      ? "contrast-[1.06] saturate-[1.08]"
-                      : "";
+                  const activeImage =
+                    product.variantImages?.[activeVariantIdx] || product.image;
                   return (
                     <article
                       key={product.id}
@@ -642,12 +666,12 @@ export default function BoutiqueStorefront({
                           }}
                         >
                           <img
-                            src={product.image}
+                            src={activeImage}
                             alt={loc.title}
                             onClick={() =>
                               onQuickView(product, activeVariantIdx)
                             }
-                            className={`h-full w-full object-cover transition duration-700 group-hover:scale-105 cursor-pointer ${swatchToneFilter}`}
+                            className="h-full w-full object-cover transition duration-700 group-hover:scale-105 cursor-pointer"
                           />
 
                           {product.badge && (

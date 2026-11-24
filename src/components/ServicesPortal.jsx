@@ -561,7 +561,7 @@ export default function ServicesPortal({
           </div>
 
           {/* Sticky Dark Order Summary + Live Bindery Preview */}
-          <aside className="min-w-0 rounded-[28px] border border-[#C8A258]/35 bg-[#123126] p-6 sm:p-7 text-[#FAF6EE] shadow-atelier md:col-span-5 lg:col-span-4 md:sticky md:top-28 space-y-5">
+          <aside className="min-w-0 rounded-[28px] border border-[#C8A258]/35 bg-[#123126] p-6 sm:p-7 text-[#FAF6EE] shadow-atelier md:col-span-5 lg:col-span-4 md:sticky md:top-32 space-y-5">
             <div>
               <p className="font-latin-ui text-[10px] font-bold tracking-[0.22em] text-[#E7D19F]">
                 {t.orderSummary.eyebrow}

@@ -9,8 +9,11 @@ import {
   Share2,
   CheckCircle2,
   Star,
+  Move3d,
+  Image as ImageIcon,
 } from "lucide-react";
 import { formatPrice, formatNumber } from "../utils/pricing";
+import Live3DPreview from "./Live3DPreview";
 
 export default function ProductModal({
   product,
@@ -24,6 +27,7 @@ export default function ProductModal({
 }) {
   const localized = product[lang];
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(initialVariantIdx);
+  const [viewMode, setViewMode] = useState("photo");
   const [qty, setQty] = useState(1);
   const [copiedLink, setCopiedLink] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -34,6 +38,7 @@ export default function ProductModal({
 
   useEffect(() => {
     setSelectedVariantIdx(initialVariantIdx);
+    setViewMode("photo");
     setQty(1);
     setReviewOpen(false);
   }, [product.id, initialVariantIdx]);
@@ -54,6 +59,11 @@ export default function ProductModal({
     localized.variants[selectedVariantIdx] || localized.variants[0];
   const selectedSwatchHex =
     product.swatches[selectedVariantIdx] || product.swatches[0];
+  const activeImage =
+    product.variantImages?.[selectedVariantIdx] || product.image;
+  const supports3D = ["notebooks", "papers", "packaging"].includes(
+    product.category
+  );
 
   const handleAdd = () => {
     onAddToBag(product, selectedVariantIdx, qty);
@@ -104,23 +114,71 @@ export default function ProductModal({
           </button>
         </div>
 
-        <div className="relative bg-[var(--bg-soft)] p-6 flex items-center justify-center">
-          <div className="relative w-full overflow-hidden rounded-2xl shadow-md">
-            <img
-              src={product.image}
-              alt={localized.title}
-              className="aspect-square max-h-[360px] w-full object-cover transition duration-500 hover:scale-105"
-            />
-            {selectedSwatchHex && (
-              <div className="absolute bottom-3 start-3 inline-flex items-center gap-2 rounded-full bg-[#FAF6EE]/92 px-3 py-1 text-[11px] font-bold text-[#14201A] shadow-sm backdrop-blur-xs">
-                <span
-                  className="h-3 w-3 rounded-full border border-black/20"
-                  style={{ backgroundColor: selectedSwatchHex }}
-                />
-                <span>{selectedVariant}</span>
-              </div>
-            )}
-          </div>
+        <div className="relative bg-[var(--bg-soft)] p-6 flex flex-col items-center justify-center gap-3">
+          {supports3D && (
+            <div className="inline-flex rounded-full border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-1 text-[11px] font-bold shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setViewMode("photo")}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 transition cursor-pointer ${
+                  viewMode === "photo"
+                    ? "bg-[var(--accent-pine)] text-white"
+                    : "text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
+                }`}
+              >
+                <ImageIcon className="h-3.5 w-3.5" />
+                <span>{lang === "fa" ? "عکس استودیو" : "Studio Photo"}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("3d")}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 transition cursor-pointer ${
+                  viewMode === "3d"
+                    ? "bg-[var(--accent-pine)] text-white"
+                    : "text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
+                }`}
+              >
+                <Move3d className="h-3.5 w-3.5" />
+                <span>{lang === "fa" ? "نمای ۳۶۰° واقعی" : "360° 3D View"}</span>
+              </button>
+            </div>
+          )}
+
+          {supports3D && viewMode === "3d" ? (
+            <div className="w-full rounded-2xl bg-[#123126] p-1 shadow-md">
+              <Live3DPreview
+                compact
+                config={{
+                  printType: "color",
+                  size: product.id === "nb-linen-forest" ? "A5" : "A4",
+                  paperStock: "cotton240",
+                  binding:
+                    product.category === "notebooks" ? "hardcover" : "perfect",
+                  pages: 180,
+                }}
+                customTitle={localized.title}
+                customHex={selectedSwatchHex}
+                t={t}
+              />
+            </div>
+          ) : (
+            <div className="relative w-full overflow-hidden rounded-2xl shadow-md">
+              <img
+                src={activeImage}
+                alt={localized.title}
+                className="aspect-square max-h-[360px] w-full object-cover transition duration-500 hover:scale-105"
+              />
+              {selectedSwatchHex && (
+                <div className="absolute bottom-3 start-3 inline-flex items-center gap-2 rounded-full bg-[#FAF6EE]/92 px-3 py-1 text-[11px] font-bold text-[#14201A] shadow-sm backdrop-blur-xs">
+                  <span
+                    className="h-3 w-3 rounded-full border border-black/20"
+                    style={{ backgroundColor: selectedSwatchHex }}
+                  />
+                  <span>{selectedVariant}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col justify-between p-6 sm:p-8">

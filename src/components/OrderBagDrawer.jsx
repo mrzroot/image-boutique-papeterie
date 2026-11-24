@@ -24,7 +24,11 @@ function resolveBagDisplay(item, lang, t) {
     if (prod) {
       const loc = prod[lang];
       const variant = loc.variants[item.variantIdx || 0] || loc.variants[0];
-      return { title: loc.title, meta: `${prod.sku} · ${variant}` };
+      return {
+        title: loc.title,
+        meta: `${prod.sku} · ${variant}`,
+        image: prod.variantImages?.[item.variantIdx || 0] || prod.image,
+      };
     }
   }
   if (item.kind === "bundle" && item.bundleId) {
@@ -449,7 +453,7 @@ export default function OrderBagDrawer({
                         className="flex gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 shadow-2xs"
                       >
                         <img
-                          src={item.image}
+                          src={display.image || item.image}
                           alt={display.title}
                           className="h-20 w-20 shrink-0 rounded-xl object-cover bg-[#EFE8DA]"
                         />

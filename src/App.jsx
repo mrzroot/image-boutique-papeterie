@@ -156,7 +156,7 @@ export default function App() {
           meta: `${product.sku} · ${variant}`,
           unitPrice: product.price,
           qty,
-          image: product.image,
+          image: product.variantImages?.[variantIdx] || product.image,
         },
       ];
     });
