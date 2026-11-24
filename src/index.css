@@ -1,0 +1,184 @@
+@import "tailwindcss";
+
+:root {
+  --bg-ivory: #faf6ee;
+  --bg-sand: #f1ebe0;
+  --bg-card: #f6f1e7;
+  --ink-dark: #14201a;
+  --ink-muted: #58655c;
+  --pine: #1b4636;
+  --pine-deep: #123126;
+  --vermilion: #bf3927;
+  --brass: #b89352;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+[dir="rtl"] body {
+  font-family: "Vazirmatn", "Estedad", system-ui, sans-serif;
+}
+
+[dir="ltr"] body {
+  font-family: "Inter", "Vazirmatn", system-ui, sans-serif;
+}
+
+.font-editorial {
+  font-family: "Amiri", Georgia, "Times New Roman", serif;
+}
+
+.font-latin-ui {
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* Tactile fine cotton paper micro-texture */
+.paper-grain {
+  position: relative;
+  background-color: #faf6ee;
+  background-image:
+    radial-gradient(rgba(27, 70, 54, 0.035) 1px, transparent 0),
+    radial-gradient(rgba(184, 147, 82, 0.04) 1px, transparent 0);
+  background-size: 24px 24px, 36px 36px;
+  background-position: 0 0, 12px 12px;
+}
+
+/* Editorial Luxury Shadows */
+.shadow-atelier {
+  box-shadow:
+    0 24px 60px -18px rgba(18, 49, 38, 0.14),
+    0 4px 16px -4px rgba(18, 49, 38, 0.05);
+}
+
+/* Metallic Brass Foil Typography Gradient */
+.text-foil {
+  background: linear-gradient(125deg, #e7d19f 0%, #c8a258 45%, #f3e4bd 75%, #b89352 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Slow Cinematic Ken Burns Hero Zoom */
+@keyframes kenBurnsSlow {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.055) translate3d(-0.6%, -0.4%, 0);
+  }
+  100% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+.animate-ken-burns {
+  animation: kenBurnsSlow 18s ease-in-out infinite;
+}
+
+/* Hero slide progress fill bar */
+@keyframes progressFill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.animate-slide-progress {
+  transform-origin: left center;
+  animation: progressFill 6.5s linear forwards;
+}
+
+[dir="rtl"] .animate-slide-progress {
+  transform-origin: right center;
+}
+
+/* Whisper-quiet Atelier Marquee */
+@keyframes marqueeLoop {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeLoop 38s linear infinite;
+}
+
+.marquee-wrap:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* Hotspot Breathing Ring */
+@keyframes hotspotPing {
+  0% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  75%,
+  100% {
+    transform: scale(2.15);
+    opacity: 0;
+  }
+}
+
+.animate-hotspot-ring {
+  animation: hotspotPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* View Fade-Up Transition */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-in {
+  animation: pageFadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Specular Gloss Sweep on Coated Paper Mockup */
+.paper-gloss-sheen {
+  background: linear-gradient(
+    130deg,
+    rgba(255, 255, 255, 0) 25%,
+    rgba(255, 255, 255, 0.36) 48%,
+    rgba(255, 255, 255, 0.05) 65%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns,
+  .animate-marquee,
+  .animate-hotspot-ring,
+  .animate-slide-progress,
+  .animate-page-in {
+    animation: none !important;
+  }
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #f1ebe0;
+}
+::-webkit-scrollbar-thumb {
+  background: #c3b7a3;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1b4636;
+}
