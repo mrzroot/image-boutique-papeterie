@@ -15,6 +15,8 @@ export const PRODUCTS = [
     category: "notebooks",
     badge: "bestseller",
     price: 890000,
+    rating: 4.9,
+    reviewCount: 48,
     image: "./images/cat-notebooks.jpg",
     swatches: ["#1F4E3D", "#D9CBB8", "#7A2E25"],
     fa: {
@@ -40,6 +42,8 @@ export const PRODUCTS = [
     category: "notebooks",
     badge: "new",
     price: 1150000,
+    rating: 4.8,
+    reviewCount: 24,
     image: "./images/hero-boutique.jpg",
     swatches: ["#2E473B", "#C8A97E"],
     fa: {
@@ -65,6 +69,8 @@ export const PRODUCTS = [
     category: "papers",
     badge: "limited",
     price: 740000,
+    rating: 5.0,
+    reviewCount: 31,
     image: "./images/cat-decorative-paper.jpg",
     swatches: ["#C89D54", "#1F4E3D", "#B84A39"],
     fa: {
@@ -115,6 +121,8 @@ export const PRODUCTS = [
     category: "pens",
     badge: "bestseller",
     price: 2450000,
+    rating: 4.9,
+    reviewCount: 62,
     image: "./images/cat-pens.jpg",
     swatches: ["#1F4E3D", "#B8965A", "#1C1E1D"],
     fa: {
@@ -215,6 +223,8 @@ export const PRODUCTS = [
     category: "packaging",
     badge: "bestseller",
     price: 1290000,
+    rating: 4.9,
+    reviewCount: 39,
     image: "./images/cat-gift-packaging.jpg",
     swatches: ["#1F4E3D", "#C83E2B", "#D8CFC0"],
     fa: {
@@ -483,4 +493,115 @@ export const SERVICES_FAQ = [
       a: "Print-ready PDFs with outlined fonts (or 300 DPI CMYK artwork) deliver sharpest results. We also accept high-res PNG, JPG, Illustrator (.ai), and ZIP archives.",
     },
   },
+];
+
+export const BUNDLES = [
+  {
+    id: "bundle-florence-desk",
+    sku: "IB-SET-01",
+    originalPrice: 5480000,
+    price: 4650000,
+    savePercent: 15,
+    image: "./images/hero-boutique.jpg",
+    fa: {
+      title: "ست هدیه میز خلاقیت فلورانس",
+      items: "دفتر کتان ورسا + کاغذ فلورانس ۵ برگ + خودنویس برنجی آتلیه",
+      tag: "پرفروش‌ترین پک هدیه",
+    },
+    en: {
+      title: "Florentine Creative Desk Coffret",
+      items: "Versa Linen Journal + 5 Florentine Sheets + Solid Brass Fountain Pen",
+      tag: "Signature Gift Set",
+    },
+  },
+  {
+    id: "bundle-paris-planner",
+    sku: "IB-SET-02",
+    originalPrice: 1805000,
+    price: 1530000,
+    savePercent: 15,
+    image: "./images/cat-stickers-washi.jpg",
+    fa: {
+      title: "پک برنامه‌ریزی و بولت‌ژورنال پاریس",
+      items: "پلنر ۶ ماهه طلاکوب + ۶ برگه استیکر بوتانیکال + سه‌گانه واشی‌تیپ",
+      tag: "اقتصادی و خلاقانه",
+    },
+    en: {
+      title: "Parisian Bullet Journal Coffret",
+      items: "6-Month Foil Planner + Botanical Sticker Folio + Gold Washi Trio",
+      tag: "Creative Bundle",
+    },
+  },
+  {
+    id: "bundle-geneva-exec",
+    sku: "IB-SET-03",
+    originalPrice: 3740000,
+    price: 3180000,
+    savePercent: 15,
+    image: "./images/cat-gift-packaging.jpg",
+    fa: {
+      title: "باکس هدیه مدیران «ژنو» با مهر موم",
+      items: "خودکار سوئیسی ژنو ۸۴۹ + هاردباکس کتان و ست مهر موم لاکی",
+      tag: "آماده تقدیم هدیه",
+    },
+    en: {
+      title: "Geneva Executive Wax-Seal Coffret",
+      items: "Swiss Hexagonal 849 Pen + Rigid Linen Keepsake Box & Brass Seal",
+      tag: "Gift Ready",
+    },
+  },
+];
+
+export const CLIENT_REVIEWS = [
+  {
+    id: "rev-1",
+    rating: 5,
+    fa: {
+      name: "سارا معتمدی",
+      role: "معمار و طراح داخلی",
+      text: "بافت کاغذ ۱۲۰ گرم دفتر ورسا فوق‌العاده است؛ حتی با خودنویس و راپید هیچ نشتی به پشت صفحه ندارد و بسته‌بندی کاغذ فلورانس مثل یک هدیه واقعی از ایتالیا بود.",
+    },
+    en: {
+      name: "Sara Motamedi",
+      role: "Interior Architect",
+      text: "The 120gsm cotton stock handles fountain pens and technical ink with zero bleed-through. Arrived wrapped like a real Florentine keepsake.",
+    },
+  },
+  {
+    id: "rev-2",
+    rating: 5,
+    fa: {
+      name: "امیرحسین شریفی",
+      role: "مدیر خلاقیت استودیو",
+      text: "خودکار سوئیسی ۸۴۹ و باکس مهر موم را برای هدیه مدیران گرفتیم. کیفیت جزئیات، ارسال سریع و ظاهر شیک جعبه‌ها همه تیم را شگفت‌زده کرد.",
+    },
+    en: {
+      name: "Amir Sharifi",
+      role: "Creative Director",
+      text: "Ordered the Swiss 849 pens with wax-sealed keepsake boxes for our studio partners. The tactile presentation and swift delivery were unmatched.",
+    },
+  },
+  {
+    id: "rev-3",
+    rating: 5,
+    fa: {
+      name: "مهسا کریمی",
+      role: "علاقه‌مند بولت‌ژورنال",
+      text: "استیکرهای بوتانیکال و واشی‌تیپ‌های طلاکوب دقیقاً همان حس بوتیک‌های فرانسوی را دارند. چسبندگی ملایم و کیفیت چاپشان بی‌نظیر است.",
+    },
+    en: {
+      name: "Mahsa Karimi",
+      role: "Journaling Enthusiast",
+      text: "The botanical stickers and foil washi tapes bring pure Parisian stationery joy. Clean kiss-cut edges and delicate gold shimmer.",
+    },
+  },
+];
+
+export const SOCIAL_GALLERY = [
+  { id: "gal-1", image: "./images/hero-boutique.jpg", productId: "nb-linen-forest" },
+  { id: "gal-2", image: "./images/cat-decorative-paper.jpg", productId: "pp-florentine-pack" },
+  { id: "gal-3", image: "./images/cat-pens.jpg", productId: "pn-swiss-hex" },
+  { id: "gal-4", image: "./images/cat-stickers-washi.jpg", productId: "st-botanical-pack" },
+  { id: "gal-5", image: "./images/cat-gift-packaging.jpg", productId: "pk-wax-box" },
+  { id: "gal-6", image: "./images/cat-printmaking.jpg", productId: "pm-linocut-kit" },
 ];

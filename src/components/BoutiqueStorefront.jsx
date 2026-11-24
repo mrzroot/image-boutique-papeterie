@@ -13,10 +13,12 @@ import {
   SlidersHorizontal,
   ShoppingBag,
   Eye,
+  Star,
 } from "lucide-react";
 import { CATEGORIES, PRODUCTS } from "../data/catalog";
 import { formatPrice, formatNumber } from "../utils/pricing";
 import Reveal from "./Reveal";
+import BoutiqueExtras from "./BoutiqueExtras";
 
 export default function BoutiqueStorefront({
   t,
@@ -29,6 +31,8 @@ export default function BoutiqueStorefront({
   onToggleWishlistOnly,
   onToggleWishlist,
   onAddToBag,
+  onAddBundle,
+  onAddGiftCard,
   onQuickView,
   onEnterServices,
 }) {
@@ -699,7 +703,15 @@ export default function BoutiqueStorefront({
 
                         <div className="px-1 pt-3.5 space-y-1.5">
                           <div className="flex items-center justify-between text-[10px] font-semibold tracking-wider text-[var(--ink-sub)] font-latin-ui">
-                            <span>{product.sku}</span>
+                            <span className="inline-flex items-center gap-1.5">
+                              <span>{product.sku}</span>
+                              {product.rating && (
+                                <span className="inline-flex items-center gap-0.5 text-[var(--accent-gold)]">
+                                  <Star className="h-2.5 w-2.5 fill-current" />
+                                  <span>{formatNumber(product.rating, lang)}</span>
+                                </span>
+                              )}
+                            </span>
                             <div className="flex items-center gap-1.5">
                               {product.swatches.map((hex, sIdx) => (
                                 <button
@@ -778,6 +790,15 @@ export default function BoutiqueStorefront({
           </div>
         </div>
       </section>
+
+      {/* 6B. Gift Coffrets, Digital Gift Card, Verified Reviews & Studio Gallery */}
+      <BoutiqueExtras
+        t={t}
+        lang={lang}
+        onAddBundle={onAddBundle}
+        onAddGiftCard={onAddGiftCard}
+        onQuickView={onQuickView}
+      />
 
       {/* 7. Editorial Heritage Story Section */}
       <section

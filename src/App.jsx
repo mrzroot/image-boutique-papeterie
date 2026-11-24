@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Store, LayoutGrid, Printer, ShoppingBag } from "lucide-react";
+import { Store, LayoutGrid, Printer, ShoppingBag, ArrowUp } from "lucide-react";
 import { TRANSLATIONS } from "./data/translations";
 import Header from "./components/Header";
 import BoutiqueStorefront from "./components/BoutiqueStorefront";
@@ -35,6 +35,13 @@ export default function App() {
   const [activeProduct, setActiveProduct] = useState(null);
   const [activeVariantIdx, setActiveVariantIdx] = useState(0);
   const [toastMsg, setToastMsg] = useState("");
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 520);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const t = TRANSLATIONS[lang];
 
@@ -165,6 +172,58 @@ export default function App() {
     showToast(t.orderSummary.jobAddedToast);
   };
 
+  const handleAddBundle = (bundle) => {
+    const key = `bundle::${bundle.id}`;
+    const loc = bundle[lang];
+    setBagItems((prev) => {
+      const existing = prev.find((i) => i.key === key);
+      if (existing) {
+        return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i));
+      }
+      return [
+        ...prev,
+        {
+          key,
+          kind: "bundle",
+          bundleId: bundle.id,
+          title: loc.title,
+          meta: `${bundle.sku} · ${loc.items}`,
+          unitPrice: bundle.price,
+          qty: 1,
+          image: bundle.image,
+        },
+      ];
+    });
+    showToast(
+      lang === "fa"
+        ? `«${loc.title}» به سبد سفارش اضافه شد.`
+        : `Added "${loc.title}" to order bag.`
+    );
+  };
+
+  const handleAddGiftCard = ({ amount, design, recipient, message }) => {
+    const key = `gc-${Date.now()}`;
+    const finishLabel = t.giftCard.designs[design] || design;
+    setBagItems((prev) => [
+      ...prev,
+      {
+        key,
+        kind: "giftcard",
+        spec: { amount, design, recipient, message },
+        title: `${t.giftCard.cardBadge} (${amount})`,
+        meta: finishLabel,
+        unitPrice: amount,
+        qty: 1,
+        image: "./images/cat-gift-packaging.jpg",
+      },
+    ]);
+    showToast(
+      lang === "fa"
+        ? "کارت هدیه دیجیتال به سبد خرید اضافه شد."
+        : "Digital gift card added to order bag."
+    );
+  };
+
   const handleUpdateQty = (key, nextQty) => {
     if (nextQty <= 0) {
       setBagItems((prev) => prev.filter((item) => item.key !== key));
@@ -217,6 +276,8 @@ export default function App() {
             onToggleWishlistOnly={() => setWishlistOnly((w) => !w)}
             onToggleWishlist={handleToggleWishlist}
             onAddToBag={handleAddProductToBag}
+            onAddBundle={handleAddBundle}
+            onAddGiftCard={handleAddGiftCard}
             onQuickView={handleOpenQuickView}
             onEnterServices={() => handleNavigate("services")}
           />
@@ -313,6 +374,18 @@ export default function App() {
         lang={lang}
         t={t}
       />
+
+      {/* Floating Back-to-Top Pill */}
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Scroll to top"
+          className="fixed bottom-20 end-5 z-30 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--accent-gold)]/45 bg-[var(--accent-deep)]/92 text-[#E7D19F] shadow-xl backdrop-blur-md transition hover:scale-105 cursor-pointer md:bottom-6"
+        >
+          <ArrowUp className="h-4 w-4" />
+        </button>
+      )}
 
       {/* Toast Feedback */}
       {toastMsg && (

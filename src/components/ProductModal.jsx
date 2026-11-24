@@ -8,8 +8,9 @@ import {
   Check,
   Share2,
   CheckCircle2,
+  Star,
 } from "lucide-react";
-import { formatPrice } from "../utils/pricing";
+import { formatPrice, formatNumber } from "../utils/pricing";
 
 export default function ProductModal({
   product,
@@ -25,11 +26,29 @@ export default function ProductModal({
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(initialVariantIdx);
   const [qty, setQty] = useState(1);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewNote, setReviewNote] = useState("");
+  const [sessionReviews, setSessionReviews] = useState([]);
 
   useEffect(() => {
     setSelectedVariantIdx(initialVariantIdx);
     setQty(1);
+    setReviewOpen(false);
   }, [product.id, initialVariantIdx]);
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    if (!reviewName.trim() || !reviewNote.trim()) return;
+    setSessionReviews((prev) => [
+      { id: Date.now(), name: reviewName.trim(), note: reviewNote.trim(), rating: reviewRating },
+      ...prev,
+    ]);
+    setReviewName("");
+    setReviewNote("");
+    setReviewOpen(false);
+  };
 
   const selectedVariant =
     localized.variants[selectedVariantIdx] || localized.variants[0];
@@ -124,6 +143,82 @@ export default function ProductModal({
             </div>
 
             <p className="text-xs text-[var(--ink-sub)]">{localized.origin}</p>
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span className="inline-flex items-center gap-1 font-semibold text-[var(--accent-gold)]">
+                <Star className="h-3.5 w-3.5 fill-current" />
+                <span>{formatNumber(product.rating || 4.9, lang)}</span>
+                <span className="text-[var(--ink-sub)] font-normal">
+                  ({formatNumber((product.reviewCount || 18) + sessionReviews.length, lang)}{" "}
+                  {lang === "fa" ? "دیدگاه" : "reviews"})
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setReviewOpen((o) => !o)}
+                className="text-[11px] font-semibold text-[var(--accent-pine)] underline underline-offset-4 cursor-pointer"
+              >
+                {lang === "fa" ? "ثبت دیدگاه سریع" : "Write a Review"}
+              </button>
+            </div>
+
+            {reviewOpen && (
+              <form
+                onSubmit={handleReviewSubmit}
+                className="space-y-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-soft)] p-3 text-xs"
+              >
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setReviewRating(n)}
+                      className={`cursor-pointer ${
+                        n <= reviewRating ? "text-[var(--accent-gold)]" : "text-[var(--border-strong)]"
+                      }`}
+                    >
+                      <Star className="h-3.5 w-3.5 fill-current" />
+                    </button>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={reviewName}
+                  onChange={(e) => setReviewName(e.target.value)}
+                  placeholder={lang === "fa" ? "نام شما" : "Your name"}
+                  className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs text-[var(--ink-main)] outline-none"
+                />
+                <input
+                  type="text"
+                  required
+                  value={reviewNote}
+                  onChange={(e) => setReviewNote(e.target.value)}
+                  placeholder={lang === "fa" ? "نظر کوتاه درباره این محصول..." : "Short note about this item..."}
+                  className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs text-[var(--ink-main)] outline-none"
+                />
+                <button
+                  type="submit"
+                  className="rounded-full bg-[var(--accent-pine)] px-3.5 py-1 text-[11px] font-bold text-white cursor-pointer"
+                >
+                  {lang === "fa" ? "ارسال دیدگاه" : "Post Review"}
+                </button>
+              </form>
+            )}
+
+            {sessionReviews.length > 0 && (
+              <div className="space-y-1.5 max-h-24 overflow-y-auto">
+                {sessionReviews.map((rev) => (
+                  <div
+                    key={rev.id}
+                    className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-soft)] px-3 py-1.5 text-[11px]"
+                  >
+                    <span className="font-bold text-[var(--ink-main)]">{rev.name}: </span>
+                    <span className="text-[var(--ink-body)]">{rev.note}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <p className="text-sm leading-relaxed text-[var(--ink-body)]">
               {localized.description}
             </p>
@@ -170,7 +265,7 @@ export default function ProductModal({
                 <button
                   type="button"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="p-1 text-[#14201A] hover:text-[#1B4636] cursor-pointer"
+                  className="p-1 text-[var(--ink-main)] hover:text-[var(--accent-gold)] cursor-pointer"
                 >
                   <Minus className="h-3.5 w-3.5" />
                 </button>
@@ -180,7 +275,7 @@ export default function ProductModal({
                 <button
                   type="button"
                   onClick={() => setQty((q) => q + 1)}
-                  className="p-1 text-[#14201A] hover:text-[#1B4636] cursor-pointer"
+                  className="p-1 text-[var(--ink-main)] hover:text-[var(--accent-gold)] cursor-pointer"
                 >
                   <Plus className="h-3.5 w-3.5" />
                 </button>
@@ -191,7 +286,7 @@ export default function ProductModal({
               <button
                 type="button"
                 onClick={handleAdd}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#14201A] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1B4636] cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--accent-deep)] border border-[var(--accent-gold)]/35 px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent-pine)] cursor-pointer"
               >
                 <ShoppingBag className="h-4 w-4 text-[#E7D19F]" />
                 <span>{t.addToBag}</span>
@@ -202,7 +297,7 @@ export default function ProductModal({
                 className={`inline-flex h-11 w-11 items-center justify-center rounded-full border transition cursor-pointer ${
                   isWishlisted
                     ? "border-[#BF3927] bg-[#BF3927]/10 text-[#BF3927]"
-                    : "border-[#D8CFBE] bg-white text-[#14201A] hover:border-[#BF3927]"
+                    : "border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:border-[#BF3927]"
                 }`}
               >
                 <Heart

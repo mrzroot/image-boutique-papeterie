@@ -16,7 +16,7 @@ import {
   History,
 } from "lucide-react";
 import { formatPrice, formatNumber } from "../utils/pricing";
-import { PRODUCTS } from "../data/catalog";
+import { PRODUCTS, BUNDLES } from "../data/catalog";
 
 function resolveBagDisplay(item, lang, t) {
   if (item.kind === "product" && item.productId) {
@@ -26,6 +26,25 @@ function resolveBagDisplay(item, lang, t) {
       const variant = loc.variants[item.variantIdx || 0] || loc.variants[0];
       return { title: loc.title, meta: `${prod.sku} · ${variant}` };
     }
+  }
+  if (item.kind === "bundle" && item.bundleId) {
+    const bundle = BUNDLES.find((b) => b.id === item.bundleId);
+    if (bundle) {
+      const loc = bundle[lang];
+      return { title: loc.title, meta: `${bundle.sku} · ${loc.items}` };
+    }
+  }
+  if (item.kind === "giftcard" && item.spec) {
+    const finishLabel = t.giftCard.designs[item.spec.design] || item.spec.design;
+    const parts = [
+      finishLabel,
+      item.spec.recipient ? item.spec.recipient : null,
+      item.spec.message ? `«${item.spec.message}»` : null,
+    ].filter(Boolean);
+    return {
+      title: `${t.giftCard.cardBadge} (${formatPrice(item.unitPrice, lang)})`,
+      meta: parts.join(" · "),
+    };
   }
   if (item.kind === "service" && item.spec) {
     const s = item.spec;
@@ -446,6 +465,10 @@ export default function OrderBagDrawer({
                               >
                                 {item.kind === "service"
                                   ? t.bagDrawer.printSpecTag
+                                  : item.kind === "bundle"
+                                  ? t.bagDrawer.bundleTag
+                                  : item.kind === "giftcard"
+                                  ? t.bagDrawer.giftCardTag
                                   : t.bagDrawer.productTag}
                               </span>
                               <button
@@ -465,10 +488,10 @@ export default function OrderBagDrawer({
                           </div>
 
                           <div className="mt-2 flex items-center justify-between">
-                            <span className="text-xs font-bold text-[#1B4636]">
+                            <span className="text-xs font-bold text-[var(--accent-pine)]">
                               {formatPrice(item.unitPrice * item.qty, lang)}
                             </span>
-                            {item.kind === "product" && (
+                            {item.kind !== "service" && (
                               <div className="inline-flex items-center rounded-full border border-[var(--border-subtle)] bg-[var(--bg-page)] px-1.5 py-0.5">
                                 <button
                                   type="button"
