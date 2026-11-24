@@ -106,7 +106,7 @@ export default function ProductModal({
 
         <div className="flex flex-col justify-between p-6 sm:p-8">
           <div className="space-y-4">
-            <div className="flex items-center justify-between gap-2 text-[11px] uppercase tracking-widest text-[#58655C] font-latin-ui">
+            <div className="flex items-center justify-between gap-2 pe-20 text-[11px] uppercase tracking-widest text-[#58655C] font-latin-ui">
               <span>{product.sku}</span>
               <span className="inline-flex items-center gap-1 rounded-full bg-[#1B4636]/10 px-2.5 py-0.5 text-[10px] font-semibold text-[#1B4636]">
                 <CheckCircle2 className="h-3 w-3" />
