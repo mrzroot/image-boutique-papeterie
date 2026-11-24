@@ -13,28 +13,31 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
   };
 
   return (
-    <footer className="border-t border-[#E5DEC9]">
-      {/* Newsletter Strip (Margaux-inspired light botanical tint) */}
-      <section className="bg-[#EEF2EE] px-4 py-10 sm:px-6">
+    <footer className="border-t border-[var(--border-subtle)]">
+      {/* Newsletter Strip */}
+      <section
+        className="px-4 py-10 sm:px-6 transition-colors"
+        style={{ backgroundColor: "var(--bg-newsletter)" }}
+      >
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 text-center md:flex-row md:text-start">
           <div className="max-w-lg space-y-1.5">
-            <h3 className="text-xl font-bold text-[#16221C]">
+            <h3 className="text-xl font-bold text-[var(--ink-main)]">
               {t.newsletterTitle}
             </h3>
-            <p className="text-xs sm:text-sm text-[#4C5850]">
+            <p className="text-xs sm:text-sm text-[var(--ink-sub)]">
               {t.newsletterDesc}
             </p>
           </div>
 
           {subscribed ? (
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#1F4E3D] px-5 py-3 text-xs font-semibold text-white">
+            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-pine)] px-5 py-3 text-xs font-semibold text-white">
               <CheckCircle2 className="h-4 w-4 text-[#9BD4B8]" />
               <span>{t.newsletterSuccess}</span>
             </div>
           ) : (
             <form
               onSubmit={handleSubscribe}
-              className="flex w-full max-w-md items-center gap-2 rounded-full border border-[#CFD9D2] bg-white p-1.5 shadow-2xs"
+              className="flex w-full max-w-md items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--bg-surface)] p-1.5 shadow-2xs"
             >
               <input
                 type="email"
@@ -42,11 +45,11 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t.newsletterPlaceholder}
-                className="flex-1 bg-transparent px-4 py-2 text-xs sm:text-sm text-[#16221C] outline-none placeholder:text-[#8E968F]"
+                className="flex-1 bg-transparent px-4 py-2 text-xs sm:text-sm text-[var(--ink-main)] outline-none placeholder:text-[var(--ink-sub)]"
               />
               <button
                 type="submit"
-                className="rounded-full bg-[#1F4E3D] px-5 py-2.5 text-xs font-bold text-white transition hover:bg-[#15372B] cursor-pointer"
+                className="rounded-full bg-[var(--accent-pine)] px-5 py-2.5 text-xs font-bold text-white transition hover:opacity-90 cursor-pointer"
               >
                 {t.newsletterBtn}
               </button>
@@ -55,15 +58,18 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
         </div>
       </section>
 
-      {/* Main Deep Botanical Pine Footer */}
-      <div className="bg-[#15372B] text-[#E6ECE8]">
+      {/* Main Botanical / Obsidian Footer */}
+      <div
+        className="text-[#E6ECE8] border-t border-[var(--accent-gold)]/20"
+        style={{ backgroundColor: "var(--footer-bg)" }}
+      >
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-12">
           <div className="space-y-4 md:col-span-5">
             <div>
               <p className="font-latin-ui text-lg font-bold tracking-[0.22em] text-white">
                 {t.brandEn}
               </p>
-              <p className="font-editorial italic text-sm text-[#A9D1BC]">
+              <p className="font-editorial italic text-sm text-[#D6B36A]">
                 La Boutique Papeterie
               </p>
             </div>
@@ -73,7 +79,7 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
           </div>
 
           <div className="space-y-3 md:col-span-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#A9D1BC]">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#D6B36A]">
               {t.footerCols.boutique}
             </h4>
             <ul className="space-y-2 text-xs text-[#DFEAE3]">
@@ -97,7 +103,7 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
           </div>
 
           <div className="space-y-3 md:col-span-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#A9D1BC]">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#D6B36A]">
               {t.footerCols.services}
             </h4>
             <ul className="space-y-2 text-xs text-[#DFEAE3]">
@@ -124,7 +130,7 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
           </div>
 
           <div className="space-y-3 md:col-span-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#A9D1BC]">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#D6B36A]">
               {t.footerCols.contact}
             </h4>
             <div className="space-y-2.5 text-xs text-[#DFEAE3]">
@@ -133,7 +139,7 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
                 className="flex items-center gap-2 hover:text-white font-latin-ui"
                 dir="ltr"
               >
-                <Phone className="h-3.5 w-3.5 text-[#A9D1BC]" />
+                <Phone className="h-3.5 w-3.5 text-[#D6B36A]" />
                 <span>0935 383 4393</span>
               </a>
               <a
@@ -141,7 +147,7 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
                 className="flex items-center gap-2 hover:text-white font-latin-ui"
                 dir="ltr"
               >
-                <Mail className="h-3.5 w-3.5 text-[#A9D1BC]" />
+                <Mail className="h-3.5 w-3.5 text-[#D6B36A]" />
                 <span>atelier@imageboutique.ir</span>
               </a>
               <p className="text-[11px] text-[#A8BCB0] pt-1">
@@ -160,7 +166,7 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
               Papeterie
             </span>
             <span className="font-latin-ui">
-              FA / EN Bilingual Boutique & Print Atelier
+              FA / EN · Light & Obsidian Editions
             </span>
           </div>
         </div>

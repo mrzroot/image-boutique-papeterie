@@ -19,6 +19,7 @@ function readStorage(key, fallback) {
 
 export default function App() {
   const [lang, setLang] = useState(() => readStorage("ib_lang", "fa"));
+  const [theme, setTheme] = useState(() => readStorage("ib_theme", "light"));
   const [view, setView] = useState(() =>
     window.location.hash === "#/services" ? "services" : "store"
   );
@@ -37,7 +38,7 @@ export default function App() {
 
   const t = TRANSLATIONS[lang];
 
-  // Sync HTML dir, lang, and title on bilingual toggle
+  // Sync HTML dir, lang, theme, and title
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === "fa" ? "rtl" : "ltr";
@@ -48,9 +49,18 @@ export default function App() {
     try {
       localStorage.setItem("ib_lang", JSON.stringify(lang));
     } catch {
-      // Ignore storage quota errors in restricted browsing modes
+      // Ignore storage quota errors
     }
   }, [lang]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem("ib_theme", JSON.stringify(theme));
+    } catch {
+      // Ignore storage errors
+    }
+  }, [theme]);
 
   useEffect(() => {
     try {
@@ -81,7 +91,6 @@ export default function App() {
     setActiveVariantIdx(variantIdx);
   };
 
-  // Keep hash navigation synchronized with browser Back/Forward
   useEffect(() => {
     const handleHashChange = () => {
       setView(window.location.hash === "#/services" ? "services" : "store");
@@ -173,10 +182,14 @@ export default function App() {
   const totalBagCount = bagItems.reduce((acc, item) => acc + item.qty, 0);
 
   return (
-    <div className="min-h-screen overflow-x-clip flex flex-col bg-[#FAF6EE] text-[#14201A] pb-20 md:pb-0">
+    <div className="min-h-screen overflow-x-clip flex flex-col bg-[var(--bg-page)] text-[var(--ink-main)] pb-20 md:pb-0">
       <Header
         t={t}
         lang={lang}
+        theme={theme}
+        onToggleTheme={() =>
+          setTheme((prev) => (prev === "light" ? "dark" : "light"))
+        }
         onToggleLang={() => setLang((prev) => (prev === "fa" ? "en" : "fa"))}
         view={view}
         onNavigate={handleNavigate}
@@ -225,7 +238,7 @@ export default function App() {
       />
 
       {/* Floating Glassmorphic Mobile Navigation Dock (< 768px phones only) */}
-      <div className="fixed bottom-3 inset-x-3 z-40 grid grid-cols-4 rounded-full border border-[#E7D19F]/30 bg-[#123126]/92 py-1 text-[#FAF6EE] shadow-2xl backdrop-blur-xl md:hidden">
+      <div className="fixed bottom-3 inset-x-3 z-40 grid grid-cols-4 rounded-full border border-[var(--accent-gold)]/35 bg-[#123126]/92 py-1 text-[#FAF6EE] shadow-2xl backdrop-blur-xl md:hidden">
         <button
           type="button"
           onClick={() => handleNavigate("store")}
@@ -303,7 +316,7 @@ export default function App() {
 
       {/* Toast Feedback */}
       {toastMsg && (
-        <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#16221C] px-5 py-2.5 text-xs font-semibold text-white shadow-xl border border-white/15 lg:bottom-6">
+        <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#14201A] px-5 py-2.5 text-xs font-semibold text-white shadow-xl border border-[#C8A258]/40 md:bottom-6">
           {toastMsg}
         </div>
       )}

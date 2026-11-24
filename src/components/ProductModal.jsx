@@ -59,7 +59,7 @@ export default function ProductModal({
       onClick={onClose}
     >
       <div
-        className="animate-modal-in relative grid w-full max-w-3xl overflow-hidden rounded-[28px] border border-[#DFD7C5] bg-[#FAF6EE] shadow-2xl md:grid-cols-2"
+        className="animate-modal-in relative grid w-full max-w-3xl overflow-hidden rounded-[28px] border border-[var(--border-subtle)] bg-[var(--bg-page)] shadow-2xl md:grid-cols-2"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="absolute top-4 end-4 z-10 flex items-center gap-2">
@@ -85,7 +85,7 @@ export default function ProductModal({
           </button>
         </div>
 
-        <div className="relative bg-[#EFE8DA] p-6 flex items-center justify-center">
+        <div className="relative bg-[var(--bg-soft)] p-6 flex items-center justify-center">
           <div className="relative w-full overflow-hidden rounded-2xl shadow-md">
             <img
               src={product.image}
@@ -106,33 +106,33 @@ export default function ProductModal({
 
         <div className="flex flex-col justify-between p-6 sm:p-8">
           <div className="space-y-4">
-            <div className="flex items-center justify-between gap-2 pe-20 text-[11px] uppercase tracking-widest text-[#58655C] font-latin-ui">
+            <div className="flex items-center justify-between gap-2 pe-20 text-[11px] uppercase tracking-widest text-[var(--ink-sub)] font-latin-ui">
               <span>{product.sku}</span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#1B4636]/10 px-2.5 py-0.5 text-[10px] font-semibold text-[#1B4636]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--accent-pine)]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[var(--accent-pine)]">
                 <CheckCircle2 className="h-3 w-3" />
                 <span>{lang === "fa" ? "موجود · ارسال فوری" : "In Stock"}</span>
               </span>
             </div>
 
             <div>
-              <h3 className="text-xl sm:text-2xl font-bold text-[#14201A] leading-snug">
+              <h3 className="text-xl sm:text-2xl font-bold text-[var(--ink-main)] leading-snug">
                 {localized.title}
               </h3>
-              <p className="mt-1 text-sm text-[#1B4636] font-medium">
+              <p className="mt-1 text-sm text-[var(--accent-pine)] font-medium">
                 {localized.subtitle}
               </p>
             </div>
 
-            <p className="text-xs text-[#58655C]">{localized.origin}</p>
-            <p className="text-sm leading-relaxed text-[#2D3832]">
+            <p className="text-xs text-[var(--ink-sub)]">{localized.origin}</p>
+            <p className="text-sm leading-relaxed text-[var(--ink-body)]">
               {localized.description}
             </p>
 
             {/* Variant Picker */}
             <div className="pt-2">
-              <p className="mb-2 text-xs font-semibold text-[#58655C]">
+              <p className="mb-2 text-xs font-semibold text-[var(--ink-sub)]">
                 {t.modal.selectVariant}:{" "}
-                <span className="text-[#14201A] font-bold">{selectedVariant}</span>
+                <span className="text-[var(--ink-main)] font-bold">{selectedVariant}</span>
               </p>
               <div className="flex flex-wrap gap-2">
                 {localized.variants.map((variant, idx) => (
@@ -142,8 +142,8 @@ export default function ProductModal({
                     onClick={() => setSelectedVariantIdx(idx)}
                     className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition cursor-pointer ${
                       selectedVariantIdx === idx
-                        ? "border-[#1B4636] bg-[#1B4636] text-white shadow-xs"
-                        : "border-[#D8CFBE] bg-white text-[#2A3730] hover:border-[#1B4636]"
+                        ? "border-[var(--accent-pine)] bg-[var(--accent-pine)] text-white shadow-xs"
+                        : "border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
                     }`}
                   >
                     {product.swatches[idx] && (
@@ -160,13 +160,13 @@ export default function ProductModal({
             </div>
           </div>
 
-          <div className="mt-6 border-t border-[#E5DEC9] pt-5 space-y-4">
+          <div className="mt-6 border-t border-[var(--border-subtle)] pt-5 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xl font-bold text-[#1B4636]">
+              <span className="text-xl font-bold text-[var(--accent-pine)]">
                 {formatPrice(product.price * qty, lang)}
               </span>
 
-              <div className="inline-flex items-center rounded-full border border-[#D8CFBE] bg-white px-2 py-1">
+              <div className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[var(--bg-surface)] px-2 py-1 text-[var(--ink-main)]">
                 <button
                   type="button"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}

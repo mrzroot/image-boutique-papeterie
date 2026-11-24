@@ -151,35 +151,35 @@ export default function OrderBagDrawer({
       onClick={resetAndClose}
     >
       <aside
-        className="animate-drawer-in flex h-full w-full max-w-md flex-col bg-[#FAF6EE] shadow-2xl border-s border-[#DFD6C3]"
+        className="animate-drawer-in flex h-full w-full max-w-md flex-col bg-[var(--bg-page)] text-[var(--ink-main)] shadow-2xl border-s border-[var(--border-subtle)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header + Bag / History Tabs */}
-        <div className="border-b border-[#E2D9C6] px-5 py-4 space-y-3">
+        <div className="border-b border-[var(--border-subtle)] px-5 py-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <ShoppingBag className="h-5 w-5 text-[#1B4636]" />
-              <h2 className="text-base font-bold text-[#14201A]">
+              <ShoppingBag className="h-5 w-5 text-[var(--accent-pine)]" />
+              <h2 className="text-base font-bold text-[var(--ink-main)]">
                 {t.bagDrawer.title}
               </h2>
             </div>
             <button
               type="button"
               onClick={resetAndClose}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#DFD6C3] text-[#14201A] hover:bg-[#EFE8DA] cursor-pointer"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-subtle)] text-[var(--ink-main)] hover:bg-[var(--bg-soft)] cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-1.5 rounded-full bg-[#EFE8DA] p-1 text-xs font-bold">
+          <div className="grid grid-cols-2 gap-1.5 rounded-full bg-[var(--bg-soft)] p-1 text-xs font-bold">
             <button
               type="button"
               onClick={() => setTab("bag")}
               className={`rounded-full py-1.5 transition cursor-pointer ${
                 tab === "bag"
-                  ? "bg-[#14201A] text-white shadow-2xs"
-                  : "text-[#58655C] hover:text-[#14201A]"
+                  ? "bg-[var(--accent-deep)] text-white shadow-2xs border border-[var(--accent-gold)]/30"
+                  : "text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
               }`}
             >
               {t.bagDrawer.bagTab} ({formatNumber(items.reduce((a, b) => a + b.qty, 0), lang)})
@@ -189,8 +189,8 @@ export default function OrderBagDrawer({
               onClick={() => setTab("history")}
               className={`inline-flex items-center justify-center gap-1.5 rounded-full py-1.5 transition cursor-pointer ${
                 tab === "history"
-                  ? "bg-[#14201A] text-white shadow-2xs"
-                  : "text-[#58655C] hover:text-[#14201A]"
+                  ? "bg-[var(--accent-deep)] text-white shadow-2xs border border-[var(--accent-gold)]/30"
+                  : "text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
               }`}
             >
               <History className="h-3.5 w-3.5" />
@@ -204,7 +204,7 @@ export default function OrderBagDrawer({
         {tab === "history" ? (
           <div className="flex-1 overflow-y-auto p-5 space-y-3">
             {!orderHistory?.length ? (
-              <div className="flex h-full flex-col items-center justify-center text-center text-sm text-[#58655C] py-12 space-y-2">
+              <div className="flex h-full flex-col items-center justify-center text-center text-sm text-[var(--ink-sub)] py-12 space-y-2">
                 <History className="h-8 w-8 text-[#B89352]" />
                 <p>{t.bagDrawer.noHistory}</p>
               </div>
@@ -212,7 +212,7 @@ export default function OrderBagDrawer({
               orderHistory.map((ord) => (
                 <div
                   key={ord.refId}
-                  className="rounded-2xl border border-[#E2D9C6] bg-white p-4 space-y-2 shadow-2xs"
+                  className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 space-y-2 shadow-2xs"
                 >
                   <div className="flex items-center justify-between">
                     <span
@@ -221,11 +221,11 @@ export default function OrderBagDrawer({
                     >
                       {ord.refId}
                     </span>
-                    <span className="text-[11px] text-[#58655C]">
+                    <span className="text-[11px] text-[var(--ink-sub)]">
                       {ord.createdAt}
                     </span>
                   </div>
-                  <p className="text-xs font-semibold text-[#14201A]">
+                  <p className="text-xs font-semibold text-[var(--ink-main)]">
                     {ord.customerName} · {formatNumber(ord.itemCount, lang)}{" "}
                     {lang === "fa" ? "قلم" : "items"}
                   </p>
@@ -245,7 +245,7 @@ export default function OrderBagDrawer({
           <>
             {/* Complimentary Shipping Progress Bar */}
             {items.length > 0 && !confirmedRef && (
-              <div className="border-b border-[#E2D9C6] bg-[#F1EBE0] px-5 py-3 space-y-2">
+              <div className="border-b border-[var(--border-subtle)] bg-[var(--bg-soft)] px-5 py-3 space-y-2">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#1B4636]">
                   <Truck className="h-3.5 w-3.5 shrink-0" />
                   <span>
@@ -266,19 +266,19 @@ export default function OrderBagDrawer({
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-5">
               {confirmedRef ? (
-                <div className="rounded-3xl border border-[#1B4636]/25 bg-white p-6 text-center space-y-4 shadow-sm animate-modal-in">
+                <div className="rounded-3xl border border-[#1B4636]/25 bg-[var(--bg-surface)] p-6 text-center space-y-4 shadow-sm animate-modal-in">
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1B4636]/10 text-[#1B4636]">
                     <CheckCircle2 className="h-8 w-8" />
                   </div>
-                  <h3 className="text-lg font-bold text-[#14201A]">
+                  <h3 className="text-lg font-bold text-[var(--ink-main)]">
                     {t.bagDrawer.orderConfirmedTitle}
                   </h3>
-                  <p className="text-sm text-[#58655C] leading-relaxed">
+                  <p className="text-sm text-[var(--ink-sub)] leading-relaxed">
                     {t.bagDrawer.orderConfirmedDesc}
                   </p>
-                  <div className="flex items-center justify-between rounded-2xl bg-[#F1EBE0] px-4 py-3">
+                  <div className="flex items-center justify-between rounded-2xl bg-[var(--bg-soft)] px-4 py-3">
                     <div className="text-start">
-                      <p className="text-[11px] text-[#58655C]">
+                      <p className="text-[11px] text-[var(--ink-sub)]">
                         {t.bagDrawer.trackingCode}
                       </p>
                       <p
@@ -291,7 +291,7 @@ export default function OrderBagDrawer({
                     <button
                       type="button"
                       onClick={copyTrackingId}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white border border-[#DFD6C3] text-[#14201A] hover:border-[#1B4636] cursor-pointer"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-surface)] border border-[var(--border-strong)] text-[var(--ink-main)] hover:border-[#1B4636] cursor-pointer"
                       aria-label="Copy"
                     >
                       {copiedRef ? (
@@ -314,7 +314,7 @@ export default function OrderBagDrawer({
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#EFE8DA] text-[#1B4636]">
                     <ShoppingBag className="h-7 w-7" />
                   </div>
-                  <p className="text-sm text-[#58655C]">{t.bagDrawer.empty}</p>
+                  <p className="text-sm text-[var(--ink-sub)]">{t.bagDrawer.empty}</p>
                   <div className="flex flex-col gap-2.5 w-full max-w-xs">
                     <button
                       type="button"
@@ -343,7 +343,7 @@ export default function OrderBagDrawer({
               ) : checkoutMode ? (
                 <form onSubmit={handleConfirm} className="space-y-4">
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-[#2A3730]">
+                    <label className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]">
                       {t.bagDrawer.nameLabel}
                     </label>
                     <input
@@ -351,12 +351,12 @@ export default function OrderBagDrawer({
                       required
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
-                      className="w-full rounded-xl border border-[#D4C9B4] bg-white px-3.5 py-2.5 text-sm outline-none focus:border-[#1B4636]"
+                      className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm outline-none focus:border-[#1B4636]"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-[#2A3730]">
+                    <label className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]">
                       {t.bagDrawer.phoneLabel}
                     </label>
                     <input
@@ -366,12 +366,12 @@ export default function OrderBagDrawer({
                       placeholder="09353834393"
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      className="w-full rounded-xl border border-[#D4C9B4] bg-white px-3.5 py-2.5 text-sm outline-none focus:border-[#1B4636] font-latin-ui"
+                      className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm outline-none focus:border-[#1B4636] font-latin-ui"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-[#2A3730]">
+                    <label className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]">
                       {t.bagDrawer.deliveryLabel}
                     </label>
                     <div className="space-y-2">
@@ -383,7 +383,7 @@ export default function OrderBagDrawer({
                           className={`w-full rounded-xl border px-3.5 py-2.5 text-start text-xs font-medium transition cursor-pointer ${
                             deliveryMethod === idx
                               ? "border-[#1B4636] bg-[#1B4636]/10 text-[#1B4636]"
-                              : "border-[#D4C9B4] bg-white text-[#2A3730]"
+                              : "border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)]"
                           }`}
                         >
                           {opt}
@@ -393,14 +393,14 @@ export default function OrderBagDrawer({
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-[#2A3730]">
+                    <label className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]">
                       {t.bagDrawer.notesLabel}
                     </label>
                     <textarea
                       rows={2}
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      className="w-full rounded-xl border border-[#D4C9B4] bg-white px-3.5 py-2 text-sm outline-none focus:border-[#1B4636]"
+                      className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2 text-sm outline-none focus:border-[#1B4636]"
                     />
                   </div>
 
@@ -408,7 +408,7 @@ export default function OrderBagDrawer({
                     <button
                       type="button"
                       onClick={() => setCheckoutMode(false)}
-                      className="rounded-full border border-[#D4C9B4] px-4 py-3 text-xs font-semibold text-[#2A3730] cursor-pointer"
+                      className="rounded-full border border-[var(--border-strong)] px-4 py-3 text-xs font-semibold text-[var(--ink-main)] cursor-pointer"
                     >
                       {lang === "fa" ? "بازگشت" : "Back"}
                     </button>
@@ -427,7 +427,7 @@ export default function OrderBagDrawer({
                     return (
                       <div
                         key={item.key}
-                        className="flex gap-3 rounded-2xl border border-[#E2D9C6] bg-white p-3 shadow-2xs"
+                        className="flex gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 shadow-2xs"
                       >
                         <img
                           src={item.image}
@@ -456,10 +456,10 @@ export default function OrderBagDrawer({
                                 <Trash2 className="h-3.5 w-3.5" />
                               </button>
                             </div>
-                            <h4 className="mt-1 truncate text-sm font-bold text-[#14201A]">
+                            <h4 className="mt-1 truncate text-sm font-bold text-[var(--ink-main)]">
                               {display.title}
                             </h4>
-                            <p className="text-xs text-[#58655C] line-clamp-2">
+                            <p className="text-xs text-[var(--ink-sub)] line-clamp-2">
                               {display.meta}
                             </p>
                           </div>
@@ -469,7 +469,7 @@ export default function OrderBagDrawer({
                               {formatPrice(item.unitPrice * item.qty, lang)}
                             </span>
                             {item.kind === "product" && (
-                              <div className="inline-flex items-center rounded-full border border-[#E2D9C6] bg-[#FAF6EE] px-1.5 py-0.5">
+                              <div className="inline-flex items-center rounded-full border border-[var(--border-subtle)] bg-[var(--bg-page)] px-1.5 py-0.5">
                                 <button
                                   type="button"
                                   onClick={() =>
@@ -506,7 +506,7 @@ export default function OrderBagDrawer({
                     className={`flex w-full items-center justify-between gap-3 rounded-2xl border p-3.5 text-start transition cursor-pointer ${
                       giftWrap
                         ? "border-[#B89352] bg-[#F3ECE0]"
-                        : "border-[#E2D9C6] bg-white hover:border-[#B89352]"
+                        : "border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[#B89352]"
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -514,13 +514,13 @@ export default function OrderBagDrawer({
                         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
                           giftWrap
                             ? "bg-[#1B4636] text-[#E7D19F]"
-                            : "bg-[#F1EBE0] text-[#1B4636]"
+                            : "bg-[var(--bg-soft)] text-[#1B4636]"
                         }`}
                       >
                         <Gift className="h-4 w-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-bold text-[#14201A]">
+                        <p className="text-xs font-bold text-[var(--ink-main)]">
                           {t.bagDrawer.giftWrapTitle}
                         </p>
                         <p className="text-[11px] font-semibold text-[#1B4636]">
@@ -541,14 +541,14 @@ export default function OrderBagDrawer({
 
                   {/* Live Promo Code Form */}
                   <form onSubmit={handlePromoApply} className="space-y-1.5">
-                    <div className="flex items-center gap-2 rounded-2xl border border-[#DFD6C3] bg-white px-3 py-1.5">
+                    <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3 py-1.5">
                       <Tag className="h-3.5 w-3.5 text-[#B89352]" />
                       <input
                         type="text"
                         value={promoInput}
                         onChange={(e) => setPromoInput(e.target.value)}
                         placeholder={t.bagDrawer.promoPlaceholder}
-                        className="flex-1 bg-transparent text-xs text-[#14201A] outline-none placeholder:text-[#8E968F]"
+                        className="flex-1 bg-transparent text-xs text-[var(--ink-main)] outline-none placeholder:text-[#8E968F]"
                       />
                       <button
                         type="submit"
@@ -574,8 +574,8 @@ export default function OrderBagDrawer({
 
             {/* Footer */}
             {items.length > 0 && !checkoutMode && !confirmedRef && (
-              <div className="border-t border-[#E2D9C6] bg-white p-5 space-y-2.5">
-                <div className="flex items-center justify-between text-xs text-[#58655C]">
+              <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 space-y-2.5">
+                <div className="flex items-center justify-between text-xs text-[var(--ink-sub)]">
                   <span>{t.bagDrawer.shippingLabel}</span>
                   <span className="font-semibold text-[#1B4636]">
                     {shippingCost === 0
@@ -584,8 +584,8 @@ export default function OrderBagDrawer({
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-[#58655C]">{t.bagDrawer.subtotal}</span>
-                  <span className="text-lg font-bold text-[#14201A]">
+                  <span className="text-[var(--ink-sub)]">{t.bagDrawer.subtotal}</span>
+                  <span className="text-lg font-bold text-[var(--ink-main)]">
                     {formatPrice(grandTotal, lang)}
                   </span>
                 </div>

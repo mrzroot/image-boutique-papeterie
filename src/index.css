@@ -1,19 +1,57 @@
 @import "tailwindcss";
 
 :root {
-  --bg-ivory: #faf6ee;
-  --bg-sand: #f1ebe0;
-  --bg-card: #f6f1e7;
-  --ink-dark: #14201a;
-  --ink-muted: #58655c;
-  --pine: #1b4636;
-  --pine-deep: #123126;
-  --vermilion: #bf3927;
-  --brass: #b89352;
+  --bg-page: #faf6ee;
+  --bg-surface: #ffffff;
+  --bg-soft: #f1ebe0;
+  --bg-muted: #efe8da;
+  --bg-newsletter: #eef2ee;
+  --ink-main: #14201a;
+  --ink-sub: #58655c;
+  --ink-body: #3c4740;
+  --border-subtle: #e2d9c6;
+  --border-strong: #d4c9b4;
+  --accent-pine: #1b4636;
+  --accent-deep: #123126;
+  --accent-gold: #b89352;
+  --accent-gold-bright: #e7d19f;
+  --accent-crimson: #bf3927;
+  --header-bg: rgba(250, 246, 238, 0.92);
+  --topbar-bg: #123126;
+  --strip-bg: #1b4636;
+  --footer-bg: #123126;
+}
+
+[data-theme="dark"] {
+  --bg-page: #0b0c0c;
+  --bg-surface: #151716;
+  --bg-soft: #1b1e1d;
+  --bg-muted: #222624;
+  --bg-newsletter: #111312;
+  --ink-main: #f4efe6;
+  --ink-sub: #a6aca8;
+  --ink-body: #cfd4d0;
+  --border-subtle: #282c2a;
+  --border-strong: #393f3c;
+  --accent-pine: #2a6b53;
+  --accent-deep: #070808;
+  --accent-gold: #d6b36a;
+  --accent-gold-bright: #f0d79d;
+  --accent-crimson: #d84b38;
+  --header-bg: rgba(11, 12, 12, 0.92);
+  --topbar-bg: #050606;
+  --strip-bg: #141716;
+  --footer-bg: #060707;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--ink-main);
+  transition: background-color 0.35s ease, color 0.35s ease;
 }
 
 [dir="rtl"] body {
@@ -32,13 +70,13 @@ html {
   font-family: "Inter", system-ui, sans-serif;
 }
 
-/* Tactile fine cotton paper micro-texture */
+/* Tactile fine cotton paper micro-texture (adapts to Light & Obsidian Black) */
 .paper-grain {
   position: relative;
-  background-color: #faf6ee;
+  background-color: var(--bg-page);
   background-image:
-    radial-gradient(rgba(27, 70, 54, 0.035) 1px, transparent 0),
-    radial-gradient(rgba(184, 147, 82, 0.04) 1px, transparent 0);
+    radial-gradient(rgba(184, 147, 82, 0.045) 1px, transparent 0),
+    radial-gradient(rgba(42, 107, 83, 0.035) 1px, transparent 0);
   background-size: 24px 24px, 36px 36px;
   background-position: 0 0, 12px 12px;
 }
@@ -46,8 +84,8 @@ html {
 /* Editorial Luxury Shadows */
 .shadow-atelier {
   box-shadow:
-    0 24px 60px -18px rgba(18, 49, 38, 0.14),
-    0 4px 16px -4px rgba(18, 49, 38, 0.05);
+    0 24px 60px -18px rgba(0, 0, 0, 0.16),
+    0 4px 16px -4px rgba(0, 0, 0, 0.06);
 }
 
 /* Metallic Brass Foil Typography Gradient */
@@ -259,12 +297,12 @@ html {
   height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1ebe0;
+  background: var(--bg-soft);
 }
 ::-webkit-scrollbar-thumb {
-  background: #c3b7a3;
+  background: var(--border-strong);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #1b4636;
+  background: var(--accent-pine);
 }

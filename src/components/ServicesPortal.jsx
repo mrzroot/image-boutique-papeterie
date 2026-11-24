@@ -189,17 +189,17 @@ export default function ServicesPortal({
   return (
     <main className="paper-grain animate-page-in">
       {/* Top Return Breadcrumb Strip */}
-      <div className="border-b border-[#E2D9C6] bg-[#F1EBE0]">
+      <div className="border-b border-[var(--border-subtle)] bg-[var(--bg-soft)]">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <button
             type="button"
             onClick={onBackToStore}
-            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-[#1B4636] border border-[#DFD6C3] shadow-2xs transition hover:bg-[#1B4636] hover:text-white cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--bg-surface)] px-4 py-1.5 text-xs font-bold text-[var(--accent-pine)] border border-[var(--border-strong)] shadow-2xs transition hover:bg-[var(--accent-pine)] hover:text-white cursor-pointer"
           >
             <BackArrow className="h-3.5 w-3.5" />
             <span>{t.backToStorefront}</span>
           </button>
-          <span className="font-latin-ui text-[11px] font-semibold tracking-wider text-[#58655C]">
+          <span className="font-latin-ui text-[11px] font-semibold tracking-wider text-[var(--ink-sub)]">
             IMAGE BOUTIQUE · PRINT & BINDERY PORTAL
           </span>
         </div>
@@ -235,9 +235,9 @@ export default function ServicesPortal({
           {t.trustBar.map((item, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-3 rounded-2xl border border-[#E2D9C6] bg-white px-4 py-3.5 shadow-2xs"
+              className="flex items-center gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-3.5 shadow-2xs"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F1EBE0] text-[#1B4636]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--bg-soft)] text-[#1B4636]">
                 {idx === 0 ? (
                   <Clock className="h-4 w-4" />
                 ) : idx === 1 ? (
@@ -249,10 +249,10 @@ export default function ServicesPortal({
                 )}
               </div>
               <div>
-                <h3 className="text-xs font-bold text-[#14201A]">
+                <h3 className="text-xs font-bold text-[var(--ink-main)]">
                   {item.title}
                 </h3>
-                <p className="text-[11px] text-[#58655C]">{item.sub}</p>
+                <p className="text-[11px] text-[var(--ink-sub)]">{item.sub}</p>
               </div>
             </div>
           ))}
@@ -268,17 +268,17 @@ export default function ServicesPortal({
           <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[#BF3927]">
             {t.calcEyebrow}
           </p>
-          <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[#14201A]">
+          <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
             {t.calcTitle}
           </h2>
         </div>
 
         <div className="grid gap-6 md:grid-cols-12 items-start">
           {/* Configurator Form */}
-          <div className="min-w-0 space-y-6 rounded-[28px] border border-[#E2D9C6] bg-white p-6 sm:p-8 shadow-sm md:col-span-7 lg:col-span-8">
+          <div className="min-w-0 space-y-6 rounded-[28px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 sm:p-8 shadow-sm md:col-span-7 lg:col-span-8">
             {/* Print Type */}
             <div>
-              <label className="mb-2.5 block text-xs font-bold text-[#2A3730]">
+              <label className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
                 {t.calcLabels.printType}
               </label>
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -290,7 +290,7 @@ export default function ServicesPortal({
                     className={`rounded-2xl border px-3 py-3 text-start text-xs font-semibold transition cursor-pointer ${
                       config.printType === pt.id
                         ? "border-[#1B4636] bg-[#1B4636] text-white shadow-sm"
-                        : "border-[#E2D9C6] bg-[#FAF6EE] text-[#2A3730] hover:border-[#B89352]"
+                        : "border-[var(--border-subtle)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[#B89352]"
                     }`}
                   >
                     {t.printTypeNames[pt.id]}
@@ -302,7 +302,7 @@ export default function ServicesPortal({
             {/* Size & Sides */}
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <label className="mb-2.5 block text-xs font-bold text-[#2A3730]">
+                <label className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
                   {t.calcLabels.size}
                 </label>
                 <div className="grid grid-cols-4 gap-2">
@@ -316,7 +316,7 @@ export default function ServicesPortal({
                       className={`font-latin-ui rounded-full border py-2 text-center text-xs font-bold transition cursor-pointer ${
                         config.size === s.id
                           ? "border-[#14201A] bg-[#14201A] text-[#E7D19F] shadow-xs"
-                          : "border-[#DFD6C3] bg-[#FAF6EE] text-[#2A3730] hover:border-[#B89352]"
+                          : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[#B89352]"
                       }`}
                     >
                       {s.id}
@@ -326,7 +326,7 @@ export default function ServicesPortal({
               </div>
 
               <div>
-                <label className="mb-2.5 block text-xs font-bold text-[#2A3730]">
+                <label className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
                   {t.calcLabels.sides}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -342,7 +342,7 @@ export default function ServicesPortal({
                         config.sides === side &&
                         !(duplexDisabled && side === "double")
                           ? "border-[#1B4636] bg-[#1B4636] text-white"
-                          : "border-[#DFD6C3] bg-[#FAF6EE] text-[#2A3730]"
+                          : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)]"
                       }`}
                     >
                       {t.sideNames[side]}
@@ -355,7 +355,7 @@ export default function ServicesPortal({
             {/* Paper Stock & Binding */}
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <label className="mb-2 block text-xs font-bold text-[#2A3730]">
+                <label className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
                   {t.calcLabels.paperStock}
                 </label>
                 <select
@@ -366,7 +366,7 @@ export default function ServicesPortal({
                       paperStock: e.target.value,
                     }))
                   }
-                  className="w-full rounded-2xl border border-[#DFD6C3] bg-[#FAF6EE] px-4 py-3 text-sm font-medium text-[#14201A] outline-none focus:border-[#1B4636]"
+                  className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm font-medium text-[var(--ink-main)] outline-none focus:border-[#1B4636]"
                 >
                   {PAPER_STOCKS.map((st) => (
                     <option key={st.id} value={st.id}>
@@ -377,7 +377,7 @@ export default function ServicesPortal({
               </div>
 
               <div>
-                <label className="mb-2 block text-xs font-bold text-[#2A3730]">
+                <label className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
                   {t.calcLabels.binding}
                 </label>
                 <select
@@ -391,7 +391,7 @@ export default function ServicesPortal({
                     }));
                     if (nextBinding === "hardcover") setCoverTheme("pine");
                   }}
-                  className="w-full rounded-2xl border border-[#DFD6C3] bg-[#FAF6EE] px-4 py-3 text-sm font-medium text-[#14201A] outline-none focus:border-[#1B4636] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm font-medium text-[var(--ink-main)] outline-none focus:border-[#1B4636] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {BINDING_OPTIONS.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -404,7 +404,7 @@ export default function ServicesPortal({
 
             {/* Cover Color Theme Picker (syncs live with 3D Mockup) */}
             <div>
-              <label className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[#2A3730]">
+              <label className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[var(--ink-main)]">
                 <Palette className="h-3.5 w-3.5 text-[#B89352]" />
                 <span>{t.calcLabels.coverThemeLabel}</span>
               </label>
@@ -419,7 +419,7 @@ export default function ServicesPortal({
                       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
                         selected
                           ? "border-[#14201A] bg-[#14201A] text-white shadow-xs"
-                          : "border-[#DFD6C3] bg-[#FAF6EE] text-[#2A3730] hover:border-[#B89352]"
+                          : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[#B89352]"
                       }`}
                     >
                       <span
@@ -440,10 +440,10 @@ export default function ServicesPortal({
                 { field: "copies", label: t.calcLabels.copies, max: 2000 },
               ].map(({ field, label, max }) => (
                 <div key={field}>
-                  <label className="mb-2 block text-xs font-bold text-[#2A3730]">
+                  <label className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
                     {label}
                   </label>
-                  <div className="flex items-center justify-between rounded-2xl border border-[#DFD6C3] bg-[#FAF6EE] p-1.5">
+                  <div className="flex items-center justify-between rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-page)] p-1.5">
                     <button
                       type="button"
                       onClick={() =>
@@ -452,7 +452,7 @@ export default function ServicesPortal({
                           [field]: Math.max(1, prev[field] - 1),
                         }))
                       }
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white text-[#14201A] shadow-2xs hover:bg-[#1B4636] hover:text-white cursor-pointer"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-surface)] text-[var(--ink-main)] shadow-2xs hover:bg-[#1B4636] hover:text-white cursor-pointer"
                     >
                       <Minus className="h-4 w-4" />
                     </button>
@@ -470,7 +470,7 @@ export default function ServicesPortal({
                           ),
                         }))
                       }
-                      className="w-24 bg-transparent text-center font-latin-ui text-base font-bold text-[#14201A] outline-none"
+                      className="w-24 bg-transparent text-center font-latin-ui text-base font-bold text-[var(--ink-main)] outline-none"
                     />
                     <button
                       type="button"
@@ -480,7 +480,7 @@ export default function ServicesPortal({
                           [field]: Math.min(max, prev[field] + 1),
                         }))
                       }
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white text-[#14201A] shadow-2xs hover:bg-[#1B4636] hover:text-white cursor-pointer"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-surface)] text-[var(--ink-main)] shadow-2xs hover:bg-[#1B4636] hover:text-white cursor-pointer"
                     >
                       <Plus className="h-4 w-4" />
                     </button>
@@ -491,7 +491,7 @@ export default function ServicesPortal({
 
             {/* Custom Foil / Cover Title Live Input */}
             <div>
-              <label className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[#2A3730]">
+              <label className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[var(--ink-main)]">
                 <Type className="h-3.5 w-3.5 text-[#B89352]" />
                 <span>{t.calcLabels.monogramTitle}</span>
               </label>
@@ -501,13 +501,13 @@ export default function ServicesPortal({
                 value={customTitle}
                 onChange={(e) => setCustomTitle(e.target.value)}
                 placeholder={t.calcLabels.monogramPlaceholder}
-                className="w-full rounded-2xl border border-[#DFD6C3] bg-[#FAF6EE] px-4 py-3 text-sm text-[#14201A] outline-none focus:border-[#B89352] placeholder:text-[#8E968F]"
+                className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm text-[var(--ink-main)] outline-none focus:border-[#B89352] placeholder:text-[#8E968F]"
               />
             </div>
 
             {/* File Attachment Dropzone */}
             <div>
-              <label className="mb-2 block text-xs font-bold text-[#2A3730]">
+              <label className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
                 {t.calcLabels.uploadTitle}
               </label>
               {uploadedFile ? (
@@ -517,16 +517,16 @@ export default function ServicesPortal({
                       <img
                         src={uploadedFile.previewUrl}
                         alt={uploadedFile.name}
-                        className="h-10 w-10 shrink-0 rounded-lg object-cover border border-[#DFD6C3]"
+                        className="h-10 w-10 shrink-0 rounded-lg object-cover border border-[var(--border-strong)]"
                       />
                     ) : (
                       <FileText className="h-5 w-5 shrink-0 text-[#1B4636]" />
                     )}
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-[#14201A] font-latin-ui">
+                      <p className="truncate text-sm font-bold text-[var(--ink-main)] font-latin-ui">
                         {uploadedFile.name}
                       </p>
-                      <p className="text-xs text-[#58655C] font-latin-ui">
+                      <p className="text-xs text-[var(--ink-sub)] font-latin-ui">
                         {uploadedFile.sizeLabel}
                       </p>
                     </div>
@@ -541,12 +541,12 @@ export default function ServicesPortal({
                   </button>
                 </div>
               ) : (
-                <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#D3C9B6] bg-[#FAF6EE] px-4 py-6 text-center transition hover:border-[#1B4636] hover:bg-[#F5EFE3]">
+                <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#D3C9B6] bg-[var(--bg-page)] px-4 py-6 text-center transition hover:border-[#1B4636] hover:bg-[#F5EFE3]">
                   <Upload className="h-6 w-6 text-[#1B4636]" />
-                  <span className="text-xs font-bold text-[#14201A]">
+                  <span className="text-xs font-bold text-[var(--ink-main)]">
                     {t.calcLabels.chooseFile}
                   </span>
-                  <span className="text-[11px] text-[#58655C]">
+                  <span className="text-[11px] text-[var(--ink-sub)]">
                     {t.calcLabels.uploadHint}
                   </span>
                   <input
@@ -699,7 +699,7 @@ export default function ServicesPortal({
           <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[#1B4636]">
             {t.servicesSectionEyebrow}
           </p>
-          <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[#14201A]">
+          <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
             {t.servicesSectionTitle}
           </h2>
         </div>
@@ -711,25 +711,25 @@ export default function ServicesPortal({
               <Reveal key={srv.id} delayMs={idx * 60}>
                 <div
                   onClick={() => applyServicePreset(srv.id)}
-                  className="group flex h-full flex-col justify-between rounded-[24px] border border-[#E2D9C6] bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-[#B89352] hover:shadow-atelier cursor-pointer"
+                  className="group flex h-full flex-col justify-between rounded-[24px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--accent-gold)] hover:shadow-atelier cursor-pointer"
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="font-latin-ui text-2xl font-bold text-[#1B4636]/35 group-hover:text-[#BF3927] transition">
+                      <span className="font-latin-ui text-2xl font-bold text-[var(--accent-gold)]/55 group-hover:text-[var(--accent-crimson)] transition">
                         {srv.code}
                       </span>
-                      <span className="rounded-full bg-[#F1EBE0] px-3 py-1 text-[11px] font-semibold text-[#14201A]">
+                      <span className="rounded-full bg-[var(--bg-soft)] px-3 py-1 text-[11px] font-semibold text-[var(--ink-main)]">
                         {t.startingFrom} {formatPrice(srv.startingPrice, lang)}
                       </span>
                     </div>
-                    <h3 className="mt-4 text-base font-bold text-[#14201A]">
+                    <h3 className="mt-4 text-base font-bold text-[var(--ink-main)]">
                       {loc.title}
                     </h3>
-                    <p className="mt-2 text-xs leading-relaxed text-[#58655C]">
+                    <p className="mt-2 text-xs leading-relaxed text-[var(--ink-sub)]">
                       {loc.desc}
                     </p>
                   </div>
-                  <p className="mt-4 border-t border-[#F1EBE0] pt-3 text-[11px] font-semibold text-[#1B4636]">
+                  <p className="mt-4 border-t border-[var(--border-subtle)] pt-3 text-[11px] font-semibold text-[var(--accent-pine)]">
                     {loc.unit} ↗
                   </p>
                 </div>
@@ -741,14 +741,14 @@ export default function ServicesPortal({
 
       {/* Tiered Pricing & Wholesale KPIs */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 space-y-10">
-        <div className="overflow-hidden rounded-[26px] border border-[#E2D9C6] bg-white p-6 sm:p-8 shadow-2xs">
-          <h3 className="mb-5 text-xl font-bold text-[#14201A]">
+        <div className="overflow-hidden rounded-[26px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 sm:p-8 shadow-2xs">
+          <h3 className="mb-5 text-xl font-bold text-[var(--ink-main)]">
             {t.priceTableTitle}
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-start text-sm">
               <thead>
-                <tr className="border-b border-[#E2D9C6] text-xs text-[#58655C]">
+                <tr className="border-b border-[var(--border-subtle)] text-xs text-[var(--ink-sub)]">
                   <th className="py-3 text-start font-semibold">
                     {t.priceTableCols.tier}
                   </th>
@@ -769,7 +769,7 @@ export default function ServicesPortal({
                     key={idx}
                     className={row.best ? "bg-[#BF3927]/5 font-bold" : ""}
                   >
-                    <td className="py-3.5 text-[#14201A]">{row.tier[lang]}</td>
+                    <td className="py-3.5 text-[var(--ink-main)]">{row.tier[lang]}</td>
                     <td className="py-3.5">{formatPrice(row.bwA4, lang)}</td>
                     <td className="py-3.5">{formatPrice(row.colorA4, lang)}</td>
                     <td className="py-3.5">
@@ -825,7 +825,7 @@ export default function ServicesPortal({
 
       {/* Services FAQ Accordion */}
       <section className="mx-auto max-w-4xl px-4 pb-16 pt-4 sm:px-6">
-        <h2 className="mb-6 text-center text-2xl font-bold text-[#14201A]">
+        <h2 className="mb-6 text-center text-2xl font-bold text-[var(--ink-main)]">
           {t.faqTitle}
         </h2>
         <div className="space-y-3">
@@ -835,12 +835,12 @@ export default function ServicesPortal({
             return (
               <div
                 key={idx}
-                className="overflow-hidden rounded-2xl border border-[#E2D9C6] bg-white"
+                className="overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]"
               >
                 <button
                   type="button"
                   onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start text-sm font-bold text-[#14201A] cursor-pointer"
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start text-sm font-bold text-[var(--ink-main)] cursor-pointer"
                 >
                   <span>{loc.q}</span>
                   <ChevronDown
