@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { CATEGORIES, PRODUCTS } from "../data/catalog";
 import { formatPrice, formatNumber } from "../utils/pricing";
+import Reveal from "./Reveal";
 
 export default function BoutiqueStorefront({
   t,
@@ -311,7 +312,8 @@ export default function BoutiqueStorefront({
       {/* 4. Interactive "Shop the Desk" Flat-Lay Lookbook */}
       {t.lookbook && activePinProduct && (
         <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
-          <div className="rounded-[32px] border border-[#DFD6C3] bg-white p-5 sm:p-8 shadow-atelier">
+          <Reveal>
+            <div className="rounded-[32px] border border-[#DFD6C3] bg-white p-5 sm:p-8 shadow-atelier">
             <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[#B89352]">
@@ -384,7 +386,10 @@ export default function BoutiqueStorefront({
               </div>
 
               {/* Active Highlighted Desk Item Card */}
-              <div className="flex flex-col justify-between rounded-[24px] border border-[#E2D9C6] bg-[#FAF6EE] p-5 sm:p-6 md:col-span-5 lg:col-span-4 space-y-4">
+              <div
+                key={activePinProduct.id}
+                className="animate-modal-in flex flex-col justify-between rounded-[24px] border border-[#E2D9C6] bg-[#FAF6EE] p-5 sm:p-6 md:col-span-5 lg:col-span-4 space-y-4"
+              >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-[11px] font-bold tracking-wider text-[#B89352] font-latin-ui">
                     <span>0{activePinIdx + 1} / {activePinProduct.sku}</span>
@@ -442,6 +447,7 @@ export default function BoutiqueStorefront({
               </div>
             </div>
           </div>
+          </Reveal>
         </section>
       )}
 
@@ -547,18 +553,35 @@ export default function BoutiqueStorefront({
                   const loc = product[lang];
                   const isWished = wishlist.includes(product.id);
                   const activeVariantIdx = cardVariants[product.id] || 0;
+                  const activeSwatchHex =
+                    product.swatches[activeVariantIdx] || product.swatches[0];
+                  const activeVariantName =
+                    loc.variants[activeVariantIdx] || loc.variants[0];
+                  const swatchToneFilter =
+                    activeVariantIdx === 1
+                      ? "sepia-[0.14] brightness-[1.03]"
+                      : activeVariantIdx === 2
+                      ? "contrast-[1.06] saturate-[1.08]"
+                      : "";
                   return (
                     <article
                       key={product.id}
                       className="group flex flex-col justify-between overflow-hidden rounded-[26px] border border-[#E2D9C6] bg-white p-3.5 transition duration-300 hover:-translate-y-1 hover:border-[#B89352] hover:shadow-atelier"
                     >
                       <div>
-                        <div className="relative aspect-square overflow-hidden rounded-[20px] bg-[#F1EBE0]">
+                        <div
+                          className="relative aspect-square overflow-hidden rounded-[20px] bg-[#F1EBE0] transition-shadow"
+                          style={{
+                            boxShadow: activeSwatchHex
+                              ? `inset 0 0 0 2px ${activeSwatchHex}33`
+                              : undefined,
+                          }}
+                        >
                           <img
                             src={product.image}
                             alt={loc.title}
-                            onClick={() => onQuickView(product)}
-                            className="h-full w-full object-cover transition duration-700 group-hover:scale-105 cursor-pointer"
+                            onClick={() => onQuickView(product, activeVariantIdx)}
+                            className={`h-full w-full object-cover transition duration-700 group-hover:scale-105 cursor-pointer ${swatchToneFilter}`}
                           />
 
                           {product.badge && (
@@ -588,13 +611,26 @@ export default function BoutiqueStorefront({
                             />
                           </button>
 
+                          {/* Active Swatch / Edition Floating Tag */}
+                          {activeVariantName && (
+                            <div className="pointer-events-none absolute bottom-2.5 start-2.5 inline-flex items-center gap-1.5 rounded-full bg-[#FAF6EE]/92 px-2.5 py-1 text-[10px] font-semibold text-[#14201A] shadow-xs backdrop-blur-xs">
+                              {activeSwatchHex && (
+                                <span
+                                  className="h-2.5 w-2.5 rounded-full border border-black/20"
+                                  style={{ backgroundColor: activeSwatchHex }}
+                                />
+                              )}
+                              <span>{activeVariantName}</span>
+                            </div>
+                          )}
+
                           {/* Desktop Hover Frosted Quick-View Bar */}
                           <button
                             type="button"
-                            onClick={() => onQuickView(product)}
-                            className="hidden lg:flex absolute inset-x-3 bottom-3 translate-y-2 opacity-0 items-center justify-center gap-1.5 rounded-full border border-white/40 bg-[#FAF6EE]/90 py-2 text-[11px] font-bold text-[#14201A] backdrop-blur-md shadow-md transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 cursor-pointer"
+                            onClick={() => onQuickView(product, activeVariantIdx)}
+                            className="hidden lg:flex absolute end-2.5 bottom-2.5 translate-y-2 opacity-0 items-center justify-center gap-1.5 rounded-full border border-white/40 bg-[#14201A]/90 px-3 py-1.5 text-[10px] font-bold text-[#FAF6EE] backdrop-blur-md shadow-md transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 cursor-pointer"
                           >
-                            <Eye className="h-3.5 w-3.5 text-[#1B4636]" />
+                            <Eye className="h-3 w-3 text-[#E7D19F]" />
                             <span>{t.quickView}</span>
                           </button>
                         </div>
@@ -608,16 +644,17 @@ export default function BoutiqueStorefront({
                                   key={hex}
                                   type="button"
                                   title={loc.variants[sIdx]}
+                                  aria-label={loc.variants[sIdx]}
                                   onClick={() =>
                                     setCardVariants((prev) => ({
                                       ...prev,
                                       [product.id]: sIdx,
                                     }))
                                   }
-                                  className={`h-3 w-3 rounded-full border transition cursor-pointer ${
+                                  className={`h-3.5 w-3.5 rounded-full border transition cursor-pointer ${
                                     activeVariantIdx === sIdx
-                                      ? "scale-125 border-[#14201A] ring-1 ring-[#B89352]"
-                                      : "border-black/15 opacity-75 hover:opacity-100"
+                                      ? "scale-125 border-[#14201A] ring-2 ring-[#B89352]"
+                                      : "border-black/15 opacity-80 hover:opacity-100"
                                   }`}
                                   style={{ backgroundColor: hex }}
                                 />
@@ -626,7 +663,7 @@ export default function BoutiqueStorefront({
                           </div>
 
                           <h3
-                            onClick={() => onQuickView(product)}
+                            onClick={() => onQuickView(product, activeVariantIdx)}
                             className="text-sm sm:text-[15px] font-bold text-[#14201A] leading-snug hover:text-[#1B4636] cursor-pointer"
                           >
                             {loc.title}
@@ -637,16 +674,21 @@ export default function BoutiqueStorefront({
                         </div>
                       </div>
 
-                      <div className="mt-4 flex items-center justify-between gap-2 border-t border-[#F1EBE0] px-1 pt-3">
-                        <span className="text-sm font-bold text-[#1B4636]">
-                          {formatPrice(product.price, lang)}
-                        </span>
+                      <div className="mt-4 space-y-2.5 border-t border-[#F1EBE0] px-1 pt-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-bold text-[#1B4636] whitespace-nowrap">
+                            {formatPrice(product.price, lang)}
+                          </span>
+                          <span className="text-[10px] font-medium text-[#8E968F] truncate">
+                            {t.selectedColorLabel} {activeVariantName}
+                          </span>
+                        </div>
 
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => onQuickView(product)}
-                            className="lg:hidden rounded-full border border-[#DFD6C3] px-2.5 py-1.5 text-[11px] font-semibold text-[#2A3730] cursor-pointer"
+                            onClick={() => onQuickView(product, activeVariantIdx)}
+                            className="flex-1 whitespace-nowrap rounded-full border border-[#DFD6C3] px-3 py-2 text-[11px] font-semibold text-[#2A3730] transition hover:border-[#1B4636] hover:text-[#1B4636] cursor-pointer"
                           >
                             {t.quickView}
                           </button>
@@ -655,9 +697,9 @@ export default function BoutiqueStorefront({
                             onClick={() =>
                               onAddToBag(product, activeVariantIdx, 1)
                             }
-                            className="inline-flex items-center gap-1 rounded-full bg-[#BF3927] px-3.5 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#A62E1E] cursor-pointer shadow-2xs"
+                            className="flex-1 whitespace-nowrap inline-flex items-center justify-center gap-1 rounded-full bg-[#BF3927] px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-[#A62E1E] cursor-pointer shadow-2xs"
                           >
-                            <Plus className="h-3.5 w-3.5" />
+                            <Plus className="h-3.5 w-3.5 shrink-0" />
                             <span>{t.addToBag}</span>
                           </button>
                         </div>
@@ -673,6 +715,7 @@ export default function BoutiqueStorefront({
 
       {/* 6. Editorial Heritage Story Section */}
       <section id="heritage" className="border-y border-[#E2D9C6] bg-[#F1EBE0]">
+        <Reveal>
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-12 sm:px-6 md:grid-cols-12">
           <div className="md:col-span-5">
             <div className="overflow-hidden rounded-[26px] border border-[#D4C9B4] bg-white p-2.5 shadow-atelier">
@@ -707,10 +750,12 @@ export default function BoutiqueStorefront({
             </div>
           </div>
         </div>
+        </Reveal>
       </section>
 
       {/* 7. Architectural Services Portal Gateway ("مدخل بخش خدماتی") */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <Reveal>
         <div className="overflow-hidden rounded-[32px] border border-[#C8A258]/40 bg-[#123126] text-[#FAF6EE] shadow-atelier">
           <div className="grid items-stretch md:grid-cols-12">
             <div className="space-y-5 p-7 sm:p-10 md:col-span-7 lg:p-12">
@@ -760,6 +805,7 @@ export default function BoutiqueStorefront({
             </div>
           </div>
         </div>
+        </Reveal>
       </section>
     </main>
   );

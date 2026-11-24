@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,6 +14,7 @@ import {
   Sparkles,
   Award,
   Type,
+  Palette,
 } from "lucide-react";
 import {
   SERVICES_LIST,
@@ -29,97 +30,8 @@ import {
   formatPrice,
   formatNumber,
 } from "../utils/pricing";
-
-function LiveBinderyPreview({ config, customTitle, t }) {
-  const isHardcover = config.binding === "hardcover";
-  const isSpiral = config.binding === "spiral";
-  const isLoose = config.binding === "none";
-  const isGlossy = config.paperStock === "glossy135";
-  const isKraft = config.paperStock === "kraft";
-  const isCotton = config.paperStock === "cotton240";
-
-  const surfaceColor = isHardcover
-    ? "bg-[#1B4636] text-[#F3E4BD] border-[#C8A258]/50"
-    : isKraft
-    ? "bg-[#B99264] text-[#1E1914] border-[#8A673F]"
-    : isCotton
-    ? "bg-[#F2E9D6] text-[#14201A] border-[#D5C5A7]"
-    : "bg-[#FAF6EE] text-[#14201A] border-[#DCD3C1]";
-
-  const titleText = customTitle.trim() || t.calcLabels.previewDefaultTitle;
-
-  return (
-    <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-      <div className="mb-3 flex items-center justify-between text-[10px] font-semibold tracking-widest text-[#E7D19F] font-latin-ui">
-        <span>{t.calcLabels.previewLabel}</span>
-        <span>
-          {config.size} · {config.pages}P
-        </span>
-      </div>
-
-      {/* 3D Mockup Stage */}
-      <div className="relative flex items-center justify-center py-3">
-        {/* Stacked Sheet Shadow for Loose or Multi-copy feel */}
-        <div
-          className={`relative flex h-44 w-32 flex-col justify-between overflow-hidden rounded-e-lg border p-3.5 shadow-2xl transition-all duration-500 ${surfaceColor} ${
-            isLoose ? "rounded-s-lg rotate-1" : "rounded-s-[3px]"
-          }`}
-        >
-          {/* Glossy Paper Specular Sweep */}
-          {isGlossy && !isHardcover && (
-            <div className="pointer-events-none absolute inset-0 paper-gloss-sheen" />
-          )}
-
-          {/* Hardcover / Perfect Binding Spine Crease */}
-          {(isHardcover || config.binding === "perfect" || config.binding === "saddle") && (
-            <div className="pointer-events-none absolute inset-y-0 start-0 w-2.5 bg-gradient-to-r from-black/25 to-transparent" />
-          )}
-
-          {/* Twin-Loop Spiral Wire Rings */}
-          {isSpiral && (
-            <div className="pointer-events-none absolute inset-y-2 -start-1.5 flex flex-col justify-between">
-              {Array.from({ length: 9 }).map((_, idx) => (
-                <span
-                  key={idx}
-                  className="h-2 w-3.5 rounded-full border border-[#B89352] bg-gradient-to-b from-[#E5DEC9] to-[#8C8476] shadow-xs"
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Decorative Foil Inner Frame for Hardcover or Cotton */}
-          <div
-            className={`relative z-10 flex h-full flex-col justify-between p-2 ${
-              isHardcover
-                ? "border border-[#E7D19F]/45"
-                : "border border-current/15"
-            }`}
-          >
-            <div className="flex items-center justify-between text-[7px] uppercase tracking-[0.2em] opacity-70 font-latin-ui">
-              <span>IMAGE BOUTIQUE</span>
-              <span>{config.size}</span>
-            </div>
-
-            <div className="my-auto text-center px-1">
-              <p
-                className={`text-xs font-bold leading-snug break-words ${
-                  isHardcover ? "text-foil" : ""
-                }`}
-              >
-                {titleText}
-              </p>
-              <span className="mt-1 inline-block h-[1px] w-6 bg-current opacity-40" />
-            </div>
-
-            <p className="text-center font-editorial italic text-[8px] opacity-75">
-              La Boutique Papeterie
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+import Reveal from "./Reveal";
+import Live3DPreview, { COVER_THEMES } from "./Live3DPreview";
 
 export default function ServicesPortal({
   t,
@@ -139,6 +51,7 @@ export default function ServicesPortal({
     pages: 48,
     copies: 5,
   });
+  const [coverTheme, setCoverTheme] = useState("ivory");
   const [customTitle, setCustomTitle] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
   const [openFaqIdx, setOpenFaqIdx] = useState(0);
@@ -148,17 +61,40 @@ export default function ServicesPortal({
   const duplexDisabled =
     config.printType === "plot" || config.printType === "sticker";
 
+  useEffect(() => {
+    return () => {
+      if (uploadedFile?.previewUrl) {
+        URL.revokeObjectURL(uploadedFile.previewUrl);
+      }
+    };
+  }, [uploadedFile]);
+
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (uploadedFile?.previewUrl) URL.revokeObjectURL(uploadedFile.previewUrl);
     const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    const previewUrl = file.type.startsWith("image/")
+      ? URL.createObjectURL(file)
+      : null;
     setUploadedFile({
       name: file.name,
+      previewUrl,
       sizeLabel:
         file.size > 1024 * 1024
           ? `${sizeMB} MB`
           : `${Math.max(1, Math.round(file.size / 1024))} KB`,
     });
+  };
+
+  const handlePrintTypeChange = (typeId) => {
+    const isSheetOnly = typeId === "plot" || typeId === "sticker";
+    setConfig((prev) => ({
+      ...prev,
+      printType: typeId,
+      sides: isSheetOnly ? "single" : prev.sides,
+      binding: isSheetOnly ? "none" : prev.binding,
+    }));
   };
 
   const applyServicePreset = (serviceId) => {
@@ -208,6 +144,9 @@ export default function ServicesPortal({
     };
     if (presets[serviceId]) {
       setConfig((prev) => ({ ...prev, ...presets[serviceId] }));
+      if (serviceId === "binding-thesis") setCoverTheme("pine");
+      else if (serviceId === "corp-packaging") setCoverTheme("kraft");
+      else setCoverTheme("ivory");
       document
         .getElementById("quote-calculator")
         ?.scrollIntoView({ behavior: "smooth" });
@@ -347,9 +286,7 @@ export default function ServicesPortal({
                   <button
                     key={pt.id}
                     type="button"
-                    onClick={() =>
-                      setConfig((prev) => ({ ...prev, printType: pt.id }))
-                    }
+                    onClick={() => handlePrintTypeChange(pt.id)}
                     className={`rounded-2xl border px-3 py-3 text-start text-xs font-semibold transition cursor-pointer ${
                       config.printType === pt.id
                         ? "border-[#1B4636] bg-[#1B4636] text-white shadow-sm"
@@ -368,7 +305,7 @@ export default function ServicesPortal({
                 <label className="mb-2.5 block text-xs font-bold text-[#2A3730]">
                   {t.calcLabels.size}
                 </label>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   {PAPER_SIZES.map((s) => (
                     <button
                       key={s.id}
@@ -376,10 +313,10 @@ export default function ServicesPortal({
                       onClick={() =>
                         setConfig((prev) => ({ ...prev, size: s.id }))
                       }
-                      className={`font-latin-ui rounded-full border px-4 py-2 text-xs font-bold transition cursor-pointer ${
+                      className={`font-latin-ui rounded-full border py-2 text-center text-xs font-bold transition cursor-pointer ${
                         config.size === s.id
-                          ? "border-[#14201A] bg-[#14201A] text-[#E7D19F]"
-                          : "border-[#DFD6C3] bg-[#FAF6EE] text-[#2A3730]"
+                          ? "border-[#14201A] bg-[#14201A] text-[#E7D19F] shadow-xs"
+                          : "border-[#DFD6C3] bg-[#FAF6EE] text-[#2A3730] hover:border-[#B89352]"
                       }`}
                     >
                       {s.id}
@@ -444,11 +381,17 @@ export default function ServicesPortal({
                   {t.calcLabels.binding}
                 </label>
                 <select
+                  disabled={duplexDisabled}
                   value={config.binding}
-                  onChange={(e) =>
-                    setConfig((prev) => ({ ...prev, binding: e.target.value }))
-                  }
-                  className="w-full rounded-2xl border border-[#DFD6C3] bg-[#FAF6EE] px-4 py-3 text-sm font-medium text-[#14201A] outline-none focus:border-[#1B4636]"
+                  onChange={(e) => {
+                    const nextBinding = e.target.value;
+                    setConfig((prev) => ({
+                      ...prev,
+                      binding: nextBinding,
+                    }));
+                    if (nextBinding === "hardcover") setCoverTheme("pine");
+                  }}
+                  className="w-full rounded-2xl border border-[#DFD6C3] bg-[#FAF6EE] px-4 py-3 text-sm font-medium text-[#14201A] outline-none focus:border-[#1B4636] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {BINDING_OPTIONS.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -456,6 +399,37 @@ export default function ServicesPortal({
                     </option>
                   ))}
                 </select>
+              </div>
+            </div>
+
+            {/* Cover Color Theme Picker (syncs live with 3D Mockup) */}
+            <div>
+              <label className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[#2A3730]">
+                <Palette className="h-3.5 w-3.5 text-[#B89352]" />
+                <span>{t.calcLabels.coverThemeLabel}</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {COVER_THEMES.map((theme) => {
+                  const selected = coverTheme === theme.id;
+                  return (
+                    <button
+                      key={theme.id}
+                      type="button"
+                      onClick={() => setCoverTheme(theme.id)}
+                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
+                        selected
+                          ? "border-[#14201A] bg-[#14201A] text-white shadow-xs"
+                          : "border-[#DFD6C3] bg-[#FAF6EE] text-[#2A3730] hover:border-[#B89352]"
+                      }`}
+                    >
+                      <span
+                        className="h-3.5 w-3.5 rounded-full border border-white/40 shadow-2xs"
+                        style={{ backgroundColor: theme.bg }}
+                      />
+                      <span>{lang === "fa" ? theme.labelFa : theme.labelEn}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -539,7 +513,15 @@ export default function ServicesPortal({
               {uploadedFile ? (
                 <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#1B4636]/35 bg-[#1B4636]/5 px-4 py-3.5">
                   <div className="flex items-center gap-3 min-w-0">
-                    <FileText className="h-5 w-5 shrink-0 text-[#1B4636]" />
+                    {uploadedFile.previewUrl ? (
+                      <img
+                        src={uploadedFile.previewUrl}
+                        alt={uploadedFile.name}
+                        className="h-10 w-10 shrink-0 rounded-lg object-cover border border-[#DFD6C3]"
+                      />
+                    ) : (
+                      <FileText className="h-5 w-5 shrink-0 text-[#1B4636]" />
+                    )}
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold text-[#14201A] font-latin-ui">
                         {uploadedFile.name}
@@ -589,9 +571,11 @@ export default function ServicesPortal({
               </h3>
             </div>
 
-            <LiveBinderyPreview
+            <Live3DPreview
               config={config}
               customTitle={customTitle}
+              coverTheme={coverTheme}
+              uploadedPreviewUrl={uploadedFile?.previewUrl}
               t={t}
             />
 
@@ -618,25 +602,75 @@ export default function ServicesPortal({
                 <span>{t.orderSummary.discount}</span>
                 <span className="font-bold text-[#F2B8A8]">
                   {quote.discountRate > 0
-                    ? `${Math.round(quote.discountRate * 100)}% (-${formatPrice(
-                        quote.discountAmount,
-                        lang
-                      )})`
+                    ? lang === "fa"
+                      ? `${formatNumber(
+                          Math.round(quote.discountRate * 100),
+                          lang
+                        )}٪ (${formatPrice(quote.discountAmount, lang)} کسر)`
+                      : `${Math.round(quote.discountRate * 100)}% (-${formatPrice(
+                          quote.discountAmount,
+                          lang
+                        )})`
                     : "—"}
                 </span>
               </div>
               <div className="flex justify-between text-[#D0D9D3]">
                 <span>{t.orderSummary.turnaround}</span>
                 <span className="font-bold text-[#9BD4B8]">
-                  ~{formatNumber(quote.turnaroundHours, lang)}{" "}
+                  {t.orderSummary.approxPrefix}{" "}
+                  {formatNumber(quote.turnaroundHours, lang)}{" "}
                   {t.orderSummary.hours}
                 </span>
               </div>
             </div>
 
+            {/* Volume Tier Progress Indicator */}
+            {quote.totalImpressions < 1000 && (
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-[11px]">
+                {(() => {
+                  const nextTarget =
+                    quote.totalImpressions < 100
+                      ? 100
+                      : quote.totalImpressions < 500
+                      ? 500
+                      : 1000;
+                  const nextRate =
+                    nextTarget === 100 ? 10 : nextTarget === 500 ? 20 : 30;
+                  const pct = Math.min(
+                    100,
+                    Math.round((quote.totalImpressions / nextTarget) * 100)
+                  );
+                  return (
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-[#E7D19F]">
+                        <span>
+                          {lang === "fa"
+                            ? `تا تخفیف ${formatNumber(nextRate, lang)}٪ پلکانی`
+                            : `Toward ${nextRate}% volume tier`}
+                        </span>
+                        <span className="font-semibold">
+                          {formatNumber(quote.totalImpressions, lang)} /{" "}
+                          {formatNumber(nextTarget, lang)}
+                        </span>
+                      </div>
+                      <div className="h-1 w-full overflow-hidden rounded-full bg-white/15">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-[#E7D19F] to-[#9BD4B8] transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
             <div>
               <p className="text-xs text-[#B7C3BC]">{t.orderSummary.total}</p>
-              <p className="mt-1 text-2xl sm:text-3xl font-bold text-white">
+              <p
+                key={quote.total}
+                className="mt-1 text-2xl sm:text-3xl font-bold text-white animate-price-pop"
+              >
                 {formatPrice(quote.total, lang)}
               </p>
             </div>
@@ -671,34 +705,35 @@ export default function ServicesPortal({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES_LIST.map((srv) => {
+          {SERVICES_LIST.map((srv, idx) => {
             const loc = srv[lang];
             return (
-              <div
-                key={srv.id}
-                onClick={() => applyServicePreset(srv.id)}
-                className="group flex flex-col justify-between rounded-[24px] border border-[#E2D9C6] bg-white p-6 transition duration-300 hover:-translate-y-0.5 hover:border-[#B89352] hover:shadow-atelier cursor-pointer"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-latin-ui text-2xl font-bold text-[#1B4636]/35 group-hover:text-[#BF3927] transition">
-                      {srv.code}
-                    </span>
-                    <span className="rounded-full bg-[#F1EBE0] px-3 py-1 text-[11px] font-semibold text-[#14201A]">
-                      {t.startingFrom} {formatPrice(srv.startingPrice, lang)}
-                    </span>
+              <Reveal key={srv.id} delayMs={idx * 60}>
+                <div
+                  onClick={() => applyServicePreset(srv.id)}
+                  className="group flex h-full flex-col justify-between rounded-[24px] border border-[#E2D9C6] bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-[#B89352] hover:shadow-atelier cursor-pointer"
+                >
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-latin-ui text-2xl font-bold text-[#1B4636]/35 group-hover:text-[#BF3927] transition">
+                        {srv.code}
+                      </span>
+                      <span className="rounded-full bg-[#F1EBE0] px-3 py-1 text-[11px] font-semibold text-[#14201A]">
+                        {t.startingFrom} {formatPrice(srv.startingPrice, lang)}
+                      </span>
+                    </div>
+                    <h3 className="mt-4 text-base font-bold text-[#14201A]">
+                      {loc.title}
+                    </h3>
+                    <p className="mt-2 text-xs leading-relaxed text-[#58655C]">
+                      {loc.desc}
+                    </p>
                   </div>
-                  <h3 className="mt-4 text-base font-bold text-[#14201A]">
-                    {loc.title}
-                  </h3>
-                  <p className="mt-2 text-xs leading-relaxed text-[#58655C]">
-                    {loc.desc}
+                  <p className="mt-4 border-t border-[#F1EBE0] pt-3 text-[11px] font-semibold text-[#1B4636]">
+                    {loc.unit} ↗
                   </p>
                 </div>
-                <p className="mt-4 border-t border-[#F1EBE0] pt-3 text-[11px] font-semibold text-[#1B4636]">
-                  {loc.unit} ↗
-                </p>
-              </div>
+              </Reveal>
             );
           })}
         </div>

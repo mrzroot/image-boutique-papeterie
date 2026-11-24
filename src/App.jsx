@@ -27,8 +27,12 @@ export default function App() {
   const [wishlistOnly, setWishlistOnly] = useState(false);
   const [wishlist, setWishlist] = useState(() => readStorage("ib_wish", []));
   const [bagItems, setBagItems] = useState(() => readStorage("ib_bag", []));
+  const [orderHistory, setOrderHistory] = useState(() =>
+    readStorage("ib_orders", [])
+  );
   const [bagOpen, setBagOpen] = useState(false);
   const [activeProduct, setActiveProduct] = useState(null);
+  const [activeVariantIdx, setActiveVariantIdx] = useState(0);
   const [toastMsg, setToastMsg] = useState("");
 
   const t = TRANSLATIONS[lang];
@@ -63,6 +67,19 @@ export default function App() {
       // Ignore storage errors
     }
   }, [bagItems]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("ib_orders", JSON.stringify(orderHistory));
+    } catch {
+      // Ignore storage errors
+    }
+  }, [orderHistory]);
+
+  const handleOpenQuickView = (product, variantIdx = 0) => {
+    setActiveProduct(product);
+    setActiveVariantIdx(variantIdx);
+  };
 
   // Keep hash navigation synchronized with browser Back/Forward
   useEffect(() => {
@@ -171,7 +188,7 @@ export default function App() {
         onOpenBag={() => setBagOpen(true)}
         onToggleWishlistFilter={() => setWishlistOnly((w) => !w)}
         wishlistOnly={wishlistOnly}
-        onQuickView={setActiveProduct}
+        onQuickView={handleOpenQuickView}
       />
 
       <div className="flex-1">
@@ -187,7 +204,7 @@ export default function App() {
             onToggleWishlistOnly={() => setWishlistOnly((w) => !w)}
             onToggleWishlist={handleToggleWishlist}
             onAddToBag={handleAddProductToBag}
-            onQuickView={setActiveProduct}
+            onQuickView={handleOpenQuickView}
             onEnterServices={() => handleNavigate("services")}
           />
         ) : (
@@ -259,6 +276,7 @@ export default function App() {
       {activeProduct && (
         <ProductModal
           product={activeProduct}
+          initialVariantIdx={activeVariantIdx}
           lang={lang}
           t={t}
           isWishlisted={wishlist.includes(activeProduct.id)}
@@ -273,6 +291,8 @@ export default function App() {
         isOpen={bagOpen}
         onClose={() => setBagOpen(false)}
         items={bagItems}
+        orderHistory={orderHistory}
+        onSaveOrder={(order) => setOrderHistory((prev) => [order, ...prev])}
         onUpdateQty={handleUpdateQty}
         onRemoveItem={handleRemoveItem}
         onClearBag={() => setBagItems([])}
