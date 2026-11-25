@@ -30,7 +30,7 @@ export default function ProductMedia({ product, variantIdx = 0, lang = "fa", com
   const [mode, setMode] = useState("photo");
   const [photoIdx, setPhotoIdx] = useState(0);
   const [failed, setFailed] = useState(null); // "webgl" | "load" | null
-  const heightClass = compact ? "h-[280px] sm:h-[320px]" : "h-[340px] sm:h-[460px]";
+  const heightClass = compact ? "h-[280px] sm:h-[320px]" : "aspect-square w-full";
 
   const photos = [product.variantImages?.[variantIdx] || product.image, ...(product.gallery || [])].filter(Boolean);
   const photo = photos[photoIdx] || photos[0];

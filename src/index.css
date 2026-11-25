@@ -419,7 +419,7 @@ button.swatch::after { content: ""; position: absolute; inset: -8px; } /* 30px t
 }
 .category-row__name {
   font-family: Amiri, "Times New Roman", serif;
-  font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+  font-size: clamp(1.2rem, 2.4vw, 1.9rem);
   font-weight: 700;
   line-height: 1.4;
 }

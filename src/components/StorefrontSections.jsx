@@ -42,7 +42,7 @@ export function CategoryIndex({ t, lang, counts, onSelectCategory }) {
                 <img src={cat.image} alt="" aria-hidden="true" loading="lazy" decoding="async" width="56" height="56" className="category-row__thumb md:hidden" />
                 <span className="tabular-nums w-7 text-xs text-[var(--ink-sub)]">{formatNumber(i + 1, lang)}</span>
                 <span className="category-row__name">{t.categoryNames[cat.id]}</span>
-                <span className="tabular-nums ms-auto text-xs text-[var(--ink-sub)]">
+                <span className="tabular-nums ms-auto shrink-0 whitespace-nowrap text-xs text-[var(--ink-sub)]">
                   {formatNumber(counts(cat.id), lang)} {lang === "fa" ? "محصول" : "items"}
                 </span>
                 <Arrow className="category-row__arrow h-4 w-4" aria-hidden="true" />
