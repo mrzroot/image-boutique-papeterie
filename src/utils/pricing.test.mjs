@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import "./productMedia.test.mjs"; // ProductMedia mode rules (getMediaModes)
 import { calculatePrintQuote, getVolumeDiscountRate, formatPrice } from "./pricing.js";
 import {
   buildDefaultSiteContent,
