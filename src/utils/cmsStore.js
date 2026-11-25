@@ -90,6 +90,25 @@ function clone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
+function cleanStringList(list) {
+  return Array.isArray(list)
+    ? list.filter((s) => typeof s === "string" && s.trim()).map((s) => s.trim())
+    : [];
+}
+
+// Single product shape used by defaults, saved drafts, imports and the admin editor.
+// gallery / spinImages / model3dUrl are optional real-media fields read by the storefront viewer.
+export function normalizeProduct(p) {
+  return {
+    ...p,
+    visible: p.visible !== false,
+    inStock: p.inStock !== false,
+    gallery: cleanStringList(p.gallery),
+    spinImages: cleanStringList(p.spinImages),
+    model3dUrl: typeof p.model3dUrl === "string" ? p.model3dUrl.trim() : "",
+  };
+}
+
 export function buildDefaultSiteContent() {
   return {
     version: 1,
@@ -136,11 +155,7 @@ export function buildDefaultSiteContent() {
         body: TRANSLATIONS.en.storyBody,
       },
     },
-    products: clone(PRODUCTS).map((p) => ({
-      ...p,
-      visible: p.visible !== false,
-      inStock: p.inStock !== false,
-    })),
+    products: clone(PRODUCTS).map(normalizeProduct),
     bundles: clone(BUNDLES),
     socialGallery: clone(SOCIAL_GALLERY),
     servicesList: clone(SERVICES_LIST),
@@ -191,11 +206,7 @@ export function mergeSiteContent(base, override) {
     };
   }
   if (Array.isArray(override.products)) {
-    next.products = override.products.map((p) => ({
-      ...p,
-      visible: p.visible !== false,
-      inStock: p.inStock !== false,
-    }));
+    next.products = override.products.map(normalizeProduct);
   }
   if (Array.isArray(override.bundles)) next.bundles = override.bundles;
   if (Array.isArray(override.socialGallery)) next.socialGallery = override.socialGallery;
