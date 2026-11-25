@@ -21,6 +21,7 @@ export default function ProductModal({
   onToggleWishlist,
   onAddToBag,
   onClose,
+  onOpenProduct,
 }) {
   const localized = product[lang] || product.fa;
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(initialVariantIdx);
@@ -119,7 +120,7 @@ export default function ProductModal({
                 <span>
                   {inStock
                     ? lang === "fa"
-                      ? "موجود · ارسال فوری"
+                      ? "موجود"
                       : "In Stock"
                     : lang === "fa"
                     ? "ناموجود"
@@ -241,6 +242,18 @@ export default function ProductModal({
                 />
               </button>
             </div>
+            {onOpenProduct && (
+              <a
+                href={`#/product/${product.id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  onOpenProduct(product, selectedVariantIdx);
+                }}
+                className="block text-center text-sm text-[var(--ink-sub)] underline underline-offset-4 hover:text-[var(--ink-main)]"
+              >
+                {lang === "fa" ? "مشاهده صفحه کامل محصول" : "View full product page"}
+              </a>
+            )}
           </div>
         </div>
       </div>

@@ -104,7 +104,7 @@
     giftCard: {
       eyebrow: "کارت هدیه دیجیتال بوتیک",
       title: "هدیه‌ای به سلیقه خودشان با کارت هدیه ایمیج بوتیک",
-      desc: "مبلغ، رنگ کارت و نام گیرنده را انتخاب کنید تا کارت هدیه اختصاصی با کد اعتبار آنی به سبد شما اضافه شود.",
+      desc: "مبلغ، رنگ کارت و نام گیرنده را انتخاب کنید تا کارت هدیه به سبد شما اضافه شود. کد کارت پس از تأیید سفارش توسط بوتیک صادر می‌شود.",
       amountLabel: "انتخاب مبلغ اعتبار کارت هدیه",
       recipientLabel: "نام گیرنده هدیه (اختیاری)",
       recipientPlaceholder: "مثلاً: به نازنین عزیز",
@@ -297,8 +297,8 @@
     newsletterDesc:
       "از رسیدن محموله‌های جدید کاغذ فلورانس، ست‌های محدود و تخفیف‌های فصلی چاپ باخبر شوید.",
     newsletterPlaceholder: "ایمیل خود را وارد کنید...",
-    newsletterBtn: "عضویت",
-    newsletterSuccess: "ایمیل شما با موفقیت در خبرنامه ایمیج بوتیک ثبت شد.",
+    newsletterBtn: "عضویت با ایمیل",
+    newsletterSuccess: "پیش‌نویس ایمیل عضویت باز شد؛ با ارسال آن، عضو خبرنامه می‌شوید.",
     footerAbout:
       "ایمیج بوتیک (La Boutique Papeterie): ویترین تخصصی نوشت‌افزار هنری و کاغذهای فاخر به همراه آتلیه خدمات چاپ، صحافی و بسته‌بندی اختصاصی.",
     footerCols: {
@@ -465,7 +465,7 @@
     giftCard: {
       eyebrow: "Digital gift card",
       title: "Gift the Joy of Fine Paper with an Image Boutique E-Card",
-      desc: "Personalize the card finish, denomination, and recipient name, added immediately to your order bag.",
+      desc: "Personalize the card finish, denomination, and recipient name, then add it to your order bag. The card code is issued by the boutique once your order is confirmed.",
       amountLabel: "Select Gift Card Value",
       recipientLabel: "Recipient Name (Optional)",
       recipientPlaceholder: "e.g. For Sara",
@@ -658,9 +658,9 @@
     newsletterDesc:
       "Receive early access to Florentine paper drops, seasonal planner releases, and atelier promotions.",
     newsletterPlaceholder: "Enter your email address...",
-    newsletterBtn: "Subscribe",
+    newsletterBtn: "Subscribe by email",
     newsletterSuccess:
-      "Thank you, you are subscribed to Image Boutique dispatches.",
+      "Your email app opened a sign-up message — send it to join the newsletter.",
     footerAbout:
       "Image Boutique (La Boutique Papeterie): curated European stationery and decorative paper storefront with an integrated bespoke print & bindery atelier.",
     footerCols: {

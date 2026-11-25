@@ -260,7 +260,7 @@ export default function BoutiqueStorefront({
 
       {/* 3. Bestsellers & new arrivals */}
       <ProductRail id="favorites" eyebrow={t.favoritesEyebrow} title={t.favoritesTitle} subtitle={t.favoritesSubtitle} products={favorites} cardProps={cardProps} />
-      <ProductRail id="new-arrivals" tone="surface" eyebrow={t.newArrivals.eyebrow} title={t.newArrivals.title} subtitle={t.newArrivals.subtitle} products={newArrivals} cardProps={cardProps} />
+      <ProductRail id="new-arrivals" tone="surface" eyebrow={t.newArrivals.eyebrow} title={t.newArrivals.title} subtitle={t.newArrivals.subtitle} products={newArrivals} cardProps={cardProps} columns={newArrivals.length === 3 ? 3 : 4} />
 
       {/* 5. Interactive "Shop the Desk" Editorial Lookbook Band */}
       {t.lookbook && activePinProduct && (

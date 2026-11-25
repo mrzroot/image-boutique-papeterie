@@ -30,7 +30,7 @@ export default function BoutiqueExtras({
   t,
   lang,
   products = [],
-  bundles = [],
+  bundles = [],
   onAddBundle,
   onAddGiftCard,
   onQuickView,
@@ -192,8 +192,8 @@ export default function BoutiqueExtras({
                 </div>
 
                 <div className="relative z-10 flex items-center justify-between text-[11px] font-latin-ui opacity-75">
-                  <span>E-GIFT · INSTANT CODE</span>
-                  <span>VALID 12 MONTHS</span>
+                  <span>DIGITAL GIFT CARD</span>
+                  <span>LA BOUTIQUE PAPETERIE</span>
                 </div>
               </div>
             </div>

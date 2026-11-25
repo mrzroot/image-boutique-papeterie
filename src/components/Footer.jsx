@@ -13,6 +13,9 @@ export default function Footer({ t, lang, contact, onNavigate, onSelectCategory 
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (!email.trim()) return;
+    // No mailing-list backend: hand the request to the shop by email instead of pretending to store it.
+    const subject = lang === "fa" ? "درخواست عضویت در خبرنامه" : "Newsletter sign-up";
+    window.location.href = `mailto:${emailAddr}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(email.trim())}`;
     setSubscribed(true);
     setEmail("");
   };

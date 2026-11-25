@@ -519,6 +519,7 @@ export default function App() {
           onToggleWishlist={handleToggleWishlist}
           onAddToBag={handleAddProductToBag}
           onClose={() => setActiveProduct(null)}
+          onOpenProduct={handleOpenProduct}
         />
       )}
 
