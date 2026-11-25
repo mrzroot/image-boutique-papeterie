@@ -1,12 +1,19 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { Store, LayoutGrid, Printer, ShoppingBag, ArrowUp } from "lucide-react";
 import { TRANSLATIONS } from "./data/translations";
+import {
+  buildDefaultSiteContent,
+  mergeSiteContent,
+  CMS_DRAFT_KEY,
+} from "./utils/cmsStore";
 import Header from "./components/Header";
 import BoutiqueStorefront from "./components/BoutiqueStorefront";
 import ServicesPortal from "./components/ServicesPortal";
 import ProductModal from "./components/ProductModal";
 import OrderBagDrawer from "./components/OrderBagDrawer";
 import Footer from "./components/Footer";
+
+const AdminDashboard = lazy(() => import("./components/AdminDashboard"));
 
 function readStorage(key, fallback) {
   try {
@@ -17,12 +24,17 @@ function readStorage(key, fallback) {
   }
 }
 
+function viewFromHash() {
+  const h = window.location.hash;
+  if (h === "#/services") return "services";
+  if (h === "#/admin") return "admin";
+  return "store";
+}
+
 export default function App() {
   const [lang, setLang] = useState(() => readStorage("ib_lang", "fa"));
   const [theme, setTheme] = useState(() => readStorage("ib_theme", "light"));
-  const [view, setView] = useState(() =>
-    window.location.hash === "#/services" ? "services" : "store"
-  );
+  const [view, setView] = useState(viewFromHash);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [wishlistOnly, setWishlistOnly] = useState(false);
@@ -37,6 +49,38 @@ export default function App() {
   const [toastMsg, setToastMsg] = useState("");
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  const [publishedBaseline, setPublishedBaseline] = useState(() =>
+    buildDefaultSiteContent()
+  );
+  const [cmsContent, setCmsContent] = useState(() => {
+    const base = buildDefaultSiteContent();
+    const draft = readStorage(CMS_DRAFT_KEY, null);
+    return draft ? mergeSiteContent(base, draft) : base;
+  });
+  const [hasLocalDraft, setHasLocalDraft] = useState(() =>
+    Boolean(readStorage(CMS_DRAFT_KEY, null))
+  );
+
+  // Load live published site-content.json on startup and merge below any local admin draft
+  useEffect(() => {
+    let active = true;
+    fetch(`./data/site-content.json?t=${Date.now()}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((remote) => {
+        if (!active || !remote) return;
+        const mergedRemote = mergeSiteContent(buildDefaultSiteContent(), remote);
+        setPublishedBaseline(mergedRemote);
+        const draft = readStorage(CMS_DRAFT_KEY, null);
+        setCmsContent(draft ? mergeSiteContent(mergedRemote, draft) : mergedRemote);
+      })
+      .catch(() => {
+        // Offline or baseline mode
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 520);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -45,7 +89,6 @@ export default function App() {
 
   const t = TRANSLATIONS[lang];
 
-  // Sync HTML dir, lang, theme, and title
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === "fa" ? "rtl" : "ltr";
@@ -93,6 +136,43 @@ export default function App() {
     }
   }, [orderHistory]);
 
+  const handleUpdateContent = useCallback((updater) => {
+    setCmsContent((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      try {
+        localStorage.setItem(CMS_DRAFT_KEY, JSON.stringify(next));
+      } catch {
+        // Ignore quota warnings
+      }
+      setHasLocalDraft(true);
+      return next;
+    });
+  }, []);
+
+  const handleDiscardDraft = useCallback(
+    (resetToFactory = false) => {
+      try {
+        localStorage.removeItem(CMS_DRAFT_KEY);
+      } catch {
+        // Ignore storage errors
+      }
+      setHasLocalDraft(false);
+      setCmsContent(resetToFactory ? buildDefaultSiteContent() : publishedBaseline);
+    },
+    [publishedBaseline]
+  );
+
+  const handlePublished = useCallback((publishedObj) => {
+    try {
+      localStorage.removeItem(CMS_DRAFT_KEY);
+    } catch {
+      // Ignore storage errors
+    }
+    setHasLocalDraft(false);
+    setPublishedBaseline(publishedObj);
+    setCmsContent(publishedObj);
+  }, []);
+
   const handleOpenQuickView = (product, variantIdx = 0) => {
     setActiveProduct(product);
     setActiveVariantIdx(variantIdx);
@@ -100,7 +180,7 @@ export default function App() {
 
   useEffect(() => {
     const handleHashChange = () => {
-      setView(window.location.hash === "#/services" ? "services" : "store");
+      setView(viewFromHash());
     };
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
@@ -112,7 +192,12 @@ export default function App() {
   }, []);
 
   const handleNavigate = useCallback((targetView, scrollId) => {
-    const nextHash = targetView === "services" ? "#/services" : "#/";
+    const nextHash =
+      targetView === "services"
+        ? "#/services"
+        : targetView === "admin"
+        ? "#/admin"
+        : "#/";
     if (window.location.hash !== nextHash) {
       window.history.pushState(null, "", nextHash);
     }
@@ -136,8 +221,9 @@ export default function App() {
 
   const handleAddProductToBag = (product, variantIdx = 0, qty = 1) => {
     const key = `${product.id}::${variantIdx}`;
-    const loc = product[lang];
-    const variant = loc.variants[variantIdx] || loc.variants[0];
+    const loc = product[lang] || product.fa;
+    const variants = loc.variants || [];
+    const variant = variants[variantIdx] || variants[0] || "";
     setBagItems((prev) => {
       const existing = prev.find((item) => item.key === key);
       if (existing) {
@@ -153,7 +239,7 @@ export default function App() {
           productId: product.id,
           variantIdx,
           title: loc.title,
-          meta: `${product.sku} · ${variant}`,
+          meta: variant ? `${product.sku} · ${variant}` : product.sku,
           unitPrice: product.price,
           qty,
           image: product.variantImages?.[variantIdx] || product.image,
@@ -174,7 +260,7 @@ export default function App() {
 
   const handleAddBundle = (bundle) => {
     const key = `bundle::${bundle.id}`;
-    const loc = bundle[lang];
+    const loc = bundle[lang] || bundle.fa;
     setBagItems((prev) => {
       const existing = prev.find((i) => i.key === key);
       if (existing) {
@@ -261,6 +347,10 @@ export default function App() {
         onToggleWishlistFilter={() => setWishlistOnly((w) => !w)}
         wishlistOnly={wishlistOnly}
         onQuickView={handleOpenQuickView}
+        products={cmsContent.products}
+        announcement={cmsContent.announcement?.[lang]}
+        contactPhone={cmsContent.contact?.phone}
+        hasLocalDraft={hasLocalDraft}
       />
 
       <div className="flex-1">
@@ -268,6 +358,12 @@ export default function App() {
           <BoutiqueStorefront
             t={t}
             lang={lang}
+            products={cmsContent.products}
+            bundles={cmsContent.bundles}
+            socialGallery={cmsContent.socialGallery}
+            heroSlides={cmsContent.heroSlides}
+            valueStrip={cmsContent.valueStrip}
+            story={cmsContent.story}
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
             searchQuery={searchQuery}
@@ -281,19 +377,46 @@ export default function App() {
             onQuickView={handleOpenQuickView}
             onEnterServices={() => handleNavigate("services")}
           />
-        ) : (
+        ) : view === "services" ? (
           <ServicesPortal
             t={t}
             lang={lang}
+            pricingOverrides={cmsContent.pricing}
+            servicesList={cmsContent.servicesList}
+            tieredPriceRows={cmsContent.tieredPriceRows}
+            servicesFaq={cmsContent.servicesFaq}
             onBackToStore={() => handleNavigate("store")}
             onAddServiceJob={handleAddServiceJob}
           />
+        ) : (
+          <Suspense
+            fallback={
+              <div className="mx-auto max-w-5xl px-4 py-16 text-center text-sm text-[var(--ink-sub)]">
+                {lang === "fa" ? "در حال بارگذاری پنل مدیریت..." : "Loading Admin Dashboard..."}
+              </div>
+            }
+          >
+            <AdminDashboard
+              lang={lang}
+              t={t}
+              cmsContent={cmsContent}
+              hasLocalDraft={hasLocalDraft}
+              onUpdateContent={handleUpdateContent}
+              onDiscardDraft={handleDiscardDraft}
+              onPublished={handlePublished}
+              orderHistory={orderHistory}
+              onUpdateOrders={setOrderHistory}
+              onNavigate={handleNavigate}
+              showToast={showToast}
+            />
+          </Suspense>
         )}
       </div>
 
       <Footer
         t={t}
         lang={lang}
+        contact={cmsContent.contact}
         onNavigate={handleNavigate}
         onSelectCategory={setSelectedCategory}
       />
@@ -368,6 +491,10 @@ export default function App() {
         isOpen={bagOpen}
         onClose={() => setBagOpen(false)}
         items={bagItems}
+        products={cmsContent.products}
+        bundles={cmsContent.bundles}
+        promoCodes={cmsContent.promoCodes}
+        shipping={cmsContent.shipping}
         orderHistory={orderHistory}
         onSaveOrder={(order) => setOrderHistory((prev) => [order, ...prev])}
         onUpdateQty={handleUpdateQty}
@@ -378,13 +505,13 @@ export default function App() {
         t={t}
       />
 
-      {/* Solid Back-to-Top Button */}
+      {/* Compact Back-to-Top Button */}
       {showScrollTop && (
         <button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top"
-          className="fixed bottom-18 end-4 z-30 inline-flex h-11 w-11 items-center justify-center rounded-[3px] border border-[var(--accent-gold)]/50 bg-[var(--accent-deep)] text-[#E7D19F] shadow-lg transition hover:bg-[var(--accent-pine)] md:bottom-6"
+          className="fixed bottom-18 end-3 z-30 inline-flex h-9 w-9 items-center justify-center rounded-[3px] border border-[var(--accent-gold)]/50 bg-[var(--accent-deep)] text-[#E7D19F] shadow-md transition hover:bg-[var(--accent-pine)] md:bottom-5 md:end-5"
         >
           <ArrowUp className="h-4 w-4" aria-hidden="true" />
         </button>

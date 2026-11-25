@@ -11,8 +11,9 @@ import {
   Sun,
   Moon,
   Store,
+  LayoutDashboard,
 } from "lucide-react";
-import { CATEGORIES, PRODUCTS } from "../data/catalog";
+import { CATEGORIES } from "../data/catalog";
 import { formatPrice } from "../utils/pricing";
 
 function BrandCrest() {
@@ -61,6 +62,10 @@ export default function Header({
   onToggleWishlistFilter,
   wishlistOnly,
   onQuickView,
+  products = [],
+  announcement = "",
+  contactPhone = "0935-383-4393",
+  hasLocalDraft = false,
 }) {
   const [collectionsOpen, setCollectionsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -86,9 +91,10 @@ export default function Header({
   };
 
   const quickMatches = searchQuery.trim()
-    ? PRODUCTS.filter((p) => {
+    ? products.filter((p) => {
+        if (p.visible === false) return false;
         const q = searchQuery.trim().toLowerCase();
-        const loc = p[lang];
+        const loc = p[lang] || p.fa;
         return (
           loc.title.toLowerCase().includes(q) ||
           loc.subtitle.toLowerCase().includes(q) ||
@@ -96,6 +102,8 @@ export default function Header({
         );
       }).slice(0, 4)
     : [];
+
+  const cleanTelHref = `tel:${String(contactPhone || "09353834393").replace(/[^0-9+]/g, "")}`;
 
   return (
     <header
@@ -107,39 +115,60 @@ export default function Header({
         className="text-[#FAF6EE] text-xs border-b border-[var(--accent-gold)]/25"
         style={{ backgroundColor: "var(--topbar-bg)" }}
       >
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-1.5 sm:px-6">
           <div className="flex items-center gap-3 min-w-0">
             <a
-              href="tel:09353834393"
+              href={cleanTelHref}
               className="hidden items-center gap-1.5 text-[#D8E5DD] hover:text-white sm:inline-flex font-latin-ui transition"
               dir="ltr"
             >
               <Phone className="h-3.5 w-3.5 text-[#D6B36A]" aria-hidden="true" />
-              <span>0935-383-4393</span>
+              <span>{contactPhone}</span>
             </a>
             <span className="hidden text-white/20 sm:inline" aria-hidden="true">|</span>
-            <p className="truncate max-w-[50vw] sm:max-w-none text-[#F2EFE8]">
-              {t.announcement}
+            <p className="truncate max-w-[46vw] sm:max-w-none text-[#F2EFE8]">
+              {announcement || t.announcement}
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Admin CMS Dashboard Button */}
+            <button
+              type="button"
+              onClick={() => onNavigate("admin")}
+              aria-label={lang === "fa" ? "داشبورد مدیریت" : "Admin Dashboard"}
+              className={`relative inline-flex items-center gap-1 rounded-[3px] border px-2 py-0.5 text-[11px] font-semibold transition ${
+                view === "admin"
+                  ? "border-[#E7D19F] bg-[#E7D19F] text-[#123126]"
+                  : "border-white/25 bg-white/10 text-[#FAF6EE] hover:bg-white/20"
+              }`}
+            >
+              <LayoutDashboard className="h-3 w-3" aria-hidden="true" />
+              <span>{lang === "fa" ? "مدیریت" : "Admin"}</span>
+              {hasLocalDraft && (
+                <span
+                  title={lang === "fa" ? "تغییرات منتشرنشده" : "Unpublished local draft"}
+                  className="h-1.5 w-1.5 rounded-full bg-[#E7D19F]"
+                />
+              )}
+            </button>
+
             {/* Obsidian Black / Light Boutique Theme Switcher */}
             <button
               type="button"
               onClick={onToggleTheme}
               aria-label="Toggle Theme"
-              className="inline-flex items-center gap-1.5 rounded-[3px] border border-white/25 bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-[#FAF6EE] transition hover:bg-white/20"
+              className="inline-flex items-center gap-1 rounded-[3px] border border-white/25 bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-[#FAF6EE] transition hover:bg-white/20"
             >
               {theme === "light" ? (
                 <>
                   <Moon className="h-3 w-3 text-[#E7D19F]" aria-hidden="true" />
-                  <span>{t.themeDark}</span>
+                  <span className="hidden sm:inline">{t.themeDark}</span>
                 </>
               ) : (
                 <>
                   <Sun className="h-3 w-3 text-[#E7D19F]" aria-hidden="true" />
-                  <span>{t.themeLight}</span>
+                  <span className="hidden sm:inline">{t.themeLight}</span>
                 </>
               )}
             </button>
@@ -148,7 +177,7 @@ export default function Header({
               type="button"
               onClick={onToggleLang}
               aria-label="Toggle Language"
-              className="inline-flex items-center gap-1 rounded-[3px] border border-[#D6B36A]/50 px-2.5 py-1 text-[11px] font-semibold tracking-wider text-white transition hover:bg-[#D6B36A] hover:text-[#123126] font-latin-ui"
+              className="inline-flex items-center gap-1 rounded-[3px] border border-[#D6B36A]/50 px-2 py-0.5 text-[11px] font-semibold tracking-wider text-white transition hover:bg-[#D6B36A] hover:text-[#123126] font-latin-ui"
             >
               <span
                 className={
@@ -171,7 +200,7 @@ export default function Header({
       </div>
 
       {/* Main Storefront Navigation */}
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
         {/* Desktop Storefront Links */}
         <nav
           aria-label={lang === "fa" ? "منوی اصلی" : "Primary"}
@@ -425,7 +454,7 @@ export default function Header({
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-xs font-bold text-[var(--ink-main)]">
-                        {prod[lang].title}
+                        {(prod[lang] || prod.fa).title}
                       </p>
                       <p className="tabular-nums text-[11px] font-semibold text-[var(--accent-gold)]">
                         {formatPrice(prod.price, lang)}

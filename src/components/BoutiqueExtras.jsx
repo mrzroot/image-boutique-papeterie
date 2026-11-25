@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Gift, Plus, ExternalLink } from "lucide-react";
-import { BUNDLES, SOCIAL_GALLERY, PRODUCTS } from "../data/catalog";
 import { formatPrice } from "../utils/pricing";
 import Reveal from "./Reveal";
 
@@ -30,6 +29,9 @@ const CARD_FINISHES = {
 export default function BoutiqueExtras({
   t,
   lang,
+  products = [],
+  bundles = [],
+  socialGallery = [],
   onAddBundle,
   onAddGiftCard,
   onQuickView,
@@ -71,8 +73,8 @@ export default function BoutiqueExtras({
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {BUNDLES.map((bundle) => {
-              const loc = bundle[lang];
+            {bundles.map((bundle) => {
+              const loc = bundle[lang] || bundle.fa;
               return (
                 <article
                   key={bundle.id}
@@ -332,9 +334,11 @@ export default function BoutiqueExtras({
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {SOCIAL_GALLERY.map((tile) => {
+            {socialGallery.map((tile) => {
               const targetProduct =
-                PRODUCTS.find((p) => p.id === tile.productId) || PRODUCTS[0];
+                products.find((p) => p.id === tile.productId) || products[0];
+              if (!targetProduct) return null;
+              const loc = targetProduct[lang] || targetProduct.fa;
               return (
                 <button
                   key={tile.id}
@@ -344,7 +348,7 @@ export default function BoutiqueExtras({
                 >
                   <img
                     src={tile.image}
-                    alt={targetProduct[lang].title}
+                    alt={loc.title}
                     loading="lazy"
                     decoding="async"
                     width="300"
@@ -354,7 +358,7 @@ export default function BoutiqueExtras({
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-black/55 p-2 text-center text-white opacity-0 transition duration-200 group-hover:opacity-100">
                     <ExternalLink className="h-4 w-4 text-[#E7D19F]" aria-hidden="true" />
                     <span className="text-[11px] font-bold line-clamp-2">
-                      {targetProduct[lang].title}
+                      {loc.title}
                     </span>
                   </div>
                 </button>

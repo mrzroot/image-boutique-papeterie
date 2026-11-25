@@ -12,7 +12,7 @@ import {
   Pause,
   Play,
 } from "lucide-react";
-import { CATEGORIES, PRODUCTS } from "../data/catalog";
+import { CATEGORIES } from "../data/catalog";
 import { formatPrice, formatNumber } from "../utils/pricing";
 import Reveal from "./Reveal";
 import BoutiqueExtras from "./BoutiqueExtras";
@@ -20,6 +20,12 @@ import BoutiqueExtras from "./BoutiqueExtras";
 export default function BoutiqueStorefront({
   t,
   lang,
+  products = [],
+  bundles = [],
+  socialGallery = [],
+  heroSlides = [],
+  valueStrip = [],
+  story = null,
   selectedCategory,
   onSelectCategory,
   searchQuery,
@@ -40,11 +46,17 @@ export default function BoutiqueStorefront({
   const [cardVariants, setCardVariants] = useState({});
   const isRtl = lang === "fa";
 
-  const slides = t.heroSlides;
-  const activeSlide = slides[slideIdx] || slides[0];
+  const slides = heroSlides.length
+    ? heroSlides.map((s) => ({
+        image: s.image,
+        ...(s[lang] || s.fa || {}),
+      }))
+    : t.heroSlides;
+  const safeSlideIdx = slideIdx < slides.length ? slideIdx : 0;
+  const activeSlide = slides[safeSlideIdx] || slides[0];
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || slides.length <= 1) return;
     const timer = setInterval(() => {
       setSlideIdx((prev) => (prev + 1) % slides.length);
     }, 6500);
@@ -55,20 +67,22 @@ export default function BoutiqueStorefront({
   const PrevIcon = isRtl ? ChevronRight : ChevronLeft;
   const NextIcon = isRtl ? ChevronLeft : ChevronRight;
 
-  const favorites = PRODUCTS.filter((p) => p.badge === "bestseller").slice(0, 4);
+  const visibleProducts = products.filter((p) => p.visible !== false);
+  const bestsellers = visibleProducts.filter((p) => p.badge === "bestseller");
+  const favorites = (bestsellers.length >= 4 ? bestsellers : visibleProducts).slice(0, 4);
 
   const pins = t.lookbook?.pins || [];
   const activePin = pins[activePinIdx] || pins[0];
   const activePinProduct =
-    PRODUCTS.find((p) => p.id === activePin?.id) || PRODUCTS[0];
+    visibleProducts.find((p) => p.id === activePin?.id) || visibleProducts[0];
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
-  const filteredProducts = PRODUCTS.filter((p) => {
+  const filteredProducts = visibleProducts.filter((p) => {
     if (selectedCategory !== "all" && p.category !== selectedCategory)
       return false;
     if (wishlistOnly && !wishlist.includes(p.id)) return false;
     if (!normalizedQuery) return true;
-    const loc = p[lang];
+    const loc = p[lang] || p.fa;
     return (
       loc.title.toLowerCase().includes(normalizedQuery) ||
       loc.subtitle.toLowerCase().includes(normalizedQuery) ||
@@ -85,8 +99,18 @@ export default function BoutiqueStorefront({
 
   const countByCategory = (catId) =>
     catId === "all"
-      ? PRODUCTS.length
-      : PRODUCTS.filter((p) => p.category === catId).length;
+      ? visibleProducts.length
+      : visibleProducts.filter((p) => p.category === catId).length;
+
+  const activeValueStrip = valueStrip.length
+    ? valueStrip.map((v) => v[lang] || v.fa || v)
+    : t.valueStrip;
+
+  const activeStory = story?.[lang] || story?.fa || {
+    eyebrow: t.storyEyebrow,
+    title: t.storyTitle,
+    body: t.storyBody,
+  };
 
   const badgeStyle = (badge) => {
     if (badge === "new") return "bg-[var(--accent-crimson)] text-white";
@@ -97,34 +121,34 @@ export default function BoutiqueStorefront({
 
   return (
     <main className="paper-grain animate-page-in">
-      {/* 1. Full-Bleed Editorial Storefront Hero */}
+      {/* 1. Compact Full-Bleed Editorial Storefront Hero */}
       <section className="border-b border-[var(--border-subtle)] bg-[var(--bg-soft)]">
-        <div className="mx-auto grid max-w-7xl items-stretch md:grid-cols-12 md:min-h-[450px] lg:min-h-[500px]">
+        <div className="mx-auto grid max-w-7xl items-stretch md:grid-cols-12 md:min-h-[340px] lg:min-h-[380px] md:max-h-[430px]">
           {/* Editorial Copy Pane */}
-          <div className="min-w-0 flex flex-col justify-between px-4 py-8 sm:px-6 md:col-span-6 md:py-10 lg:py-12">
-            <div className="space-y-4">
+          <div className="min-w-0 flex flex-col justify-center gap-5 px-4 py-6 sm:px-6 md:col-span-6 md:py-7 lg:py-8">
+            <div className="space-y-2.5">
               <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-gold)]">
                 {activeSlide.eyebrow}
               </p>
 
               <h1
-                className={`text-2xl sm:text-3xl lg:text-[42px] font-bold leading-[1.24] text-[var(--ink-main)] ${
+                className={`text-xl sm:text-2xl lg:text-[32px] font-bold leading-[1.28] text-[var(--ink-main)] ${
                   isRtl ? "" : "font-editorial"
                 }`}
               >
                 {activeSlide.title}
               </h1>
 
-              <p className="max-w-xl text-sm lg:text-base leading-relaxed text-[var(--ink-sub)]">
+              <p className="max-w-lg text-xs sm:text-sm lg:text-[15px] leading-relaxed text-[var(--ink-sub)]">
                 {activeSlide.desc}
               </p>
             </div>
 
-            <div className="mt-7 space-y-5">
-              <div className="flex flex-wrap items-center gap-5">
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <a
                   href="#catalog"
-                  className="inline-flex items-center gap-2.5 rounded-[3px] bg-[var(--accent-crimson)] px-7 py-3.5 text-xs lg:text-sm font-semibold text-white transition hover:opacity-90"
+                  className="inline-flex items-center gap-2 rounded-[3px] bg-[var(--accent-crimson)] px-5 py-2.5 text-xs lg:text-sm font-semibold text-white transition hover:opacity-90"
                 >
                   <span>{activeSlide.ctaPrimary}</span>
                   <ArrowForward className="h-4 w-4" aria-hidden="true" />
@@ -132,17 +156,17 @@ export default function BoutiqueStorefront({
 
                 <a
                   href="#favorites"
-                  className="text-xs lg:text-sm font-semibold text-[var(--ink-main)] underline underline-offset-4 transition hover:text-[var(--accent-gold)] py-2"
+                  className="text-xs lg:text-sm font-semibold text-[var(--ink-main)] underline underline-offset-4 transition hover:text-[var(--accent-gold)] py-1.5"
                 >
                   {t.nav.newArrivals}
                 </a>
               </div>
 
               {/* Slide Progress & Play/Pause Controls */}
-              <div className="space-y-2.5 border-t border-[var(--border-subtle)] pt-4">
+              <div className="space-y-2 border-t border-[var(--border-subtle)] pt-3">
                 <div className="h-[2px] w-full overflow-hidden bg-[var(--border-subtle)]">
                   <div
-                    key={`${slideIdx}-${isPaused}`}
+                    key={`${safeSlideIdx}-${isPaused}`}
                     className={`h-full w-full bg-[var(--accent-pine)] ${
                       isPaused ? "opacity-35" : "animate-slide-progress"
                     }`}
@@ -158,14 +182,14 @@ export default function BoutiqueStorefront({
                         onClick={() => setSlideIdx(idx)}
                         aria-label={`Slide ${idx + 1}`}
                         className={`h-2 rounded-[2px] transition-all ${
-                          idx === slideIdx
+                          idx === safeSlideIdx
                             ? "w-8 bg-[var(--accent-pine)]"
                             : "w-2 bg-[var(--border-strong)] hover:opacity-80"
                         }`}
                       />
                     ))}
                     <span className="tabular-nums ms-2 font-latin-ui text-xs font-semibold text-[var(--ink-sub)]">
-                      0{slideIdx + 1} / 0{slides.length}
+                      0{safeSlideIdx + 1} / 0{slides.length}
                     </span>
                   </div>
 
@@ -174,7 +198,7 @@ export default function BoutiqueStorefront({
                       type="button"
                       onClick={() => setIsPaused((p) => !p)}
                       aria-label={isPaused ? "Play slides" : "Pause slides"}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
                     >
                       {isPaused ? (
                         <Play className="h-3.5 w-3.5" aria-hidden="true" />
@@ -190,7 +214,7 @@ export default function BoutiqueStorefront({
                         )
                       }
                       aria-label="Previous slide"
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
                     >
                       <PrevIcon className="h-4 w-4" aria-hidden="true" />
                     </button>
@@ -200,7 +224,7 @@ export default function BoutiqueStorefront({
                         setSlideIdx((prev) => (prev + 1) % slides.length)
                       }
                       aria-label="Next slide"
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
                     >
                       <NextIcon className="h-4 w-4" aria-hidden="true" />
                     </button>
@@ -210,8 +234,8 @@ export default function BoutiqueStorefront({
             </div>
           </div>
 
-          {/* Full-Bleed Hero Photograph (zero overlay pill/stamp clutter, eager LCP priority) */}
-          <div className="relative aspect-[16/10] sm:aspect-[16/9] md:aspect-auto md:h-full md:col-span-6 overflow-hidden bg-[var(--bg-muted)]">
+          {/* Full-Bleed Hero Photograph */}
+          <div className="relative aspect-[16/10] sm:aspect-[16/9] md:aspect-auto md:h-full md:max-h-[430px] md:col-span-6 overflow-hidden bg-[var(--bg-muted)]">
             <img
               key={activeSlide.image}
               src={activeSlide.image}
@@ -231,8 +255,8 @@ export default function BoutiqueStorefront({
         className="text-[#FAF6EE] border-b border-[var(--accent-gold)]/25"
         style={{ backgroundColor: "var(--strip-bg)" }}
       >
-        <div className="mx-auto grid max-w-7xl divide-y divide-white/15 px-4 py-6 sm:px-6 md:grid-cols-3 md:divide-y-0 md:divide-x rtl:md:divide-x-reverse">
-          {t.valueStrip.map((item, i) => (
+        <div className="mx-auto grid max-w-7xl divide-y divide-white/15 px-4 py-5 sm:px-6 md:grid-cols-3 md:divide-y-0 md:divide-x rtl:md:divide-x-reverse">
+          {activeValueStrip.map((item, i) => (
             <div
               key={i}
               className="flex items-start gap-4 py-3 md:px-6 md:py-1 first:md:ps-0 last:md:pe-0"
@@ -267,7 +291,7 @@ export default function BoutiqueStorefront({
 
         <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
           {favorites.map((product) => {
-            const loc = product[lang];
+            const loc = product[lang] || product.fa;
             const activeVariantIdx = cardVariants[product.id] || 0;
             const activeImage =
               product.variantImages?.[activeVariantIdx] || product.image;
@@ -652,11 +676,12 @@ export default function BoutiqueStorefront({
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {filteredProducts.map((product) => {
-                  const loc = product[lang];
+                  const loc = product[lang] || product.fa;
                   const isWished = wishlist.includes(product.id);
                   const activeVariantIdx = cardVariants[product.id] || 0;
+                  const variants = loc.variants || [];
                   const activeVariantName =
-                    loc.variants[activeVariantIdx] || loc.variants[0];
+                    variants[activeVariantIdx] || variants[0] || "";
                   const activeImage =
                     product.variantImages?.[activeVariantIdx] || product.image;
                   return (
@@ -790,6 +815,9 @@ export default function BoutiqueStorefront({
       <BoutiqueExtras
         t={t}
         lang={lang}
+        products={visibleProducts}
+        bundles={bundles}
+        socialGallery={socialGallery}
         onAddBundle={onAddBundle}
         onAddGiftCard={onAddGiftCard}
         onQuickView={onQuickView}
@@ -806,7 +834,7 @@ export default function BoutiqueStorefront({
               <div className="overflow-hidden rounded-[4px] border border-[var(--border-strong)] bg-[var(--bg-surface)] p-2">
                 <img
                   src="./images/cat-decorative-paper.jpg"
-                  alt={t.storyTitle}
+                  alt={activeStory.title}
                   loading="lazy"
                   decoding="async"
                   width="500"
@@ -818,13 +846,13 @@ export default function BoutiqueStorefront({
 
             <div className="space-y-4 md:col-span-7 md:ps-6">
               <p className="font-latin-ui text-xs font-bold tracking-[0.22em] text-[var(--accent-gold)]">
-                {t.storyEyebrow}
+                {activeStory.eyebrow}
               </p>
               <h2 className="text-2xl sm:text-3xl font-bold leading-snug text-[var(--ink-main)]">
-                {t.storyTitle}
+                {activeStory.title}
               </h2>
               <p className="text-sm sm:text-base leading-loose text-[var(--ink-body)]">
-                {t.storyBody}
+                {activeStory.body}
               </p>
             </div>
           </div>

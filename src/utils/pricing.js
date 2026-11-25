@@ -53,24 +53,38 @@ export function getVolumeDiscountRate(totalSheets) {
   return 0;
 }
 
-export function calculatePrintQuote({
-  printType = "color",
-  size = "A4",
-  sides = "double",
-  paperStock = "tahrir100",
-  binding = "spiral",
-  pages = 40,
-  copies = 2,
-}) {
+export function getNextVolumeTier(totalImpressions) {
+  if (totalImpressions < 100) return { minImpressions: 100, rate: 0.1 };
+  if (totalImpressions < 500) return { minImpressions: 500, rate: 0.2 };
+  if (totalImpressions < 1000) return { minImpressions: 1000, rate: 0.3 };
+  return null;
+}
+
+export function calculatePrintQuote(
+  {
+    printType = "color",
+    size = "A4",
+    sides = "double",
+    paperStock = "tahrir100",
+    binding = "spiral",
+    pages = 40,
+    copies = 2,
+  },
+  overrides = null
+) {
   const safePages = Math.max(1, Math.min(5000, Number(pages) || 1));
   const safeCopies = Math.max(1, Math.min(2000, Number(copies) || 1));
 
-  const typeCfg = PRINT_TYPES.find((t) => t.id === printType) || PRINT_TYPES[1];
+  const printTypes = overrides?.printTypes?.length ? overrides.printTypes : PRINT_TYPES;
+  const paperStocks = overrides?.paperStocks?.length ? overrides.paperStocks : PAPER_STOCKS;
+  const bindings = overrides?.bindings?.length ? overrides.bindings : BINDING_OPTIONS;
+
+  const typeCfg = printTypes.find((t) => t.id === printType) || printTypes[1] || PRINT_TYPES[1];
   const sizeCfg = PAPER_SIZES.find((s) => s.id === size) || PAPER_SIZES[1];
   const stockCfg =
-    PAPER_STOCKS.find((p) => p.id === paperStock) || PAPER_STOCKS[0];
+    paperStocks.find((p) => p.id === paperStock) || paperStocks[0] || PAPER_STOCKS[0];
   const bindingCfg =
-    BINDING_OPTIONS.find((b) => b.id === binding) || BINDING_OPTIONS[0];
+    bindings.find((b) => b.id === binding) || bindings[0] || BINDING_OPTIONS[0];
 
   const isDouble = sides === "double" && printType !== "plot" && printType !== "sticker";
   const physicalSheetsPerCopy = isDouble ? Math.ceil(safePages / 2) : safePages;
@@ -79,9 +93,9 @@ export function calculatePrintQuote({
 
   const sideFactor = isDouble ? 0.92 : 1;
   const impressionCost =
-    totalImpressions * typeCfg.baseRate * sizeCfg.multiplier * sideFactor;
-  const stockCost = totalSheets * stockCfg.extraPerSheet * sizeCfg.multiplier;
-  const bindingCost = safeCopies * bindingCfg.flatFee;
+    totalImpressions * Number(typeCfg.baseRate || 0) * sizeCfg.multiplier * sideFactor;
+  const stockCost = totalSheets * Number(stockCfg.extraPerSheet || 0) * sizeCfg.multiplier;
+  const bindingCost = safeCopies * Number(bindingCfg.flatFee || 0);
 
   const rawSubtotal = impressionCost + stockCost + bindingCost;
   const discountRate = getVolumeDiscountRate(totalImpressions);
@@ -97,6 +111,7 @@ export function calculatePrintQuote({
     bindingCost,
     perCopy,
     total,
+    nextTier: getNextVolumeTier(totalImpressions),
     turnaroundHours: totalImpressions > 600 || binding === "hardcover" ? 24 : 4,
   };
 }

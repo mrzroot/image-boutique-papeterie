@@ -1,9 +1,14 @@
 import { useState } from "react";
-import { Phone, Mail, CheckCircle2, ArrowUpRight } from "lucide-react";
+import { Phone, Mail, CheckCircle2, ArrowUpRight, LayoutDashboard } from "lucide-react";
 
-export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
+export default function Footer({ t, lang, contact, onNavigate, onSelectCategory }) {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+
+  const phone = contact?.phone || "0935-383-4393";
+  const emailAddr = contact?.email || "atelier@imageboutique.ir";
+  const hours = lang === "fa" ? contact?.hoursFa || "شنبه تا پنج‌شنبه · ۱۰ الی ۲۱" : contact?.hoursEn || "Sat - Thu · 10:00 - 21:00";
+  const cleanTel = `tel:${String(phone).replace(/[^0-9+]/g, "")}`;
 
   const handleSubscribe = (e) => {
     e.preventDefault();
@@ -139,26 +144,22 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
             </h4>
             <div className="space-y-2.5 text-xs text-[#DFEAE3]">
               <a
-                href="tel:09353834393"
+                href={cleanTel}
                 className="flex items-center gap-2 hover:text-white font-latin-ui"
                 dir="ltr"
               >
                 <Phone className="h-3.5 w-3.5 text-[#D6B36A]" aria-hidden="true" />
-                <span>0935 383 4393</span>
+                <span>{phone}</span>
               </a>
               <a
-                href="mailto:atelier@imageboutique.ir"
+                href={`mailto:${emailAddr}`}
                 className="flex items-center gap-2 hover:text-white font-latin-ui"
                 dir="ltr"
               >
                 <Mail className="h-3.5 w-3.5 text-[#D6B36A]" aria-hidden="true" />
-                <span>atelier@imageboutique.ir</span>
+                <span>{emailAddr}</span>
               </a>
-              <p className="text-[11px] text-[#B8C8BE] pt-1">
-                {lang === "fa"
-                  ? "شنبه تا پنج‌شنبه · ۱۰ الی ۲۱"
-                  : "Sat – Thu · 10:00 – 21:00"}
-              </p>
+              <p className="text-[11px] text-[#B8C8BE] pt-1">{hours}</p>
             </div>
           </div>
         </div>
@@ -169,9 +170,19 @@ export default function Footer({ t, lang, onNavigate, onSelectCategory }) {
               © {lang === "fa" ? "۱۴۰۵" : "2026"} {t.brandMain} · La Boutique
               Papeterie
             </span>
-            <span className="font-latin-ui">
-              FA / EN · Archival Paper & Print Atelier
-            </span>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => onNavigate("admin")}
+                className="inline-flex items-center gap-1.5 text-[#E7D19F] hover:text-white transition"
+              >
+                <LayoutDashboard className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>{lang === "fa" ? "پنل مدیریت سایت" : "Admin Dashboard"}</span>
+              </button>
+              <span className="font-latin-ui hidden sm:inline">
+                FA / EN · Archival Paper & Print Atelier
+              </span>
+            </div>
           </div>
         </div>
       </div>

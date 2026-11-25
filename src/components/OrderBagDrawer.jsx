@@ -16,25 +16,25 @@ import {
   Store,
 } from "lucide-react";
 import { formatPrice, formatNumber } from "../utils/pricing";
-import { PRODUCTS, BUNDLES } from "../data/catalog";
 
-function resolveBagDisplay(item, lang, t) {
+function resolveBagDisplay(item, lang, t, products = [], bundles = []) {
   if (item.kind === "product" && item.productId) {
-    const prod = PRODUCTS.find((p) => p.id === item.productId);
+    const prod = products.find((p) => p.id === item.productId);
     if (prod) {
-      const loc = prod[lang];
-      const variant = loc.variants[item.variantIdx || 0] || loc.variants[0];
+      const loc = prod[lang] || prod.fa;
+      const variants = loc.variants || [];
+      const variant = variants[item.variantIdx || 0] || variants[0] || "";
       return {
         title: loc.title,
-        meta: `${prod.sku} · ${variant}`,
+        meta: variant ? `${prod.sku} · ${variant}` : prod.sku,
         image: prod.variantImages?.[item.variantIdx || 0] || prod.image,
       };
     }
   }
   if (item.kind === "bundle" && item.bundleId) {
-    const bundle = BUNDLES.find((b) => b.id === item.bundleId);
+    const bundle = bundles.find((b) => b.id === item.bundleId);
     if (bundle) {
-      const loc = bundle[lang];
+      const loc = bundle[lang] || bundle.fa;
       return { title: loc.title, meta: `${bundle.sku} · ${loc.items}` };
     }
   }
@@ -72,6 +72,10 @@ export default function OrderBagDrawer({
   isOpen,
   onClose,
   items,
+  products = [],
+  bundles = [],
+  promoCodes = [],
+  shipping = null,
   orderHistory,
   onSaveOrder,
   onUpdateQty,
@@ -85,7 +89,7 @@ export default function OrderBagDrawer({
   const [checkoutMode, setCheckoutMode] = useState(false);
   const [giftWrap, setGiftWrap] = useState(false);
   const [promoInput, setPromoInput] = useState("");
-  const [promoApplied, setPromoApplied] = useState(false);
+  const [appliedPromo, setAppliedPromo] = useState(null);
   const [promoError, setPromoError] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -116,16 +120,20 @@ export default function OrderBagDrawer({
     (sum, item) => sum + item.unitPrice * item.qty,
     0
   );
-  const promoDiscount = promoApplied ? Math.round(itemsSubtotal * 0.1) : 0;
-  const giftPrice = giftWrap && items.length > 0 ? t.bagDrawer.giftWrapPrice : 0;
+  const promoDiscount = appliedPromo
+    ? Math.round((itemsSubtotal * Number(appliedPromo.percent || 0)) / 100)
+    : 0;
+  const giftWrapPrice = shipping?.giftWrapPrice ?? t.bagDrawer.giftWrapPrice;
+  const giftPrice = giftWrap && items.length > 0 ? giftWrapPrice : 0;
   const beforeShipping = Math.max(0, itemsSubtotal - promoDiscount + giftPrice);
 
-  const threshold = t.bagDrawer.freeShippingThreshold || 2500000;
+  const threshold = shipping?.freeThreshold ?? t.bagDrawer.freeShippingThreshold ?? 2500000;
   const isPickup = deliveryMethod === 2;
+  const baseShippingFee = shipping?.fee ?? t.bagDrawer.shippingFee ?? 95000;
   const shippingCost =
     items.length === 0 || isPickup || beforeShipping >= threshold
       ? 0
-      : t.bagDrawer.shippingFee || 95000;
+      : baseShippingFee;
   const grandTotal = beforeShipping + shippingCost;
 
   const remaining = Math.max(0, threshold - beforeShipping);
@@ -136,11 +144,15 @@ export default function OrderBagDrawer({
 
   const handlePromoApply = (e) => {
     e.preventDefault();
-    if (promoInput.trim().toUpperCase() === "BOUTIQUE10") {
-      setPromoApplied(true);
+    const codeUpper = promoInput.trim().toUpperCase();
+    const match = promoCodes.find(
+      (p) => p.active !== false && String(p.code || "").trim().toUpperCase() === codeUpper
+    );
+    if (match) {
+      setAppliedPromo(match);
       setPromoError(false);
     } else {
-      setPromoApplied(false);
+      setAppliedPromo(null);
       setPromoError(true);
     }
   };
@@ -150,18 +162,33 @@ export default function OrderBagDrawer({
     if (!customerName.trim() || !customerPhone.trim()) return;
     const randomNum = Math.floor(1000 + Math.random() * 9000);
     const refId = `IB-1405-${randomNum}`;
+    const lineSummaries = items.map((item) => {
+      const disp = resolveBagDisplay(item, lang, t, products, bundles);
+      return {
+        title: disp.title,
+        meta: disp.meta,
+        qty: item.qty,
+        unitPrice: item.unitPrice,
+      };
+    });
     onSaveOrder?.({
       refId,
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
+      deliveryMethod: t.bagDrawer.deliveryOptions[deliveryMethod] || "",
+      notes: notes.trim(),
+      giftWrap,
+      promoCode: appliedPromo?.code || null,
+      items: lineSummaries,
       itemCount: items.reduce((acc, i) => acc + i.qty, 0),
       total: grandTotal,
+      status: "pending",
       createdAt: new Date().toLocaleDateString(lang === "fa" ? "fa-IR" : "en-US"),
     });
     setConfirmedRef(refId);
     onClearBag();
     setGiftWrap(false);
-    setPromoApplied(false);
+    setAppliedPromo(null);
     setPromoInput("");
     setCheckoutMode(false);
   };
@@ -471,7 +498,7 @@ export default function OrderBagDrawer({
               ) : (
                 <div className="space-y-3.5">
                   {items.map((item) => {
-                    const display = resolveBagDisplay(item, lang, t);
+                    const display = resolveBagDisplay(item, lang, t, products, bundles);
                     return (
                       <div
                         key={item.key}
@@ -582,7 +609,7 @@ export default function OrderBagDrawer({
                           {t.bagDrawer.giftWrapTitle}
                         </p>
                         <p className="tabular-nums text-[11px] font-semibold text-[var(--accent-pine)]">
-                          +{formatPrice(t.bagDrawer.giftWrapPrice, lang)}
+                          +{formatPrice(giftWrapPrice, lang)}
                         </p>
                       </div>
                     </div>
@@ -619,9 +646,9 @@ export default function OrderBagDrawer({
                         {t.bagDrawer.promoApply}
                       </button>
                     </div>
-                    {promoApplied && (
+                    {appliedPromo && (
                       <p className="tabular-nums text-[11px] font-semibold text-[var(--accent-pine)] px-1">
-                        ✓ {t.bagDrawer.promoApplied} (-{formatPrice(promoDiscount, lang)})
+                        ✓ {appliedPromo.code} ({appliedPromo.percent}%) (-{formatPrice(promoDiscount, lang)})
                       </p>
                     )}
                     {promoError && (

@@ -13,11 +13,6 @@ import {
   Palette,
 } from "lucide-react";
 import {
-  SERVICES_LIST,
-  TIERED_PRICE_ROWS,
-  SERVICES_FAQ,
-} from "../data/catalog";
-import {
   PRINT_TYPES,
   PAPER_SIZES,
   PAPER_STOCKS,
@@ -32,6 +27,10 @@ import Live3DPreview, { COVER_THEMES } from "./Live3DPreview";
 export default function ServicesPortal({
   t,
   lang,
+  pricingOverrides = null,
+  servicesList = [],
+  tieredPriceRows = [],
+  servicesFaq = [],
   onBackToStore,
   onAddServiceJob,
 }) {
@@ -53,7 +52,7 @@ export default function ServicesPortal({
   const [openFaqIdx, setOpenFaqIdx] = useState(0);
   const [justAdded, setJustAdded] = useState(false);
 
-  const quote = calculatePrintQuote(config);
+  const quote = calculatePrintQuote(config, pricingOverrides);
   const duplexDisabled =
     config.printType === "plot" || config.printType === "sticker";
 
@@ -266,21 +265,21 @@ export default function ServicesPortal({
           </h2>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-12 items-start">
+        <div className="grid gap-5 md:grid-cols-12 items-start">
           {/* Configurator Form */}
-          <div className="min-w-0 space-y-6 rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 sm:p-8 md:col-span-7 lg:col-span-8">
+          <div className="min-w-0 space-y-4 rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-6 md:col-span-7 lg:col-span-8">
             {/* Print Type */}
             <div>
-              <span className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
+              <span className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
                 {t.calcLabels.printType}
               </span>
-              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {PRINT_TYPES.map((pt) => (
                   <button
                     key={pt.id}
                     type="button"
                     onClick={() => handlePrintTypeChange(pt.id)}
-                    className={`rounded-[3px] border px-3 py-3 text-start text-xs font-semibold transition ${
+                    className={`rounded-[3px] border px-2.5 py-2.5 text-start text-xs font-semibold transition ${
                       config.printType === pt.id
                         ? "border-[#183E30] bg-[#183E30] text-white"
                         : "border-[var(--border-subtle)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
@@ -293,12 +292,12 @@ export default function ServicesPortal({
             </div>
 
             {/* Size & Sides */}
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <span className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
+                <span className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
                   {t.calcLabels.size}
                 </span>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-1.5">
                   {PAPER_SIZES.map((s) => (
                     <button
                       key={s.id}
@@ -306,7 +305,7 @@ export default function ServicesPortal({
                       onClick={() =>
                         setConfig((prev) => ({ ...prev, size: s.id }))
                       }
-                      className={`font-latin-ui rounded-[3px] border py-2 text-center text-xs font-bold transition ${
+                      className={`font-latin-ui rounded-[3px] border py-1.5 text-center text-xs font-bold transition ${
                         config.size === s.id
                           ? "border-[#14201A] bg-[#14201A] text-[#E7D19F]"
                           : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
@@ -319,7 +318,7 @@ export default function ServicesPortal({
               </div>
 
               <div>
-                <span className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
+                <span className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
                   {t.calcLabels.sides}
                 </span>
                 <div className="grid grid-cols-2 gap-2">
@@ -331,7 +330,7 @@ export default function ServicesPortal({
                       onClick={() =>
                         setConfig((prev) => ({ ...prev, sides: side }))
                       }
-                      className={`rounded-[3px] border px-4 py-2 text-xs font-semibold transition disabled:opacity-40 ${
+                      className={`rounded-[3px] border px-3 py-1.5 text-xs font-semibold transition disabled:opacity-40 ${
                         config.sides === side &&
                         !(duplexDisabled && side === "double")
                           ? "border-[#183E30] bg-[#183E30] text-white"
@@ -346,11 +345,11 @@ export default function ServicesPortal({
             </div>
 
             {/* Paper Stock & Binding */}
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label
                   htmlFor="calc-paper-stock"
-                  className="mb-2 block text-xs font-bold text-[var(--ink-main)]"
+                  className="mb-1.5 block text-xs font-bold text-[var(--ink-main)]"
                 >
                   {t.calcLabels.paperStock}
                 </label>
@@ -363,7 +362,7 @@ export default function ServicesPortal({
                       paperStock: e.target.value,
                     }))
                   }
-                  className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm font-medium text-[var(--ink-main)]"
+                  className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] px-3 py-2 text-xs sm:text-sm font-medium text-[var(--ink-main)]"
                 >
                   {PAPER_STOCKS.map((st) => (
                     <option key={st.id} value={st.id} className="bg-[var(--bg-surface)] text-[var(--ink-main)]">
@@ -376,7 +375,7 @@ export default function ServicesPortal({
               <div>
                 <label
                   htmlFor="calc-binding"
-                  className="mb-2 block text-xs font-bold text-[var(--ink-main)]"
+                  className="mb-1.5 block text-xs font-bold text-[var(--ink-main)]"
                 >
                   {t.calcLabels.binding}
                 </label>
@@ -392,7 +391,7 @@ export default function ServicesPortal({
                     }));
                     if (nextBinding === "hardcover") setCoverTheme("pine");
                   }}
-                  className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm font-medium text-[var(--ink-main)] disabled:opacity-50"
+                  className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] px-3 py-2 text-xs sm:text-sm font-medium text-[var(--ink-main)] disabled:opacity-50"
                 >
                   {BINDING_OPTIONS.map((b) => (
                     <option key={b.id} value={b.id} className="bg-[var(--bg-surface)] text-[var(--ink-main)]">
@@ -405,11 +404,11 @@ export default function ServicesPortal({
 
             {/* Cover Color Theme Picker */}
             <div>
-              <span className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[var(--ink-main)]">
+              <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-[var(--ink-main)]">
                 <Palette className="h-3.5 w-3.5 text-[var(--accent-gold)]" aria-hidden="true" />
                 <span>{t.calcLabels.coverThemeLabel}</span>
               </span>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {COVER_THEMES.map((theme) => {
                   const selected = coverTheme === theme.id;
                   return (
@@ -417,14 +416,14 @@ export default function ServicesPortal({
                       key={theme.id}
                       type="button"
                       onClick={() => setCoverTheme(theme.id)}
-                      className={`inline-flex items-center gap-2 rounded-[3px] border px-3 py-1.5 text-xs font-semibold transition ${
+                      className={`inline-flex items-center gap-1.5 rounded-[3px] border px-2.5 py-1 text-xs font-semibold transition ${
                         selected
                           ? "border-[#14201A] bg-[#14201A] text-white"
                           : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
                       }`}
                     >
                       <span
-                        className="h-3.5 w-3.5 rounded-full border border-white/40"
+                        className="h-3 w-3 rounded-full border border-white/40"
                         style={{ backgroundColor: theme.bg }}
                       />
                       <span>{lang === "fa" ? theme.labelFa : theme.labelEn}</span>
@@ -435,7 +434,7 @@ export default function ServicesPortal({
             </div>
 
             {/* Pages & Copies Steppers */}
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               {[
                 { field: "pages", label: t.calcLabels.pages, max: 5000 },
                 { field: "copies", label: t.calcLabels.copies, max: 2000 },
@@ -443,11 +442,11 @@ export default function ServicesPortal({
                 <div key={field}>
                   <label
                     htmlFor={`calc-${field}`}
-                    className="mb-2 block text-xs font-bold text-[var(--ink-main)]"
+                    className="mb-1.5 block text-xs font-bold text-[var(--ink-main)]"
                   >
                     {label}
                   </label>
-                  <div className="flex items-center justify-between rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] p-1.5">
+                  <div className="flex items-center justify-between rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] p-1">
                     <button
                       type="button"
                       aria-label={`Decrease ${field}`}
@@ -457,9 +456,9 @@ export default function ServicesPortal({
                           [field]: Math.max(1, prev[field] - 1),
                         }))
                       }
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-[2px] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:bg-[#183E30] hover:text-white"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-[2px] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:bg-[#183E30] hover:text-white"
                     >
-                      <Minus className="h-4 w-4" aria-hidden="true" />
+                      <Minus className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
                     <input
                       id={`calc-${field}`}
@@ -476,7 +475,7 @@ export default function ServicesPortal({
                           ),
                         }))
                       }
-                      className="tabular-nums w-24 bg-transparent text-center font-latin-ui text-base font-bold text-[var(--ink-main)]"
+                      className="tabular-nums w-20 bg-transparent text-center font-latin-ui text-sm font-bold text-[var(--ink-main)]"
                     />
                     <button
                       type="button"
@@ -487,9 +486,9 @@ export default function ServicesPortal({
                           [field]: Math.min(max, prev[field] + 1),
                         }))
                       }
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-[2px] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:bg-[#183E30] hover:text-white"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-[2px] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:bg-[#183E30] hover:text-white"
                     >
-                      <Plus className="h-4 w-4" aria-hidden="true" />
+                      <Plus className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -500,7 +499,7 @@ export default function ServicesPortal({
             <div>
               <label
                 htmlFor="calc-monogram"
-                className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[var(--ink-main)]"
+                className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-[var(--ink-main)]"
               >
                 <Type className="h-3.5 w-3.5 text-[var(--accent-gold)]" aria-hidden="true" />
                 <span>{t.calcLabels.monogramTitle}</span>
@@ -512,34 +511,34 @@ export default function ServicesPortal({
                 value={customTitle}
                 onChange={(e) => setCustomTitle(e.target.value)}
                 placeholder={t.calcLabels.monogramPlaceholder}
-                className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm text-[var(--ink-main)] placeholder:text-[var(--ink-sub)]"
+                className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] px-3.5 py-2 text-xs sm:text-sm text-[var(--ink-main)] placeholder:text-[var(--ink-sub)]"
               />
             </div>
 
             {/* File Attachment Dropzone */}
             <div>
-              <span className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
+              <span className="mb-1.5 block text-xs font-bold text-[var(--ink-main)]">
                 {t.calcLabels.uploadTitle}
               </span>
               {uploadedFile ? (
-                <div className="flex items-center justify-between gap-3 rounded-[3px] border border-[var(--accent-pine)]/40 bg-[var(--bg-soft)] px-4 py-3.5">
+                <div className="flex items-center justify-between gap-3 rounded-[3px] border border-[var(--accent-pine)]/40 bg-[var(--bg-soft)] px-3.5 py-2.5">
                   <div className="flex items-center gap-3 min-w-0">
                     {uploadedFile.previewUrl ? (
                       <img
                         src={uploadedFile.previewUrl}
                         alt={uploadedFile.name}
-                        width="40"
-                        height="40"
-                        className="h-10 w-10 shrink-0 rounded-[2px] object-cover border border-[var(--border-strong)]"
+                        width="36"
+                        height="36"
+                        className="h-9 w-9 shrink-0 rounded-[2px] object-cover border border-[var(--border-strong)]"
                       />
                     ) : (
                       <FileText className="h-5 w-5 shrink-0 text-[var(--accent-pine)]" aria-hidden="true" />
                     )}
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-[var(--ink-main)] font-latin-ui">
+                      <p className="truncate text-xs sm:text-sm font-bold text-[var(--ink-main)] font-latin-ui">
                         {uploadedFile.name}
                       </p>
-                      <p className="text-xs text-[var(--ink-sub)] font-latin-ui">
+                      <p className="text-[11px] text-[var(--ink-sub)] font-latin-ui">
                         {uploadedFile.sizeLabel}
                       </p>
                     </div>
@@ -547,15 +546,15 @@ export default function ServicesPortal({
                   <button
                     type="button"
                     onClick={() => setUploadedFile(null)}
-                    className="inline-flex items-center gap-1 rounded-[3px] border border-[var(--accent-crimson)]/40 px-3 py-1.5 text-xs font-semibold text-[var(--accent-crimson)] hover:bg-[var(--accent-crimson)] hover:text-white"
+                    className="inline-flex items-center gap-1 rounded-[3px] border border-[var(--accent-crimson)]/40 px-2.5 py-1 text-xs font-semibold text-[var(--accent-crimson)] hover:bg-[var(--accent-crimson)] hover:text-white"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>{t.calcLabels.removeFile}</span>
                   </button>
                 </div>
               ) : (
-                <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[4px] border border-dashed border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-6 text-center transition hover:border-[var(--accent-pine)] hover:bg-[var(--bg-soft)]">
-                  <Upload className="h-6 w-6 text-[var(--accent-pine)]" aria-hidden="true" />
+                <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[4px] border border-dashed border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-4 text-center transition hover:border-[var(--accent-pine)] hover:bg-[var(--bg-soft)]">
+                  <Upload className="h-5 w-5 text-[var(--accent-pine)]" aria-hidden="true" />
                   <span className="text-xs font-bold text-[var(--ink-main)]">
                     {t.calcLabels.chooseFile}
                   </span>
@@ -574,25 +573,27 @@ export default function ServicesPortal({
           </div>
 
           {/* Sticky Dark Order Summary + Live Bindery 3D Preview */}
-          <aside className="min-w-0 rounded-[4px] border border-[#C8A258]/40 bg-[#123126] p-6 sm:p-7 text-[#FAF6EE] md:col-span-5 lg:col-span-4 md:sticky md:top-32 space-y-5">
+          <aside className="min-w-0 rounded-[4px] border border-[#C8A258]/40 bg-[#123126] p-4 sm:p-5 text-[#FAF6EE] md:col-span-5 lg:col-span-4 md:sticky md:top-[96px] md:max-h-[calc(100vh-112px)] md:overflow-y-auto space-y-3">
             <div>
               <p className="font-latin-ui text-[10px] font-bold tracking-[0.22em] text-[#E7D19F]">
                 {t.orderSummary.eyebrow}
               </p>
-              <h3 className="mt-1 text-xl font-bold text-white">
+              <h3 className="mt-0.5 text-lg font-bold text-white">
                 {t.orderSummary.title}
               </h3>
             </div>
 
             <Live3DPreview
+              mode="print"
               config={config}
               customTitle={customTitle}
               coverTheme={coverTheme}
               uploadedPreviewUrl={uploadedFile?.previewUrl}
+              lang={lang}
               t={t}
             />
 
-            <div className="space-y-3 border-y border-white/15 py-4 text-xs">
+            <div className="space-y-1.5 border-y border-white/15 py-2.5 text-xs">
               <div className="flex justify-between text-[#D0D9D3]">
                 <span>{t.orderSummary.impressions}</span>
                 <span className="tabular-nums font-bold text-white">
@@ -624,13 +625,13 @@ export default function ServicesPortal({
                 <span>{t.orderSummary.turnaround}</span>
                 <span className="tabular-nums font-semibold text-[#E7D19F]">
                   {t.orderSummary.approxPrefix}{" "}
-                  {formatNumber(quote.estimatedHours, lang)} {t.orderSummary.hours}
+                  {formatNumber(quote.turnaroundHours, lang)} {t.orderSummary.hours}
                 </span>
               </div>
             </div>
 
             {quote.nextTier && (
-              <div className="rounded-[3px] bg-white/10 px-3.5 py-2.5 text-[11px] space-y-1.5">
+              <div className="rounded-[3px] bg-white/10 px-3 py-2 text-[11px] space-y-1">
                 <div className="flex justify-between text-[#E7D19F]">
                   <span>
                     {lang === "fa"
@@ -663,7 +664,7 @@ export default function ServicesPortal({
               <p className="text-[11px] text-[#D0D9D3]">
                 {t.orderSummary.total}
               </p>
-              <p className="tabular-nums mt-1 text-3xl font-bold text-white">
+              <p className="tabular-nums mt-0.5 text-2xl font-bold text-white">
                 {formatPrice(quote.total, lang)}
               </p>
             </div>
@@ -671,7 +672,7 @@ export default function ServicesPortal({
             <button
               type="button"
               onClick={handleAddToBag}
-              className="w-full rounded-[3px] bg-[var(--accent-crimson)] px-5 py-3.5 text-sm font-bold text-white transition hover:opacity-90"
+              className="w-full rounded-[3px] bg-[var(--accent-crimson)] px-4 py-2.5 text-xs sm:text-sm font-bold text-white transition hover:opacity-90"
             >
               {t.orderSummary.addJobBtn}
             </button>
@@ -680,7 +681,7 @@ export default function ServicesPortal({
               <div
                 role="status"
                 aria-live="polite"
-                className="flex items-center gap-2 rounded-[3px] bg-[#183E30] border border-white/20 px-3.5 py-2.5 text-xs font-medium text-white"
+                className="flex items-center gap-2 rounded-[3px] bg-[#183E30] border border-white/20 px-3 py-2 text-xs font-medium text-white"
               >
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-[#9BD4B8]" aria-hidden="true" />
                 <span>{t.orderSummary.jobAddedToast}</span>
@@ -702,8 +703,8 @@ export default function ServicesPortal({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES_LIST.map((srv, idx) => {
-            const loc = srv[lang];
+          {servicesList.map((srv, idx) => {
+            const loc = srv[lang] || srv.fa;
             return (
               <Reveal key={srv.id} delayMs={idx * 50}>
                 <button
@@ -762,7 +763,7 @@ export default function ServicesPortal({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-subtle)]">
-                {TIERED_PRICE_ROWS.map((row, idx) => (
+                {tieredPriceRows.map((row, idx) => (
                   <tr
                     key={idx}
                     className={row.best ? "bg-[var(--accent-crimson)]/10 font-bold" : ""}
@@ -827,9 +828,9 @@ export default function ServicesPortal({
           {t.faqTitle}
         </h2>
         <div className="space-y-3">
-          {SERVICES_FAQ.map((item, idx) => {
+          {servicesFaq.map((item, idx) => {
             const isOpen = openFaqIdx === idx;
-            const loc = item[lang];
+            const loc = item[lang] || item.fa;
             return (
               <div
                 key={idx}
