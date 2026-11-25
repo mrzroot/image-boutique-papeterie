@@ -23,5 +23,21 @@
 - **Glass (R-10)**: Subtle backdrop blur strictly on the sticky `<header>` navigation bar only.
 
 ## Typography & Accessibility
-- **Typefaces (R-06)**: `Vazirmatn` / `Estedad` for Persian UI clarity, `Amiri` editorial serif for display headings and signature scripts, `Inter` for SKUs and English UI, with `tabular-nums` on all prices and technical print specs.
+- **Typefaces**: `Estedad` is the Persian UI/body face; `Inter` (Latin subset) is the English/LTR body face; `Amiri` is the display face for section titles, product-page titles, the wordmark and eyebrow notes. All are self-hosted woff2 in `public/fonts`, declared in `index.html`. Display titles are any `h1/h2/h3` sized `text-2xl` or larger.
+- **Weights**: body 400, UI 500–600, `font-bold` is remapped to 620; Amiri titles 700. No spaced-caps kicker labels.
 - **WCAG AA & Keyboard (R-25, R-32, R-39)**: Minimum `4.5:1` contrast across both Light and Obsidian themes, native `<button>`/`<a href>` semantics, explicit `cursor: pointer`, visible `2px` brass `:focus-visible` ring on all focusable elements, and `Escape` dismissal for modals and drawers.
+
+## Components
+- `ProductCard` is the only product tile (bestsellers, new arrivals, catalog, related): image (object-contain), badge, wishlist, quick view, swatches, title linking to the product page, price, one quiet add-to-bag.
+- `StorefrontSections`: `SectionHead`, `CategoryIndex`, `ProductRail`, `GalleryMosaic` (CMS `socialGallery`), `AtelierIntro`, `TrustSection` (only facts from the CMS: value strip, shipping threshold, contact).
+- Routes: `#/`, `#/product/:id`, `#/services`, `#/admin`.
+- Controls in `src/index.css`: `.btn-primary` (crimson, one per view), `.btn-quiet` (outlined ink), `.btn-on-dark`, `.icon-btn`, `.icon-chip`, `.swatch`, `.variant-pill`, `.qty-stepper`.
+- Contrast: small brass text uses `--accent-gold-ink`; dark theme lifts pine/crimson text colours to AA.
+
+## Product imagery & 3D policy
+- The real photo is the reference. Never replace a product photo with a generated one; never present invented geometry as the product.
+- `ProductMedia` modes: Original photo (default), 3D presentation (the real photo on a board at its true aspect, rotation clamped so no invented sides show), Accurate 360° only when `model3dUrl` (GLB/GLTF) or at least 8 ordered `spinImages` exist. three.js is lazy-loaded.
+- The services 3D preview shows the customer's own configured job and uploaded artwork; it is not a product claim.
+
+## Honesty rules
+- There is no backend. Orders are stored on the device and sent to the shop by email or SMS; newsletter sign-up opens an email; gift-card codes are issued by the shop after confirmation. Copy must say so.
