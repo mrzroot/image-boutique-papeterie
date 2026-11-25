@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Gift, Plus, ExternalLink } from "lucide-react";
+import { Gift, Plus } from "lucide-react";
 import { formatPrice } from "../utils/pricing";
 import Reveal from "./Reveal";
 
@@ -30,8 +30,7 @@ export default function BoutiqueExtras({
   t,
   lang,
   products = [],
-  bundles = [],
-  socialGallery = [],
+  bundles = [],
   onAddBundle,
   onAddGiftCard,
   onQuickView,
@@ -78,7 +77,7 @@ export default function BoutiqueExtras({
               return (
                 <article
                   key={bundle.id}
-                  className="group flex flex-col justify-between overflow-hidden rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 transition-colors hover:border-[var(--accent-gold)]"
+                  className="group flex flex-col justify-between"
                 >
                   <div>
                     <div className="relative aspect-[4/3] overflow-hidden rounded-[3px] bg-[var(--bg-soft)]">
@@ -91,13 +90,13 @@ export default function BoutiqueExtras({
                         height="450"
                         className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                       />
-                      <span className="absolute top-2.5 start-2.5 rounded-[2px] bg-[var(--accent-crimson)] px-2.5 py-1 text-[10px] font-bold text-white">
+                      <span className="absolute top-2.5 start-2.5 rounded-[2px] bg-[var(--accent-crimson)] px-2.5 py-1 text-[11px] font-bold text-white">
                         {t.bundles.saveLabel}
                       </span>
                     </div>
 
                     <div className="pt-4 space-y-2">
-                      <div className="flex items-center justify-between gap-2 text-[10px] font-semibold tracking-wider text-[var(--ink-sub)]">
+                      <div className="flex items-center justify-between gap-2 text-[11px] font-semibold tracking-wider text-[var(--ink-sub)]">
                         <span className="font-latin-ui">{bundle.sku}</span>
                         <span className="text-[var(--accent-gold)]">{loc.tag}</span>
                       </div>
@@ -110,7 +109,7 @@ export default function BoutiqueExtras({
                     </div>
                   </div>
 
-                  <div className="mt-5 space-y-3 border-t border-[var(--border-subtle)] pt-3.5">
+                  <div className="mt-4 space-y-3">
                     <div className="tabular-nums flex items-center justify-between gap-2">
                       <span className="text-base font-bold text-[var(--accent-pine)]">
                         {formatPrice(bundle.price, lang)}
@@ -123,9 +122,9 @@ export default function BoutiqueExtras({
                     <button
                       type="button"
                       onClick={() => onAddBundle(bundle)}
-                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-[3px] bg-[var(--accent-deep)] border border-[var(--accent-gold)]/40 py-2.5 text-xs font-bold text-[#FAF6EE] transition hover:bg-[var(--accent-pine)]"
+                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-[3px] border border-[var(--ink-main)] py-2.5 text-xs font-semibold text-[var(--ink-main)] transition hover:bg-[var(--ink-main)] hover:text-[var(--bg-page)]"
                     >
-                      <Plus className="h-3.5 w-3.5 text-[#E7D19F]" aria-hidden="true" />
+                      <Plus className="h-3.5 w-3.5" aria-hidden="true" />
                       <span>{t.bundles.addBundleBtn}</span>
                     </button>
                   </div>
@@ -139,7 +138,7 @@ export default function BoutiqueExtras({
       {/* 2. Interactive Digital Gift Card ("CARTE-CADEAU") */}
       <section id="gift-card" className="mx-auto max-w-7xl px-4 sm:px-6">
         <Reveal>
-          <div className="grid items-center gap-8 rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 sm:p-10 lg:grid-cols-12">
+          <div className="grid items-center gap-10 border-y border-[var(--border-subtle)] py-12 lg:grid-cols-12">
             {/* Live Metallic-Foil Card Preview */}
             <div className="lg:col-span-5 flex flex-col items-center justify-center">
               <div
@@ -165,7 +164,7 @@ export default function BoutiqueExtras({
                     </p>
                   </div>
                   <span
-                    className="inline-flex items-center gap-1 rounded-[2px] px-2.5 py-0.5 text-[10px] font-bold"
+                    className="inline-flex items-center gap-1 rounded-[2px] px-2.5 py-0.5 text-[11px] font-bold"
                     style={{
                       backgroundColor: `${finish.border}22`,
                       color: finish.accent,
@@ -186,13 +185,13 @@ export default function BoutiqueExtras({
                     {formatPrice(cardAmount, lang)}
                   </p>
                   {message.trim() && (
-                    <p className="text-[11px] opacity-80 line-clamp-1">
+                    <p className="text-xs opacity-80 line-clamp-1">
                       «{message.trim()}»
                     </p>
                   )}
                 </div>
 
-                <div className="relative z-10 flex items-center justify-between text-[10px] font-latin-ui opacity-75">
+                <div className="relative z-10 flex items-center justify-between text-[11px] font-latin-ui opacity-75">
                   <span>E-GIFT · INSTANT CODE</span>
                   <span>VALID 12 MONTHS</span>
                 </div>
@@ -312,58 +311,6 @@ export default function BoutiqueExtras({
                 <span>{t.giftCard.addCardBtn}</span>
               </button>
             </form>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* 3. Studio Gallery Grid */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6">
-        <Reveal>
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <p className="eyebrow text-[var(--accent-gold)]">
-                {t.socialSection.eyebrow}
-              </p>
-              <h2 className="mt-1 text-xl sm:text-2xl font-bold text-[var(--ink-main)]">
-                {t.socialSection.title}
-              </h2>
-            </div>
-            <p className="text-xs text-[var(--ink-sub)]">
-              {t.socialSection.hint}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {socialGallery.map((tile) => {
-              const targetProduct =
-                products.find((p) => p.id === tile.productId) || products[0];
-              if (!targetProduct) return null;
-              const loc = targetProduct[lang] || targetProduct.fa;
-              return (
-                <button
-                  key={tile.id}
-                  type="button"
-                  onClick={() => onQuickView(targetProduct, 0)}
-                  className="group relative aspect-square overflow-hidden rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-soft)]"
-                >
-                  <img
-                    src={tile.image}
-                    alt={loc.title}
-                    loading="lazy"
-                    decoding="async"
-                    width="300"
-                    height="300"
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-black/55 p-2 text-center text-white opacity-0 transition duration-200 group-hover:opacity-100">
-                    <ExternalLink className="h-4 w-4 text-[#E7D19F]" aria-hidden="true" />
-                    <span className="text-[11px] font-bold line-clamp-2">
-                      {loc.title}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
           </div>
         </Reveal>
       </section>

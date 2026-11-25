@@ -137,7 +137,7 @@ export default function Header({
               type="button"
               onClick={() => onNavigate("admin")}
               aria-label={lang === "fa" ? "داشبورد مدیریت" : "Admin Dashboard"}
-              className={`relative inline-flex items-center gap-1 rounded-[3px] border px-2 py-0.5 text-[11px] font-semibold transition ${
+              className={`relative inline-flex items-center gap-1 rounded-[3px] border px-2 py-0.5 text-xs font-semibold transition ${
                 view === "admin"
                   ? "border-[#E7D19F] bg-[#E7D19F] text-[#123126]"
                   : "border-white/25 bg-white/10 text-[#FAF6EE] hover:bg-white/20"
@@ -158,7 +158,7 @@ export default function Header({
               type="button"
               onClick={onToggleTheme}
               aria-label="Toggle Theme"
-              className="inline-flex items-center gap-1 rounded-[3px] border border-white/25 bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-[#FAF6EE] transition hover:bg-white/20"
+              className="inline-flex items-center gap-1 rounded-[3px] border border-white/25 bg-white/10 px-2 py-0.5 text-xs font-semibold text-[#FAF6EE] transition hover:bg-white/20"
             >
               {theme === "light" ? (
                 <>
@@ -177,7 +177,7 @@ export default function Header({
               type="button"
               onClick={onToggleLang}
               aria-label="Toggle Language"
-              className="inline-flex items-center gap-1 rounded-[3px] border border-[#D6B36A]/50 px-2 py-0.5 text-[11px] font-semibold tracking-wider text-white transition hover:bg-[#D6B36A] hover:text-[#123126] font-latin-ui"
+              className="inline-flex items-center gap-1 rounded-[3px] border border-[#D6B36A]/50 px-2 py-0.5 text-xs font-semibold tracking-wider text-white transition hover:bg-[#D6B36A] hover:text-[#123126] font-latin-ui"
             >
               <span
                 className={
@@ -321,7 +321,7 @@ export default function Header({
             <span className="brand-mark text-base sm:text-lg lg:text-xl text-[var(--ink-main)] group-hover:text-[var(--accent-gold)] transition">
               {t.brandEn}
             </span>
-            <span className="font-editorial italic text-[11px] sm:text-xs lg:text-[13px] text-[var(--accent-pine)] tracking-wide">
+            <span className="font-editorial italic text-xs sm:text-xs lg:text-[13px] text-[var(--accent-pine)] tracking-wide">
               La Boutique Papeterie
             </span>
           </div>
@@ -361,7 +361,7 @@ export default function Header({
               className={`h-4 w-4 ${wishlistOnly ? "fill-current" : ""}`}
             />
             {wishlistCount > 0 && (
-              <span className="tabular-nums absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent-pine)] px-1 text-[10px] font-bold text-white font-latin-ui">
+              <span className="tabular-nums absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent-pine)] px-1 text-[11px] font-bold text-white font-latin-ui">
                 {wishlistCount}
               </span>
             )}
@@ -376,7 +376,7 @@ export default function Header({
             <ShoppingBag className="h-4 w-4 text-[#E7D19F]" aria-hidden="true" />
             <span className="hidden sm:inline">{t.bag}</span>
             {cartCount > 0 && (
-              <span className="tabular-nums inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--accent-crimson)] px-1.5 text-[11px] font-bold text-white font-latin-ui">
+              <span className="tabular-nums inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--accent-crimson)] px-1.5 text-xs font-bold text-white font-latin-ui">
                 {cartCount}
               </span>
             )}
@@ -426,7 +426,7 @@ export default function Header({
                     onSearchChange(tag);
                     onNavigate("store", "catalog");
                   }}
-                  className="rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-1.5 text-[11px] font-medium text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
+                  className="rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs font-medium text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
                 >
                   {tag}
                 </button>
@@ -456,7 +456,7 @@ export default function Header({
                       <p className="truncate text-xs font-bold text-[var(--ink-main)]">
                         {(prod[lang] || prod.fa).title}
                       </p>
-                      <p className="tabular-nums text-[11px] font-semibold text-[var(--accent-gold)]">
+                      <p className="tabular-nums text-xs font-semibold text-[var(--accent-gold)]">
                         {formatPrice(prod.price, lang)}
                       </p>
                     </div>

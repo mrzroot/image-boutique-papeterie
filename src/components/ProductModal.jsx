@@ -107,7 +107,7 @@ export default function ProductModal({
 
         {/* Media Column: Studio Photo + Real Product-Specific 360° 3D Viewer */}
         <div className="relative bg-[var(--bg-soft)] p-4 sm:p-5 flex flex-col items-center justify-center gap-2.5">
-          <div className="inline-flex rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-0.5 text-[11px] font-bold">
+          <div className="inline-flex rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-0.5 text-xs font-bold">
             <button
               type="button"
               onClick={() => setViewMode("photo")}
@@ -155,7 +155,7 @@ export default function ProductModal({
                 className="aspect-square max-h-[270px] sm:max-h-[295px] w-full object-cover"
               />
               {selectedSwatchHex && selectedVariant && (
-                <div className="absolute bottom-2.5 start-2.5 inline-flex items-center gap-1.5 rounded-[3px] border border-[var(--border-subtle)] bg-[#FAF6EE] px-2.5 py-1 text-[11px] font-bold text-[#14201A]">
+                <div className="absolute bottom-2.5 start-2.5 inline-flex items-center gap-1.5 rounded-[3px] border border-[var(--border-subtle)] bg-[#FAF6EE] px-2.5 py-1 text-xs font-bold text-[#14201A]">
                   <span
                     className="h-2.5 w-2.5 rounded-full border border-black/20"
                     style={{ backgroundColor: selectedSwatchHex }}
@@ -170,10 +170,10 @@ export default function ProductModal({
         {/* Details Column */}
         <div className="flex flex-col justify-between p-4 sm:p-6">
           <div className="space-y-3">
-            <div className="flex items-center justify-between gap-2 pe-20 text-[11px] uppercase tracking-widest text-[var(--ink-sub)] font-latin-ui">
+            <div className="flex items-center justify-between gap-2 pe-20 text-xs uppercase tracking-widest text-[var(--ink-sub)] font-latin-ui">
               <span>{product.sku}</span>
               <span
-                className={`inline-flex items-center gap-1 rounded-[2px] px-2 py-0.5 text-[10px] font-semibold ${
+                className={`inline-flex items-center gap-1 rounded-[2px] px-2 py-0.5 text-[11px] font-semibold ${
                   inStock
                     ? "bg-[var(--accent-pine)]/15 text-[var(--accent-pine)]"
                     : "bg-[var(--accent-crimson)]/15 text-[var(--accent-crimson)]"
@@ -202,7 +202,7 @@ export default function ProductModal({
             </div>
 
             {localized.origin && (
-              <p className="text-[11px] text-[var(--ink-sub)]">{localized.origin}</p>
+              <p className="text-xs text-[var(--ink-sub)]">{localized.origin}</p>
             )}
 
             <p className="text-xs sm:text-sm leading-relaxed text-[var(--ink-body)]">
@@ -212,7 +212,7 @@ export default function ProductModal({
             {/* Variant Picker */}
             {variants.length > 0 && (
               <div className="pt-1">
-                <p className="mb-1.5 text-[11px] font-semibold text-[var(--ink-sub)]">
+                <p className="mb-1.5 text-xs font-semibold text-[var(--ink-sub)]">
                   {t.modal.selectVariant}:{" "}
                   <span className="text-[var(--ink-main)] font-bold">{selectedVariant}</span>
                 </p>

@@ -3,6 +3,8 @@
 /* Softer bold: everything at 700+ reads as a generated template */
 @theme {
   --font-weight-bold: 620;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.7;
 }
 
 :root {
@@ -243,24 +245,26 @@ select:disabled {
 }
 
 
-/* Hero: one plain framed card, image beside copy */
+/* Hero: a full-bleed scene, photo running to the viewport edge */
 .paper-studio-hero {
-  padding: clamp(1rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.5rem);
+  padding: 0;
 }
 .paper-studio-shell {
-  border: 1px solid var(--border-subtle);
   background: var(--bg-surface);
-  border-radius: 4px;
-  overflow: hidden;
+}
+.paper-studio-copy {
+  /* align copy with the 80rem content column used by every other section */
+  padding-inline-start: max(1rem, calc((100vw - 80rem) / 2 + 1.5rem)) !important;
+  padding-inline-end: clamp(1.5rem, 4vw, 4rem) !important;
 }
 .paper-studio-copy h1 {
-  font-size: clamp(1.9rem, 3.6vw, 3rem);
-  line-height: 1.45;
+  font-size: clamp(2rem, 4.2vw, 3.5rem);
+  line-height: 1.4;
 }
 @media (min-width: 768px) {
-  .paper-studio-shell { min-height: 430px; }
-  .paper-studio-photo { max-height: 620px; }
+  .paper-studio-shell { min-height: min(78vh, 680px); }
 }
 @media (max-width: 767px) {
   .paper-studio-photo { order: -1; }
+  .paper-studio-copy { padding-block: 2rem !important; }
 }

@@ -194,7 +194,7 @@ export default function ServicesPortal({
             <BackArrow className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{t.backToStorefront}</span>
           </button>
-          <span className="font-latin-ui text-[11px] font-semibold tracking-wider text-[var(--ink-sub)]">
+          <span className="font-latin-ui text-xs font-semibold tracking-wider text-[var(--ink-sub)]">
             IMAGE BOUTIQUE · PRINT & BINDERY PORTAL
           </span>
         </div>
@@ -244,7 +244,7 @@ export default function ServicesPortal({
                 <h2 className="text-xs font-bold text-[var(--ink-main)]">
                   {item.title}
                 </h2>
-                <p className="mt-0.5 text-[11px] text-[var(--ink-sub)]">{item.sub}</p>
+                <p className="mt-0.5 text-xs text-[var(--ink-sub)]">{item.sub}</p>
               </div>
             </div>
           ))}
@@ -538,7 +538,7 @@ export default function ServicesPortal({
                       <p className="truncate text-xs sm:text-sm font-bold text-[var(--ink-main)] font-latin-ui">
                         {uploadedFile.name}
                       </p>
-                      <p className="text-[11px] text-[var(--ink-sub)] font-latin-ui">
+                      <p className="text-xs text-[var(--ink-sub)] font-latin-ui">
                         {uploadedFile.sizeLabel}
                       </p>
                     </div>
@@ -558,7 +558,7 @@ export default function ServicesPortal({
                   <span className="text-xs font-bold text-[var(--ink-main)]">
                     {t.calcLabels.chooseFile}
                   </span>
-                  <span className="text-[11px] text-[var(--ink-sub)]">
+                  <span className="text-xs text-[var(--ink-sub)]">
                     {t.calcLabels.uploadHint}
                   </span>
                   <input
@@ -631,7 +631,7 @@ export default function ServicesPortal({
             </div>
 
             {quote.nextTier && (
-              <div className="rounded-[3px] bg-white/10 px-3 py-2 text-[11px] space-y-1">
+              <div className="rounded-[3px] bg-white/10 px-3 py-2 text-xs space-y-1">
                 <div className="flex justify-between text-[#E7D19F]">
                   <span>
                     {lang === "fa"
@@ -661,7 +661,7 @@ export default function ServicesPortal({
             )}
 
             <div>
-              <p className="text-[11px] text-[#D0D9D3]">
+              <p className="text-xs text-[#D0D9D3]">
                 {t.orderSummary.total}
               </p>
               <p className="tabular-nums mt-0.5 text-2xl font-bold text-white">
@@ -717,7 +717,7 @@ export default function ServicesPortal({
                       <span className="font-latin-ui text-2xl font-bold text-[var(--accent-gold)] group-hover:text-[var(--accent-crimson)] transition">
                         {srv.code}
                       </span>
-                      <span className="tabular-nums rounded-[2px] bg-[var(--bg-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--ink-main)]">
+                      <span className="tabular-nums rounded-[2px] bg-[var(--bg-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--ink-main)]">
                         {t.startingFrom} {formatPrice(srv.startingPrice, lang)}
                       </span>
                     </div>
@@ -728,7 +728,7 @@ export default function ServicesPortal({
                       {loc.desc}
                     </p>
                   </div>
-                  <span className="mt-4 block w-full border-t border-[var(--border-subtle)] pt-3 text-[11px] font-semibold text-[var(--accent-pine)]">
+                  <span className="mt-4 block w-full border-t border-[var(--border-subtle)] pt-3 text-xs font-semibold text-[var(--accent-pine)]">
                     {loc.unit}
                   </span>
                 </button>
@@ -812,7 +812,7 @@ export default function ServicesPortal({
                   <p className="tabular-nums text-lg sm:text-xl font-bold text-white">
                     {kpi.value}
                   </p>
-                  <p className="mt-1 text-[11px] leading-snug text-[#D7E3DC]">
+                  <p className="mt-1 text-xs leading-snug text-[#D7E3DC]">
                     {kpi.label}
                   </p>
                 </div>

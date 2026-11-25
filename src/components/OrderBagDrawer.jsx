@@ -284,7 +284,7 @@ export default function OrderBagDrawer({
                     >
                       {ord.refId}
                     </span>
-                    <span className="text-[11px] text-[var(--ink-sub)]">
+                    <span className="text-xs text-[var(--ink-sub)]">
                       {ord.createdAt}
                     </span>
                   </div>
@@ -296,7 +296,7 @@ export default function OrderBagDrawer({
                     <span className="tabular-nums text-[var(--accent-pine)] font-bold">
                       {formatPrice(ord.total, lang)}
                     </span>
-                    <span className="rounded-[2px] bg-[var(--accent-pine)]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[var(--accent-pine)]">
+                    <span className="rounded-[2px] bg-[var(--accent-pine)]/15 px-2.5 py-0.5 text-[11px] font-semibold text-[var(--accent-pine)]">
                       {lang === "fa" ? "ثبت‌شده" : "Confirmed"}
                     </span>
                   </div>
@@ -341,7 +341,7 @@ export default function OrderBagDrawer({
                   </p>
                   <div className="flex items-center justify-between rounded-[3px] bg-[var(--bg-soft)] px-4 py-3">
                     <div className="text-start">
-                      <p className="text-[11px] text-[var(--ink-sub)]">
+                      <p className="text-xs text-[var(--ink-sub)]">
                         {t.bagDrawer.trackingCode}
                       </p>
                       <p
@@ -515,7 +515,7 @@ export default function OrderBagDrawer({
                           <div>
                             <div className="flex items-start justify-between gap-2">
                               <span
-                                className={`inline-flex rounded-[2px] px-2 py-0.5 text-[10px] font-semibold ${
+                                className={`inline-flex rounded-[2px] px-2 py-0.5 text-[11px] font-semibold ${
                                   item.kind === "service"
                                     ? "bg-[var(--accent-crimson)]/15 text-[var(--accent-crimson)]"
                                     : "bg-[var(--accent-pine)]/15 text-[var(--accent-pine)]"
@@ -608,7 +608,7 @@ export default function OrderBagDrawer({
                         <p className="text-xs font-bold text-[var(--ink-main)]">
                           {t.bagDrawer.giftWrapTitle}
                         </p>
-                        <p className="tabular-nums text-[11px] font-semibold text-[var(--accent-pine)]">
+                        <p className="tabular-nums text-xs font-semibold text-[var(--accent-pine)]">
                           +{formatPrice(giftWrapPrice, lang)}
                         </p>
                       </div>
@@ -641,18 +641,18 @@ export default function OrderBagDrawer({
                       />
                       <button
                         type="submit"
-                        className="rounded-[2px] bg-[var(--accent-pine)] px-3 py-1.5 text-[11px] font-bold text-white"
+                        className="rounded-[2px] bg-[var(--accent-pine)] px-3 py-1.5 text-xs font-bold text-white"
                       >
                         {t.bagDrawer.promoApply}
                       </button>
                     </div>
                     {appliedPromo && (
-                      <p className="tabular-nums text-[11px] font-semibold text-[var(--accent-pine)] px-1">
+                      <p className="tabular-nums text-xs font-semibold text-[var(--accent-pine)] px-1">
                         ✓ {appliedPromo.code} ({appliedPromo.percent}%) (-{formatPrice(promoDiscount, lang)})
                       </p>
                     )}
                     {promoError && (
-                      <p className="text-[11px] text-[var(--accent-crimson)] px-1">
+                      <p className="text-xs text-[var(--accent-crimson)] px-1">
                         {t.bagDrawer.promoInvalid}
                       </p>
                     )}

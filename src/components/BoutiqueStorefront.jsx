@@ -123,7 +123,7 @@ export default function BoutiqueStorefront({
     <main className="paper-grain animate-page-in">
       {/* 1. Compact Full-Bleed Editorial Storefront Hero */}
       <section className="paper-studio-hero border-b border-[var(--border-subtle)] bg-[var(--bg-soft)]">
-        <div className="paper-studio-shell mx-auto grid max-w-7xl items-stretch md:grid-cols-12">
+        <div className="paper-studio-shell grid items-stretch md:grid-cols-12">
           {/* Editorial Copy Pane */}
           <div className="paper-studio-copy min-w-0 flex flex-col justify-center gap-5 px-4 py-6 sm:px-6 md:col-span-6 md:py-7 lg:py-8">
             <div className="space-y-2.5">
@@ -317,7 +317,7 @@ export default function BoutiqueStorefront({
                   <button
                     type="button"
                     onClick={() => onAddToBag(product, activeVariantIdx, 1)}
-                    className="hidden sm:inline-flex absolute inset-x-3 bottom-3 translate-y-2 opacity-0 items-center justify-center gap-1.5 rounded-[3px] bg-[var(--accent-deep)] py-2 text-[11px] font-bold text-[#FAF6EE] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100 border border-[#D6B36A]/45"
+                    className="hidden sm:inline-flex absolute inset-x-3 bottom-3 translate-y-2 opacity-0 items-center justify-center gap-1.5 rounded-[3px] bg-[var(--accent-deep)] py-2 text-xs font-bold text-[#FAF6EE] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100 border border-[#D6B36A]/45"
                   >
                     <Plus className="h-3.5 w-3.5 text-[#E7D19F]" aria-hidden="true" />
                     <span>{t.addToBag}</span>
@@ -365,58 +365,6 @@ export default function BoutiqueStorefront({
         </div>
       </section>
 
-      {/* 4. Visual Curated Collections Strip (borderless gallery index) */}
-      <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--border-subtle)] pb-4">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
-              {t.categoriesTitle}
-            </h2>
-            <p className="mt-1 text-sm text-[var(--ink-sub)]">
-              {t.categoriesSubtitle}
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {CATEGORIES.filter((c) => c.id !== "all").map((cat) => {
-            const active = selectedCategory === cat.id;
-            return (
-              <a
-                key={cat.id}
-                href="#catalog"
-                onClick={() => onSelectCategory(cat.id)}
-                className={`group block pb-2 transition-colors border-b-2 ${
-                  active
-                    ? "border-[var(--accent-pine)] text-[var(--accent-pine)]"
-                    : "border-transparent text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
-                }`}
-              >
-                <div className="aspect-square overflow-hidden rounded-[3px] bg-[var(--bg-soft)] border border-[var(--border-subtle)]">
-                  <img
-                    src={cat.image}
-                    alt={t.categoryNames[cat.id]}
-                    loading="lazy"
-                    decoding="async"
-                    width="300"
-                    height="300"
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                  />
-                </div>
-                <div className="mt-2.5 flex items-center justify-between gap-1">
-                  <span className="text-xs font-bold leading-snug">
-                    {t.categoryNames[cat.id]}
-                  </span>
-                  <span className="tabular-nums font-latin-ui text-[11px] font-semibold text-[var(--ink-sub)]">
-                    {formatNumber(countByCategory(cat.id), lang)}
-                  </span>
-                </div>
-              </a>
-            );
-          })}
-        </div>
-      </section>
-
       {/* 5. Interactive "Shop the Desk" Editorial Lookbook Band */}
       {t.lookbook && activePinProduct && (
         <section className="border-y border-[var(--border-subtle)] bg-[var(--bg-surface)] py-12">
@@ -440,7 +388,7 @@ export default function BoutiqueStorefront({
                       key={pin.id}
                       type="button"
                       onClick={() => setActivePinIdx(idx)}
-                      className={`rounded-[3px] px-3 py-1.5 text-[11px] font-bold transition ${
+                      className={`rounded-[3px] px-3 py-1.5 text-xs font-bold transition ${
                         activePinIdx === idx
                           ? "bg-[var(--accent-deep)] text-[#E7D19F] border border-[var(--accent-gold)]/45"
                           : "bg-[var(--bg-soft)] text-[var(--ink-sub)] border border-[var(--border-subtle)] hover:text-[var(--ink-main)]"
@@ -477,7 +425,7 @@ export default function BoutiqueStorefront({
                           className="group absolute -translate-x-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center"
                         >
                           <span
-                            className={`relative flex h-7 w-7 items-center justify-center rounded-full border-2 border-white font-latin-ui text-[10px] font-bold shadow-md transition-transform group-hover:scale-110 ${
+                            className={`relative flex h-7 w-7 items-center justify-center rounded-full border-2 border-white font-latin-ui text-[11px] font-bold shadow-md transition-transform group-hover:scale-110 ${
                               selected
                                 ? "bg-[var(--accent-crimson)] text-white scale-110"
                                 : "bg-[#123126] text-[#F3E4BD]"
@@ -497,7 +445,7 @@ export default function BoutiqueStorefront({
                   className="animate-modal-in flex flex-col justify-between rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-soft)] p-5 sm:p-6 md:col-span-5 lg:col-span-4 space-y-4"
                 >
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between text-[11px] font-bold tracking-wider text-[var(--accent-gold)] font-latin-ui">
+                    <div className="flex items-center justify-between text-xs font-bold tracking-wider text-[var(--accent-gold)] font-latin-ui">
                       <span>
                         0{activePinIdx + 1} / {activePinProduct.sku}
                       </span>
@@ -630,19 +578,15 @@ export default function BoutiqueStorefront({
                     key={cat.id}
                     type="button"
                     onClick={() => onSelectCategory(cat.id)}
-                    className={`flex shrink-0 items-center justify-between gap-3 rounded-[3px] border px-4 py-3 text-sm font-medium transition ${
+                    className={`flex shrink-0 items-center justify-between gap-3 border-b-2 px-1 py-3 text-sm transition md:border-b md:py-3.5 ${
                       isSelected
-                        ? "border-[var(--accent-gold)] bg-[var(--accent-deep)] text-[#FAF6EE]"
-                        : "border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
+                        ? "border-[var(--accent-pine)] font-semibold text-[var(--accent-pine)]"
+                        : "border-[var(--border-subtle)] text-[var(--ink-body)] hover:text-[var(--accent-pine)]"
                     }`}
                   >
                     <span className="truncate">{t.categoryNames[cat.id]}</span>
                     <span
-                      className={`tabular-nums rounded-[2px] px-2 py-0.5 font-latin-ui text-[11px] font-semibold ${
-                        isSelected
-                          ? "bg-white/15 text-[#E7D19F]"
-                          : "bg-[var(--bg-soft)] text-[var(--ink-sub)]"
-                      }`}
+                      className={"tabular-nums text-xs text-[var(--ink-sub)]"}
                     >
                       {formatNumber(countByCategory(cat.id), lang)}
                     </span>
@@ -671,7 +615,7 @@ export default function BoutiqueStorefront({
                 </button>
               </div>
             ) : (
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
                 {filteredProducts.map((product) => {
                   const loc = product[lang] || product.fa;
                   const isWished = wishlist.includes(product.id);
@@ -684,7 +628,7 @@ export default function BoutiqueStorefront({
                   return (
                     <article
                       key={product.id}
-                      className="group flex flex-col justify-between overflow-hidden rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3.5 transition-colors hover:border-[var(--accent-gold)]"
+                      className="group flex flex-col justify-between"
                     >
                       <div>
                         <div className="relative aspect-square overflow-hidden rounded-[3px] bg-[var(--bg-soft)]">
@@ -710,7 +654,7 @@ export default function BoutiqueStorefront({
                           {(product.badge === "new" ||
                             product.badge === "limited") && (
                             <span
-                              className={`pointer-events-none absolute top-2.5 start-2.5 rounded-[2px] px-2 py-0.5 text-[10px] font-bold ${badgeStyle(
+                              className={`pointer-events-none absolute top-2.5 start-2.5 rounded-[2px] px-2 py-0.5 text-[11px] font-bold ${badgeStyle(
                                 product.badge
                               )}`}
                             >
@@ -723,7 +667,7 @@ export default function BoutiqueStorefront({
                             onClick={() => onToggleWishlist(product.id)}
                             aria-label={t.wishlist}
                             aria-pressed={isWished}
-                            className={`absolute top-2.5 end-2.5 inline-flex h-9 w-9 items-center justify-center rounded-[3px] border border-[var(--border-subtle)] bg-white/95 transition ${
+                            className={`absolute top-2.5 end-2.5 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--bg-page)]/90 transition ${
                               isWished
                                 ? "text-[#AE3322]"
                                 : "text-[#4B574F] hover:text-[#AE3322]"
@@ -759,7 +703,7 @@ export default function BoutiqueStorefront({
                         </div>
                       </div>
 
-                      <div className="mt-3.5 flex items-center justify-between gap-2 border-t border-[var(--border-subtle)] pt-3">
+                      <div className="mt-3 flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <div className="flex items-center gap-1.5 shrink-0">
                             {product.swatches.map((hex, sIdx) => (
@@ -783,7 +727,7 @@ export default function BoutiqueStorefront({
                               />
                             ))}
                           </div>
-                          <span className="text-[11px] font-medium text-[var(--ink-sub)] truncate">
+                          <span className="text-xs font-medium text-[var(--ink-sub)] truncate">
                             {activeVariantName}
                           </span>
                         </div>
@@ -793,7 +737,7 @@ export default function BoutiqueStorefront({
                           onClick={() =>
                             onAddToBag(product, activeVariantIdx, 1)
                           }
-                          className="shrink-0 whitespace-nowrap inline-flex items-center justify-center gap-1 rounded-[3px] bg-[var(--accent-crimson)] px-3.5 py-2 text-[11px] font-semibold text-white transition hover:opacity-90"
+                          className="shrink-0 whitespace-nowrap inline-flex items-center justify-center gap-1 rounded-[3px] border border-[var(--ink-main)] px-3.5 py-2 text-xs font-semibold text-[var(--ink-main)] transition hover:bg-[var(--ink-main)] hover:text-[var(--bg-page)]"
                         >
                           <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                           <span>{t.addToBag}</span>
@@ -828,7 +772,7 @@ export default function BoutiqueStorefront({
         <Reveal>
           <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-12 sm:px-6 md:grid-cols-12">
             <div className="md:col-span-5">
-              <div className="overflow-hidden rounded-[4px] border border-[var(--border-strong)] bg-[var(--bg-surface)] p-2">
+              <div className="overflow-hidden">
                 <img
                   src="./images/cat-decorative-paper.jpg"
                   alt={activeStory.title}

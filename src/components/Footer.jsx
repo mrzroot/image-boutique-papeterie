@@ -159,13 +159,13 @@ export default function Footer({ t, lang, contact, onNavigate, onSelectCategory 
                 <Mail className="h-3.5 w-3.5 text-[#D6B36A]" aria-hidden="true" />
                 <span>{emailAddr}</span>
               </a>
-              <p className="text-[11px] text-[#B8C8BE] pt-1">{hours}</p>
+              <p className="text-xs text-[#B8C8BE] pt-1">{hours}</p>
             </div>
           </div>
         </div>
 
         <div className="border-t border-white/10">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-[11px] text-[#B8C8BE] sm:px-6">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-[#B8C8BE] sm:px-6">
             <span>
               © {lang === "fa" ? "۱۴۰۵" : "2026"} {t.brandMain} · La Boutique
               Papeterie
