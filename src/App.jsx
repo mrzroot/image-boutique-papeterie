@@ -150,7 +150,14 @@ export default function App() {
       try {
         localStorage.setItem(CMS_DRAFT_KEY, JSON.stringify(next));
       } catch {
-        // Ignore quota warnings
+        // Storage full (usually large uploaded images): the edit lives in memory only, so say so.
+        queueMicrotask(() =>
+          showToast(
+            document.documentElement.lang === "fa"
+              ? "حافظه مرورگر پر است؛ این تغییر ذخیره نشد. پیش از بستن صفحه، منتشر یا خروجی بگیرید."
+              : "Browser storage is full — this change was not saved. Publish or export before closing the page."
+          )
+        );
       }
       setHasLocalDraft(true);
       return next;
