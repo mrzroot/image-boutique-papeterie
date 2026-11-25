@@ -77,6 +77,28 @@ assert.equal(merged.version, 2);
 assert.equal(merged.announcement.fa, "اعلان جدید");
 assert.equal(merged.products.length, 12);
 
+// Verify product media fields survive normalisation (draft/import/published JSON round-trip)
+assert.ok(baseCms.products.every((p) => Array.isArray(p.gallery) && Array.isArray(p.spinImages) && p.model3dUrl === ""));
+const spin = Array.from({ length: 8 }, (_, i) => `./images/spin/a-${i}.jpg`);
+const withMedia = mergeSiteContent(baseCms, {
+  products: [
+    {
+      ...baseCms.products[0],
+      gallery: ["./images/g1.jpg", "  ", 42, " https://cdn.example/g2.jpg "],
+      spinImages: spin,
+      model3dUrl: " ./models/notebook.glb ",
+    },
+    { id: "legacy-draft", sku: "OLD-1", fa: { title: "قدیمی" }, en: { title: "Old" } },
+  ],
+});
+const roundTripped = mergeSiteContent(buildDefaultSiteContent(), JSON.parse(JSON.stringify(withMedia)));
+assert.deepEqual(roundTripped.products[0].gallery, ["./images/g1.jpg", "https://cdn.example/g2.jpg"]);
+assert.deepEqual(roundTripped.products[0].spinImages, spin);
+assert.equal(roundTripped.products[0].model3dUrl, "./models/notebook.glb");
+assert.deepEqual(roundTripped.products[1].gallery, []);
+assert.equal(roundTripped.products[1].model3dUrl, "");
+assert.equal(roundTripped.products[1].visible, true);
+
 const hashedDefault = await hashPasscode(DEFAULT_ADMIN_PASSCODE);
 assert.equal(hashedDefault, baseCms.settings.adminPasscodeHash);
 assert.equal(hashedDefault.length, 64);
