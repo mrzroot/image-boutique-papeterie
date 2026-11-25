@@ -55,19 +55,19 @@ body {
 }
 
 [dir="rtl"] body {
-  font-family: "Vazirmatn", "Estedad", system-ui, sans-serif;
+  font-family: Vazirmatn, sans-serif;
 }
 
 [dir="ltr"] body {
-  font-family: "Inter", "Vazirmatn", system-ui, sans-serif;
+  font-family: Vazirmatn, sans-serif;
 }
 
 .font-editorial {
-  font-family: "Amiri", Georgia, "Times New Roman", serif;
+  font-family: Vazirmatn, sans-serif;
 }
 
 .font-latin-ui {
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: Vazirmatn, sans-serif;
 }
 
 .tabular-nums {
@@ -214,3 +214,17 @@ select:disabled {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-pine);
 }
+
+/* Paper Atelier: shared typography with a new physical-paper identity. */
+html:root{--bg-page:#eee9db;--bg-surface:#fbf7ed;--bg-soft:#e7dfca;--bg-muted:#dcd0b7;--bg-newsletter:#eadfc9;--ink-main:#2c2623;--ink-sub:#5b4d46;--ink-body:#453933;--border-subtle:#ccbca6;--border-strong:#a79277;--accent-pine:#735137;--accent-deep:#3c261f;--accent-gold:#7f522b;--accent-gold-bright:#f3c68e;--accent-crimson:#823831;--header-bg:#ede4d2f7;--topbar-bg:#4d2822;--strip-bg:#633c2e;--footer-bg:#392722}
+html[data-theme="dark"]{--bg-page:#211a18;--bg-surface:#302320;--bg-soft:#362824;--bg-muted:#49332b;--bg-newsletter:#2a211b;--ink-main:#fff2df;--ink-sub:#dfc6b5;--ink-body:#f2decd;--border-subtle:#785848;--border-strong:#946b56;--accent-pine:#a66849;--accent-deep:#2b1e19;--accent-gold:#e6a776;--accent-crimson:#9f433e;--header-bg:#2c201df4;--topbar-bg:#281914;--strip-bg:#4d3028;--footer-bg:#211614}
+html body,html body :is(button,input,textarea,select,code,pre){font-family:Vazirmatn,sans-serif}
+html .paper-studio-hero{padding:clamp(1rem,3vw,2.65rem);background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--border-subtle) 32%,transparent) 0 1px,transparent 1px 28px),var(--bg-page)}
+html .paper-studio-shell{border:1px solid var(--border-subtle);background:var(--bg-surface);box-shadow:0 13px 35px #321e161a;border-radius:8px 8px 28px 8px;overflow:hidden;max-width:79rem}
+html .paper-studio-copy{padding:clamp(1.2rem,3.6vw,3.2rem)}
+html .paper-studio-copy h1{font-weight:890;font-size:clamp(1.75rem,4.3vw,4rem);line-height:1.15;letter-spacing:-.045em}
+html[dir=rtl] .paper-studio-copy h1{letter-spacing:normal}
+html .paper-studio-photo img{filter:saturate(.9) contrast(.96)}
+html .paper-studio-photo:after{content:"";position:absolute;inset:.75rem;border:1px solid #fff3dc90;pointer-events:none}
+@media(min-width:768px){html .paper-studio-shell{min-height:430px}.paper-studio-photo{max-height:620px}}
+@media(max-width:767px){html .paper-studio-photo{order:-1}}

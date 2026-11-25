@@ -122,10 +122,10 @@ export default function BoutiqueStorefront({
   return (
     <main className="paper-grain animate-page-in">
       {/* 1. Compact Full-Bleed Editorial Storefront Hero */}
-      <section className="border-b border-[var(--border-subtle)] bg-[var(--bg-soft)]">
-        <div className="mx-auto grid max-w-7xl items-stretch md:grid-cols-12 md:min-h-[340px] lg:min-h-[380px] md:max-h-[430px]">
+      <section className="paper-studio-hero border-b border-[var(--border-subtle)] bg-[var(--bg-soft)]">
+        <div className="paper-studio-shell mx-auto grid max-w-7xl items-stretch md:grid-cols-12">
           {/* Editorial Copy Pane */}
-          <div className="min-w-0 flex flex-col justify-center gap-5 px-4 py-6 sm:px-6 md:col-span-6 md:py-7 lg:py-8">
+          <div className="paper-studio-copy min-w-0 flex flex-col justify-center gap-5 px-4 py-6 sm:px-6 md:col-span-6 md:py-7 lg:py-8">
             <div className="space-y-2.5">
               <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-gold)]">
                 {activeSlide.eyebrow}
@@ -235,7 +235,7 @@ export default function BoutiqueStorefront({
           </div>
 
           {/* Full-Bleed Hero Photograph */}
-          <div className="relative aspect-[16/10] sm:aspect-[16/9] md:aspect-auto md:h-full md:max-h-[430px] md:col-span-6 overflow-hidden bg-[var(--bg-muted)]">
+          <div className="paper-studio-photo relative aspect-[16/10] sm:aspect-[16/9] md:aspect-auto md:h-full md:col-span-6 overflow-hidden bg-[var(--bg-muted)]">
             <img
               key={activeSlide.image}
               src={activeSlide.image}
