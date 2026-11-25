@@ -237,9 +237,6 @@ export default function ServicesPortal({
         <div className="mt-5 grid divide-y divide-[var(--border-subtle)] rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] sm:grid-cols-2 lg:grid-cols-4 lg:divide-y-0 lg:divide-x rtl:lg:divide-x-reverse">
           {t.trustBar.map((item, idx) => (
             <div key={idx} className="flex items-start gap-3 px-4 py-4">
-              <span className="tabular-nums font-latin-ui text-xs font-bold text-[var(--accent-gold)]">
-                0{idx + 1}
-              </span>
               <div>
                 <h2 className="text-xs font-bold text-[var(--ink-main)]">
                   {item.title}
@@ -713,10 +710,7 @@ export default function ServicesPortal({
                   className="group flex h-full w-full flex-col justify-between rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 text-start transition-colors hover:border-[var(--accent-gold)]"
                 >
                   <div className="w-full">
-                    <div className="flex items-center justify-between">
-                      <span className="font-latin-ui text-2xl font-bold text-[var(--accent-gold)] group-hover:text-[var(--accent-crimson)] transition">
-                        {srv.code}
-                      </span>
+                    <div className="flex items-center justify-start">
                       <span className="tabular-nums rounded-[2px] bg-[var(--bg-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--ink-main)]">
                         {t.startingFrom} {formatPrice(srv.startingPrice, lang)}
                       </span>
