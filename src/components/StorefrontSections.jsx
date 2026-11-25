@@ -51,7 +51,7 @@ export function CategoryIndex({ t, lang, counts, onSelectCategory }) {
           ))}
         </ol>
         <div className="hidden md:block md:col-span-5">
-          <div className="aspect-[4/5] overflow-hidden rounded-[3px] bg-[var(--bg-soft)]">
+          <div className="mx-auto aspect-[4/5] max-w-[360px] overflow-hidden rounded-[3px] bg-[var(--bg-soft)]">
             <img
               key={activeCat.image}
               src={activeCat.image}
@@ -123,12 +123,12 @@ export function AtelierIntro({ t, lang, onEnterServices }) {
   const Arrow = lang === "fa" ? ArrowLeft : ArrowRight;
   return (
     <section id="atelier" className="bg-[var(--accent-deep)] text-[#F5EFE3]">
-      <div className="mx-auto grid max-w-7xl md:grid-cols-12">
-        <div className="relative min-h-[260px] md:col-span-6">
+      <div className="grid md:grid-cols-2">
+        <div className="relative min-h-[240px] md:min-h-[420px]">
           <img src="./images/atelier-services.jpg" alt={t.atelierIntro.eyebrow} loading="lazy" decoding="async" width="1376" height="768" className="absolute inset-0 h-full w-full object-cover" />
         </div>
-        <Reveal className="md:col-span-6">
-          <div className="px-6 py-12 sm:px-10 lg:px-14 lg:py-16">
+        <Reveal className="flex items-center">
+          <div className="atelier-copy py-12 lg:py-16">
             <p className="eyebrow text-[#E7D19F]">{t.atelierIntro.eyebrow}</p>
             <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-white">{t.gatewayTitle}</h2>
             <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#D7E3DC]">{t.gatewayDesc}</p>

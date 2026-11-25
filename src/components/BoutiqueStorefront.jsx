@@ -130,7 +130,7 @@ export default function BoutiqueStorefront({
       <section className="paper-studio-hero border-b border-[var(--border-subtle)] bg-[var(--bg-soft)]">
         <div className="paper-studio-shell grid items-stretch md:grid-cols-12">
           {/* Editorial Copy Pane */}
-          <div className="paper-studio-copy min-w-0 flex flex-col justify-center gap-5 px-4 py-6 sm:px-6 md:col-span-6 md:py-7 lg:py-8">
+          <div className="paper-studio-copy min-w-0 flex flex-col justify-center gap-5 px-4 py-6 sm:px-6 md:col-span-6 lg:col-span-7 md:py-7 lg:py-8">
             <div className="space-y-2.5">
               <p className="eyebrow text-[var(--accent-gold)]">
                 {activeSlide.eyebrow}
@@ -240,7 +240,7 @@ export default function BoutiqueStorefront({
           </div>
 
           {/* Full-Bleed Hero Photograph */}
-          <div className="paper-studio-photo relative aspect-[16/10] sm:aspect-[16/9] md:aspect-auto md:h-full md:col-span-6 overflow-hidden bg-[var(--bg-muted)]">
+          <div className="paper-studio-photo relative aspect-[16/10] sm:aspect-[16/9] md:aspect-auto md:h-full md:col-span-6 lg:col-span-5 overflow-hidden bg-[var(--bg-muted)]">
             <img
               key={activeSlide.image}
               src={activeSlide.image}

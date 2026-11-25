@@ -262,7 +262,9 @@ select:disabled {
   line-height: 1.4;
 }
 @media (min-width: 768px) {
-  .paper-studio-shell { min-height: min(78vh, 680px); }
+  /* fixed band height: a square slide photo must not stretch the hero to the column width */
+  .paper-studio-shell { height: clamp(420px, 62vh, 580px); }
+  .paper-studio-photo img { position: absolute; inset: 0; }
 }
 @media (max-width: 767px) {
   .paper-studio-photo { order: -1; }
@@ -443,7 +445,8 @@ html[dir="ltr"] .category-row__name { line-height: 1.2; }
 }
 .gallery-mosaic__tile:first-child { grid-column: span 2; aspect-ratio: 16 / 10; }
 @media (min-width: 768px) {
-  .gallery-mosaic { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .gallery-mosaic { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, clamp(10rem, 15vw, 13rem)); }
+  .gallery-mosaic__tile { aspect-ratio: auto; }
   .gallery-mosaic__tile:first-child { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; }
 }
 .gallery-mosaic__caption {
@@ -485,3 +488,14 @@ html[dir="ltr"] .category-row__name { line-height: 1.2; }
 .eyebrow.text-\[var\(--accent-gold\)\] { color: var(--accent-gold-ink); }
 /* dark: pine as a text colour is lifted above; keep filled pine surfaces deep enough for white text */
 [data-theme="dark"] .bg-\[var\(--accent-pine\)\] { background-color: #2a6b53; }
+
+/* copy half of a full-bleed split band, aligned with the 80rem content column */
+.atelier-copy {
+  padding-inline: 1.5rem;
+}
+@media (min-width: 768px) {
+  .atelier-copy {
+    padding-inline-start: clamp(2rem, 4vw, 4rem);
+    padding-inline-end: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem));
+  }
+}

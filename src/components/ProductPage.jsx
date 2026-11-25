@@ -75,11 +75,11 @@ export default function ProductPage({
       </nav>
 
       <section className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-12 lg:gap-12">
-        <div className="lg:col-span-7">
+        <div className="mx-auto w-full max-w-[600px] lg:col-span-6">
           <ProductMedia product={product} variantIdx={variantIdx} lang={lang} />
         </div>
 
-        <div className="lg:col-span-5 lg:sticky lg:top-28 lg:self-start">
+        <div className="lg:col-span-6 lg:sticky lg:top-28 lg:self-start">
           <p className="eyebrow text-[var(--accent-gold)]">{t.categoryNames[product.category]}</p>
           <h1 className="mt-1 text-3xl sm:text-[2.5rem] font-bold leading-[1.35] text-[var(--ink-main)]">{loc.title}</h1>
           <p className="mt-2 text-[15px] text-[var(--ink-sub)]">{loc.subtitle}</p>
