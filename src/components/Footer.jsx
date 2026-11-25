@@ -75,7 +75,7 @@ export default function Footer({ t, lang, contact, onNavigate, onSelectCategory 
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-12">
           <div className="space-y-4 md:col-span-5">
             <div>
-              <p className="font-latin-ui text-lg font-bold tracking-[0.22em] text-white">
+              <p className="brand-mark text-xl text-white">
                 {t.brandEn}
               </p>
               <p className="font-editorial italic text-sm text-[#D6B36A]">

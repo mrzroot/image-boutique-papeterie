@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Softer bold: everything at 700+ reads as a generated template */
+@theme {
+  --font-weight-bold: 620;
+}
+
 :root {
   --bg-page: #f7f3eb;
   --bg-surface: #ffffff;
@@ -54,24 +59,46 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-[dir="rtl"] body {
-  font-family: Vazirmatn, sans-serif;
+body,
+button,
+input,
+textarea,
+select {
+  font-family: Estedad, Tahoma, sans-serif;
 }
 
-[dir="ltr"] body {
-  font-family: Vazirmatn, sans-serif;
+/* Display serif for logo, notes and section titles (storefront headings use text-2xl+; admin ones don't) */
+.font-editorial,
+.brand-mark,
+.eyebrow,
+:is(h1, h2, h3):is([class*="text-2xl"], [class*="text-3xl"], [class*="text-[32px]"]) {
+  font-family: Amiri, "Times New Roman", serif;
 }
 
-.font-editorial {
-  font-family: Vazirmatn, sans-serif;
+:is(h1, h2, h3):is([class*="text-2xl"], [class*="text-3xl"], [class*="text-[32px]"]) {
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.brand-mark {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.eyebrow {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
 }
 
 .font-latin-ui {
-  font-family: Vazirmatn, sans-serif;
+  font-family: Estedad, Tahoma, sans-serif;
 }
 
+/* Estedad already draws equal-width digits; its tnum feature only pads the thousands comma ("۸۹۰ , ۰۰۰") */
 .tabular-nums {
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: normal;
 }
 
 /* Accessibility & interactive affordances (R-32, R-39) */
@@ -215,16 +242,25 @@ select:disabled {
   background: var(--accent-pine);
 }
 
-/* Paper Atelier: shared typography with a new physical-paper identity. */
-html:root{--bg-page:#eee9db;--bg-surface:#fbf7ed;--bg-soft:#e7dfca;--bg-muted:#dcd0b7;--bg-newsletter:#eadfc9;--ink-main:#2c2623;--ink-sub:#5b4d46;--ink-body:#453933;--border-subtle:#ccbca6;--border-strong:#a79277;--accent-pine:#735137;--accent-deep:#3c261f;--accent-gold:#7f522b;--accent-gold-bright:#f3c68e;--accent-crimson:#823831;--header-bg:#ede4d2f7;--topbar-bg:#4d2822;--strip-bg:#633c2e;--footer-bg:#392722}
-html[data-theme="dark"]{--bg-page:#211a18;--bg-surface:#302320;--bg-soft:#362824;--bg-muted:#49332b;--bg-newsletter:#2a211b;--ink-main:#fff2df;--ink-sub:#dfc6b5;--ink-body:#f2decd;--border-subtle:#785848;--border-strong:#946b56;--accent-pine:#a66849;--accent-deep:#2b1e19;--accent-gold:#e6a776;--accent-crimson:#9f433e;--header-bg:#2c201df4;--topbar-bg:#281914;--strip-bg:#4d3028;--footer-bg:#211614}
-html body,html body :is(button,input,textarea,select,code,pre){font-family:Vazirmatn,sans-serif}
-html .paper-studio-hero{padding:clamp(1rem,3vw,2.65rem);background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--border-subtle) 32%,transparent) 0 1px,transparent 1px 28px),var(--bg-page)}
-html .paper-studio-shell{border:1px solid var(--border-subtle);background:var(--bg-surface);box-shadow:0 13px 35px #321e161a;border-radius:8px 8px 28px 8px;overflow:hidden;max-width:79rem}
-html .paper-studio-copy{padding:clamp(1.2rem,3.6vw,3.2rem)}
-html .paper-studio-copy h1{font-weight:890;font-size:clamp(1.75rem,4.3vw,4rem);line-height:1.15;letter-spacing:-.045em}
-html[dir=rtl] .paper-studio-copy h1{letter-spacing:normal}
-html .paper-studio-photo img{filter:saturate(.9) contrast(.96)}
-html .paper-studio-photo:after{content:"";position:absolute;inset:.75rem;border:1px solid #fff3dc90;pointer-events:none}
-@media(min-width:768px){html .paper-studio-shell{min-height:430px}.paper-studio-photo{max-height:620px}}
-@media(max-width:767px){html .paper-studio-photo{order:-1}}
+
+/* Hero: one plain framed card, image beside copy */
+.paper-studio-hero {
+  padding: clamp(1rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.5rem);
+}
+.paper-studio-shell {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.paper-studio-copy h1 {
+  font-size: clamp(1.9rem, 3.6vw, 3rem);
+  line-height: 1.45;
+}
+@media (min-width: 768px) {
+  .paper-studio-shell { min-height: 430px; }
+  .paper-studio-photo { max-height: 620px; }
+}
+@media (max-width: 767px) {
+  .paper-studio-photo { order: -1; }
+}

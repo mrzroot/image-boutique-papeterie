@@ -127,7 +127,7 @@ export default function BoutiqueStorefront({
           {/* Editorial Copy Pane */}
           <div className="paper-studio-copy min-w-0 flex flex-col justify-center gap-5 px-4 py-6 sm:px-6 md:col-span-6 md:py-7 lg:py-8">
             <div className="space-y-2.5">
-              <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-gold)]">
+              <p className="eyebrow text-[var(--accent-gold)]">
                 {activeSlide.eyebrow}
               </p>
 
@@ -261,9 +261,6 @@ export default function BoutiqueStorefront({
               key={i}
               className="flex items-start gap-4 py-3 md:px-6 md:py-1 first:md:ps-0 last:md:pe-0"
             >
-              <span className="tabular-nums mt-0.5 font-latin-ui text-xs font-bold tracking-[0.2em] text-[#E7D19F]">
-                0{i + 1}
-              </span>
               <div>
                 <h2 className="text-sm font-bold text-white">{item.title}</h2>
                 <p className="mt-1 text-xs leading-relaxed text-[#D7E3DC]">
@@ -278,7 +275,7 @@ export default function BoutiqueStorefront({
       {/* 3. Bestsellers Showcase ("NOS FAVORIS") */}
       <section id="favorites" className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="mb-8 text-center space-y-1.5">
-          <p className="font-latin-ui text-[11px] font-bold tracking-[0.24em] text-[var(--accent-gold)]">
+          <p className="eyebrow text-[var(--accent-gold)]">
             {t.favoritesEyebrow}
           </p>
           <h2 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
@@ -427,7 +424,7 @@ export default function BoutiqueStorefront({
             <Reveal>
               <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                  <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-gold)]">
+                  <p className="eyebrow text-[var(--accent-gold)]">
                     {t.lookbook.eyebrow}
                   </p>
                   <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
@@ -577,7 +574,7 @@ export default function BoutiqueStorefront({
       >
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--border-subtle)] pb-5">
           <div>
-            <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-gold)]">
+            <p className="eyebrow text-[var(--accent-gold)]">
               {t.catalogEyebrow}
             </p>
             <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
@@ -845,7 +842,7 @@ export default function BoutiqueStorefront({
             </div>
 
             <div className="space-y-4 md:col-span-7 md:ps-6">
-              <p className="font-latin-ui text-xs font-bold tracking-[0.22em] text-[var(--accent-gold)]">
+              <p className="eyebrow text-[var(--accent-gold)]">
                 {activeStory.eyebrow}
               </p>
               <h2 className="text-2xl sm:text-3xl font-bold leading-snug text-[var(--ink-main)]">
@@ -865,7 +862,7 @@ export default function BoutiqueStorefront({
           <div className="flex items-start gap-4">
             <Printer className="mt-1 h-6 w-6 shrink-0 text-[#E7D19F]" aria-hidden="true" />
             <div>
-              <p className="font-latin-ui text-[10px] font-bold tracking-[0.2em] text-[#E7D19F]">
+              <p className="eyebrow text-[#E7D19F]">
                 {t.gatewayEyebrow}
               </p>
               <h2 className="mt-1 text-base sm:text-lg font-bold text-white">

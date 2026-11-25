@@ -318,7 +318,7 @@ export default function Header({
             <BrandCrest />
           </div>
           <div className="flex flex-col items-center sm:items-start">
-            <span className="font-latin-ui text-xs sm:text-sm lg:text-base font-bold tracking-[0.18em] lg:tracking-[0.24em] text-[var(--ink-main)] group-hover:text-[var(--accent-gold)] transition">
+            <span className="brand-mark text-base sm:text-lg lg:text-xl text-[var(--ink-main)] group-hover:text-[var(--accent-gold)] transition">
               {t.brandEn}
             </span>
             <span className="font-editorial italic text-[11px] sm:text-xs lg:text-[13px] text-[var(--accent-pine)] tracking-wide">

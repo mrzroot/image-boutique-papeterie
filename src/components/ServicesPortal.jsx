@@ -205,7 +205,7 @@ export default function ServicesPortal({
         <div className="overflow-hidden rounded-[4px] border border-[#C8A258]/40 bg-[#123126] text-[#FAF6EE]">
           <div className="grid items-stretch md:grid-cols-12">
             <div className="space-y-4 p-7 sm:p-9 md:col-span-7">
-              <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[#E7D19F]">
+              <p className="eyebrow text-[#E7D19F]">
                 {t.servicesHeroEyebrow}
               </p>
               <h1
@@ -257,7 +257,7 @@ export default function ServicesPortal({
         className="mx-auto max-w-7xl px-4 py-8 sm:px-6"
       >
         <div className="mb-6">
-          <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-crimson)]">
+          <p className="eyebrow text-[var(--accent-crimson)]">
             {t.calcEyebrow}
           </p>
           <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
@@ -575,7 +575,7 @@ export default function ServicesPortal({
           {/* Sticky Dark Order Summary + Live Bindery 3D Preview */}
           <aside className="min-w-0 rounded-[4px] border border-[#C8A258]/40 bg-[#123126] p-4 sm:p-5 text-[#FAF6EE] md:col-span-5 lg:col-span-4 md:sticky md:top-[96px] md:max-h-[calc(100vh-112px)] md:overflow-y-auto space-y-3">
             <div>
-              <p className="font-latin-ui text-[10px] font-bold tracking-[0.22em] text-[#E7D19F]">
+              <p className="eyebrow text-[#E7D19F]">
                 {t.orderSummary.eyebrow}
               </p>
               <h3 className="mt-0.5 text-lg font-bold text-white">
@@ -694,7 +694,7 @@ export default function ServicesPortal({
       {/* 6 Numbered Services Catalog (Semantic Buttons) */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="mb-6">
-          <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-pine)]">
+          <p className="eyebrow text-[var(--accent-pine)]">
             {t.servicesSectionEyebrow}
           </p>
           <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
@@ -793,7 +793,7 @@ export default function ServicesPortal({
         <div className="rounded-[4px] border border-[#C8A258]/35 bg-[#123126] p-7 sm:p-10 text-[#FAF6EE]">
           <div className="grid gap-8 lg:grid-cols-12 items-center">
             <div className="space-y-3 lg:col-span-6">
-              <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[#E7D19F]">
+              <p className="eyebrow text-[#E7D19F]">
                 {t.wholesaleEyebrow}
               </p>
               <h3 className="text-2xl font-bold text-white">

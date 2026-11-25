@@ -60,7 +60,7 @@ export default function BoutiqueExtras({
         <Reveal>
           <div className="mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--border-subtle)] pb-4">
             <div>
-              <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-gold)]">
+              <p className="eyebrow text-[var(--accent-gold)]">
                 {t.bundles.eyebrow}
               </p>
               <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
@@ -157,7 +157,7 @@ export default function BoutiqueExtras({
 
                 <div className="relative z-10 flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-latin-ui text-xs font-bold tracking-[0.22em]">
+                    <p className="eyebrow">
                       IMAGE BOUTIQUE
                     </p>
                     <p className="font-editorial italic text-xs opacity-85">
@@ -205,7 +205,7 @@ export default function BoutiqueExtras({
               className="space-y-5 lg:col-span-7"
             >
               <div>
-                <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-gold)]">
+                <p className="eyebrow text-[var(--accent-gold)]">
                   {t.giftCard.eyebrow}
                 </p>
                 <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
@@ -321,7 +321,7 @@ export default function BoutiqueExtras({
         <Reveal>
           <div className="mb-6 flex flex-wrap items-end justify-between gap-2">
             <div>
-              <p className="font-latin-ui text-[11px] font-bold tracking-[0.22em] text-[var(--accent-gold)]">
+              <p className="eyebrow text-[var(--accent-gold)]">
                 {t.socialSection.eyebrow}
               </p>
               <h2 className="mt-1 text-xl sm:text-2xl font-bold text-[var(--ink-main)]">
