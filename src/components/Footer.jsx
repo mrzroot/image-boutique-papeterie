@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Phone, Mail, CheckCircle2, ArrowUpRight, LayoutDashboard } from "lucide-react";
 
-export default function Footer({ t, lang, contact, onNavigate, onSelectCategory }) {
+export default function Footer({ t, lang, contact, onNavigate, onSelectCategory, showNewsletter = true }) {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
@@ -23,6 +23,7 @@ export default function Footer({ t, lang, contact, onNavigate, onSelectCategory 
   return (
     <footer className="border-t border-[var(--border-subtle)]">
       {/* Newsletter Strip */}
+      {showNewsletter && (
       <section
         className="px-4 py-10 sm:px-6 transition-colors"
         style={{ backgroundColor: "var(--bg-newsletter)" }}
@@ -69,6 +70,7 @@ export default function Footer({ t, lang, contact, onNavigate, onSelectCategory 
           )}
         </div>
       </section>
+      )}
 
       {/* Main Botanical / Obsidian Footer */}
       <div

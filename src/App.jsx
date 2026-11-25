@@ -33,6 +33,7 @@ function productIdFromHash() {
 function viewFromHash() {
   const h = window.location.hash;
   if (productIdFromHash()) return "product";
+  if (h === "#/shop") return "shop";
   if (h === "#/services") return "services";
   if (h === "#/admin") return "admin";
   return "store";
@@ -203,14 +204,25 @@ export default function App() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [view]);
+
   const showToast = useCallback((msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(""), 2600);
   }, []);
 
   const handleNavigate = useCallback((targetView, scrollId) => {
+    // the catalog is its own page now; old "store#catalog" callers land there
+    if (targetView === "store" && scrollId === "catalog") {
+      targetView = "shop";
+      scrollId = null;
+    }
     const nextHash =
-      targetView === "services"
+      targetView === "shop"
+        ? "#/shop"
+        : targetView === "services"
         ? "#/services"
         : targetView === "admin"
         ? "#/admin"
@@ -380,8 +392,10 @@ export default function App() {
       />
 
       <div className="flex-1">
-        {view === "store" ? (
+        {view === "store" || view === "shop" ? (
           <BoutiqueStorefront
+            key={view}
+            page={view === "shop" ? "shop" : "home"}
             t={t}
             lang={lang}
             products={cmsContent.products}
@@ -457,6 +471,7 @@ export default function App() {
       </div>
 
       <Footer
+        showNewsletter={view !== "admin"}
         t={t}
         lang={lang}
         contact={cmsContent.contact}
@@ -482,8 +497,11 @@ export default function App() {
 
         <button
           type="button"
-          onClick={() => handleNavigate("store", "catalog")}
-          className="flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-[var(--ink-sub)]"
+          onClick={() => handleNavigate("shop")}
+          aria-current={view === "shop" ? "page" : undefined}
+          className={`flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold ${
+            view === "shop" ? "text-[var(--accent-pine)] font-bold" : "text-[var(--ink-sub)]"
+          }`}
         >
           <LayoutGrid className="h-4 w-4" aria-hidden="true" />
           <span>{lang === "fa" ? "دسته‌ها" : "Catalog"}</span>

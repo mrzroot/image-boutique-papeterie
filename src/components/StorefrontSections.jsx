@@ -33,7 +33,7 @@ export function CategoryIndex({ t, lang, counts, onSelectCategory }) {
           {cats.map((cat, i) => (
             <li key={cat.id}>
               <a
-                href="#catalog"
+                href="#/shop"
                 onClick={() => onSelectCategory(cat.id)}
                 onMouseEnter={() => setActive(cat.id)}
                 onFocus={() => setActive(cat.id)}

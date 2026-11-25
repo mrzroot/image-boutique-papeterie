@@ -132,7 +132,8 @@ export default function Header({
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Admin CMS Dashboard Button */}
+            {/* Admin entry: owner-only (draft in this browser) — customers use the store */}
+            {(hasLocalDraft || view === "admin") && (
             <button
               type="button"
               onClick={() => onNavigate("admin")}
@@ -152,6 +153,7 @@ export default function Header({
                 />
               )}
             </button>
+            )}
 
             {/* Obsidian Black / Light Boutique Theme Switcher */}
             <button
@@ -399,7 +401,7 @@ export default function Header({
                 value={searchQuery}
                 onChange={(e) => {
                   onSearchChange(e.target.value);
-                  if (view !== "store") onNavigate("store", "catalog");
+                  if (view !== "shop") onNavigate("shop");
                 }}
                 placeholder={t.searchPlaceholder}
                 className="w-full bg-transparent text-sm text-[var(--ink-main)] placeholder:text-[var(--ink-sub)]"

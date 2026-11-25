@@ -41,6 +41,7 @@ export default function BoutiqueStorefront({
   onOpenProduct,
   shipping,
   contact,
+  page = "home",
 }) {
   const [slideIdx, setSlideIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -124,6 +125,121 @@ export default function BoutiqueStorefront({
     return "bg-[var(--bg-surface)] text-[var(--ink-main)] border border-[var(--border-subtle)]";
   };
 
+  if (page === "shop") {
+    return (
+      <main className="paper-grain animate-page-in">
+      <section
+        id="catalog"
+        className="mx-auto max-w-7xl px-4 pb-16 pt-10 sm:px-6"
+      >
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--border-subtle)] pb-5">
+          <div>
+            <p className="eyebrow text-[var(--accent-gold)]">
+              {t.catalogEyebrow}
+            </p>
+            <h1 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
+              {t.catalogTitle}
+            </h1>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              onClick={onToggleWishlistOnly}
+              className={`inline-flex h-10 items-center gap-1.5 rounded-[3px] border px-3.5 text-xs font-semibold transition ${
+                wishlistOnly
+                  ? "border-[var(--accent-crimson)] bg-[var(--accent-crimson)] text-white"
+                  : "border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
+              }`}
+            >
+              <Heart
+                aria-hidden="true"
+                className={`h-3.5 w-3.5 ${wishlistOnly ? "fill-current" : ""}`}
+              />
+              <span>{t.wishlist}</span>
+            </button>
+
+            <div className="inline-flex h-10 items-center gap-2 rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 text-xs">
+              <SlidersHorizontal className="h-3.5 w-3.5 text-[var(--ink-sub)]" aria-hidden="true" />
+              <label htmlFor="catalog-sort" className="sr-only">
+                Sort
+              </label>
+              <select
+                id="catalog-sort"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-transparent font-medium text-[var(--ink-main)]"
+              >
+                <option value="featured" className="bg-[var(--bg-surface)] text-[var(--ink-main)]">{t.sortOptions.featured}</option>
+                <option value="newest" className="bg-[var(--bg-surface)] text-[var(--ink-main)]">{t.sortOptions.newest}</option>
+                <option value="priceAsc" className="bg-[var(--bg-surface)] text-[var(--ink-main)]">{t.sortOptions.priceAsc}</option>
+                <option value="priceDesc" className="bg-[var(--bg-surface)] text-[var(--ink-main)]">{t.sortOptions.priceDesc}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-8 md:grid-cols-12">
+          {/* Category Sidebar */}
+          <aside className="min-w-0 md:col-span-3">
+            <div className="flex gap-2 overflow-x-auto pb-2 md:flex-col md:sticky md:top-28 md:pb-0">
+              {CATEGORIES.map((cat) => {
+                const isSelected = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => onSelectCategory(cat.id)}
+                    className={`flex shrink-0 items-center justify-between gap-3 border-b-2 px-1 py-3 text-sm transition md:border-b md:py-3.5 ${
+                      isSelected
+                        ? "border-[var(--accent-pine)] font-semibold text-[var(--accent-pine)]"
+                        : "border-[var(--border-subtle)] text-[var(--ink-body)] hover:text-[var(--accent-pine)]"
+                    }`}
+                  >
+                    <span className="truncate">{t.categoryNames[cat.id]}</span>
+                    <span
+                      className={"tabular-nums text-xs text-[var(--ink-sub)]"}
+                    >
+                      {formatNumber(countByCategory(cat.id), lang)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+
+          {/* Product Grid */}
+          <div className="min-w-0 md:col-span-9">
+            {filteredProducts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-12 text-center space-y-4">
+                <p className="text-sm text-[var(--ink-sub)]">
+                  {t.noProductsFound}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelectCategory("all");
+                    if (wishlistOnly) onToggleWishlistOnly();
+                  }}
+                  className="rounded-[3px] bg-[var(--accent-pine)] px-5 py-2.5 text-xs font-semibold text-white"
+                >
+                  {t.clearFilters}
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12 xl:grid-cols-3">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} {...cardProps} isWished={wishlist.includes(product.id)} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+      </main>
+    );
+  }
+
   return (
     <main className="paper-grain animate-page-in">
       {/* 1. Compact Full-Bleed Editorial Storefront Hero */}
@@ -152,7 +268,7 @@ export default function BoutiqueStorefront({
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-4">
                 <a
-                  href="#catalog"
+                  href="#/shop"
                   className="inline-flex items-center gap-2 rounded-[3px] bg-[var(--accent-crimson)] px-5 py-2.5 text-xs lg:text-sm font-semibold text-white transition hover:opacity-90"
                 >
                   <span>{activeSlide.ctaPrimary}</span>
@@ -411,116 +527,6 @@ export default function BoutiqueStorefront({
           </div>
         </section>
       )}
-
-      {/* 6. Interactive Boutique Product Catalog */}
-      <section
-        id="catalog"
-        className="mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6"
-      >
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--border-subtle)] pb-5">
-          <div>
-            <p className="eyebrow text-[var(--accent-gold)]">
-              {t.catalogEyebrow}
-            </p>
-            <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
-              {t.catalogTitle}
-            </h2>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5">
-            <button
-              type="button"
-              onClick={onToggleWishlistOnly}
-              className={`inline-flex h-10 items-center gap-1.5 rounded-[3px] border px-3.5 text-xs font-semibold transition ${
-                wishlistOnly
-                  ? "border-[var(--accent-crimson)] bg-[var(--accent-crimson)] text-white"
-                  : "border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
-              }`}
-            >
-              <Heart
-                aria-hidden="true"
-                className={`h-3.5 w-3.5 ${wishlistOnly ? "fill-current" : ""}`}
-              />
-              <span>{t.wishlist}</span>
-            </button>
-
-            <div className="inline-flex h-10 items-center gap-2 rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 text-xs">
-              <SlidersHorizontal className="h-3.5 w-3.5 text-[var(--ink-sub)]" aria-hidden="true" />
-              <label htmlFor="catalog-sort" className="sr-only">
-                Sort
-              </label>
-              <select
-                id="catalog-sort"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent font-medium text-[var(--ink-main)]"
-              >
-                <option value="featured" className="bg-[var(--bg-surface)] text-[var(--ink-main)]">{t.sortOptions.featured}</option>
-                <option value="newest" className="bg-[var(--bg-surface)] text-[var(--ink-main)]">{t.sortOptions.newest}</option>
-                <option value="priceAsc" className="bg-[var(--bg-surface)] text-[var(--ink-main)]">{t.sortOptions.priceAsc}</option>
-                <option value="priceDesc" className="bg-[var(--bg-surface)] text-[var(--ink-main)]">{t.sortOptions.priceDesc}</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid gap-8 md:grid-cols-12">
-          {/* Category Sidebar */}
-          <aside className="min-w-0 md:col-span-3">
-            <div className="flex gap-2 overflow-x-auto pb-2 md:flex-col md:sticky md:top-28 md:pb-0">
-              {CATEGORIES.map((cat) => {
-                const isSelected = selectedCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => onSelectCategory(cat.id)}
-                    className={`flex shrink-0 items-center justify-between gap-3 border-b-2 px-1 py-3 text-sm transition md:border-b md:py-3.5 ${
-                      isSelected
-                        ? "border-[var(--accent-pine)] font-semibold text-[var(--accent-pine)]"
-                        : "border-[var(--border-subtle)] text-[var(--ink-body)] hover:text-[var(--accent-pine)]"
-                    }`}
-                  >
-                    <span className="truncate">{t.categoryNames[cat.id]}</span>
-                    <span
-                      className={"tabular-nums text-xs text-[var(--ink-sub)]"}
-                    >
-                      {formatNumber(countByCategory(cat.id), lang)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </aside>
-
-          {/* Product Grid */}
-          <div className="min-w-0 md:col-span-9">
-            {filteredProducts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-12 text-center space-y-4">
-                <p className="text-sm text-[var(--ink-sub)]">
-                  {t.noProductsFound}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onSelectCategory("all");
-                    if (wishlistOnly) onToggleWishlistOnly();
-                  }}
-                  className="rounded-[3px] bg-[var(--accent-pine)] px-5 py-2.5 text-xs font-semibold text-white"
-                >
-                  {t.clearFilters}
-                </button>
-              </div>
-            ) : (
-              <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} {...cardProps} isWished={wishlist.includes(product.id)} />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* 6B. Gift Coffrets, Digital Gift Card & Studio Gallery */}
       <BoutiqueExtras

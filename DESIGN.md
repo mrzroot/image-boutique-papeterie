@@ -30,7 +30,7 @@
 ## Components
 - `ProductCard` is the only product tile (bestsellers, new arrivals, catalog, related): image (object-contain), badge, wishlist, quick view, swatches, title linking to the product page, price, one quiet add-to-bag.
 - `StorefrontSections`: `SectionHead`, `CategoryIndex`, `ProductRail`, `GalleryMosaic` (CMS `socialGallery`), `AtelierIntro`, `TrustSection` (only facts from the CMS: value strip, shipping threshold, contact).
-- Routes: `#/`, `#/product/:id`, `#/services`, `#/admin`.
+- Routes: `#/` (curated home), `#/shop` (full catalog with filters), `#/product/:id`, `#/services`, `#/admin`. The admin entry in the header only shows in a browser holding an unpublished draft; the footer link is the owner's way in.
 - Controls in `src/index.css`: `.btn-primary` (crimson, one per view), `.btn-quiet` (outlined ink), `.btn-on-dark`, `.icon-btn`, `.icon-chip`, `.swatch`, `.variant-pill`, `.qty-stepper`.
 - Contrast: small brass text uses `--accent-gold-ink`; dark theme lifts pine/crimson text colours to AA.
 
