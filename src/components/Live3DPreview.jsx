@@ -217,6 +217,7 @@ export default function Live3DPreview({
   ]);
 
   const handlePointerDown = (e) => {
+    if (e.target.closest?.("button")) return;
     setAutoSpin(false);
     e.currentTarget.setPointerCapture?.(e.pointerId);
     dragRef.current = { x: e.clientX, y: e.clientY };
