@@ -478,3 +478,10 @@ html[dir="ltr"] .category-row__name { line-height: 1.2; }
 }
 .spec-list dt { font-size: 0.8125rem; color: var(--ink-sub); }
 .spec-list dd { font-size: 0.9375rem; line-height: 1.8; color: var(--ink-body); }
+
+/* ---------- Contrast (WCAG AA) ---------- */
+:root { --accent-gold-ink: #7d6231; } /* brass for small text on light grounds; --accent-gold stays for lines/icons */
+[data-theme="dark"] { --accent-gold-ink: var(--accent-gold); --accent-pine: #4c9a7f; --accent-crimson: #c2412f; }
+.eyebrow.text-\[var\(--accent-gold\)\] { color: var(--accent-gold-ink); }
+/* dark: pine as a text colour is lifted above; keep filled pine surfaces deep enough for white text */
+[data-theme="dark"] .bg-\[var\(--accent-pine\)\] { background-color: #2a6b53; }
