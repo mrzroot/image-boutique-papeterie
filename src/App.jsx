@@ -10,6 +10,7 @@ import Header from "./components/Header";
 import BoutiqueStorefront from "./components/BoutiqueStorefront";
 import ServicesPortal from "./components/ServicesPortal";
 import ProductModal from "./components/ProductModal";
+import ProductPage from "./components/ProductPage";
 import OrderBagDrawer from "./components/OrderBagDrawer";
 import Footer from "./components/Footer";
 
@@ -24,8 +25,14 @@ function readStorage(key, fallback) {
   }
 }
 
+function productIdFromHash() {
+  const m = window.location.hash.match(/^#\/product\/([\w-]+)/);
+  return m ? m[1] : null;
+}
+
 function viewFromHash() {
   const h = window.location.hash;
+  if (productIdFromHash()) return "product";
   if (h === "#/services") return "services";
   if (h === "#/admin") return "admin";
   return "store";
@@ -35,6 +42,7 @@ export default function App() {
   const [lang, setLang] = useState(() => readStorage("ib_lang", "fa"));
   const [theme, setTheme] = useState(() => readStorage("ib_theme", "light"));
   const [view, setView] = useState(viewFromHash);
+  const [productRoute, setProductRoute] = useState(() => ({ id: productIdFromHash(), variantIdx: 0 }));
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [wishlistOnly, setWishlistOnly] = useState(false);
@@ -181,6 +189,8 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       setView(viewFromHash());
+      const id = productIdFromHash();
+      if (id) setProductRoute((prev) => (prev.id === id ? prev : { id, variantIdx: 0 }));
     };
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
@@ -209,6 +219,15 @@ export default function App() {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     }, 60);
+  }, []);
+
+  const handleOpenProduct = useCallback((product, variantIdx = 0) => {
+    const nextHash = `#/product/${product.id}`;
+    if (window.location.hash !== nextHash) window.history.pushState(null, "", nextHash);
+    setActiveProduct(null);
+    setProductRoute({ id: product.id, variantIdx });
+    setView("product");
+    window.scrollTo({ top: 0 });
   }, []);
 
   const handleToggleWishlist = (productId) => {
@@ -376,6 +395,23 @@ export default function App() {
             onAddGiftCard={handleAddGiftCard}
             onQuickView={handleOpenQuickView}
             onEnterServices={() => handleNavigate("services")}
+            onOpenProduct={handleOpenProduct}
+            shipping={cmsContent.shipping}
+            contact={cmsContent.contact}
+          />
+        ) : view === "product" ? (
+          <ProductPage
+            product={cmsContent.products.find((p) => p.id === productRoute.id && p.visible !== false)}
+            products={cmsContent.products}
+            initialVariantIdx={productRoute.variantIdx}
+            lang={lang}
+            t={t}
+            wishlist={wishlist}
+            onToggleWishlist={handleToggleWishlist}
+            onAddToBag={handleAddProductToBag}
+            onQuickView={handleOpenQuickView}
+            onOpenProduct={handleOpenProduct}
+            onBack={() => handleNavigate("store", "catalog")}
           />
         ) : view === "services" ? (
           <ServicesPortal
@@ -495,6 +531,7 @@ export default function App() {
         bundles={cmsContent.bundles}
         promoCodes={cmsContent.promoCodes}
         shipping={cmsContent.shipping}
+        contact={cmsContent.contact}
         orderHistory={orderHistory}
         onSaveOrder={(order) => setOrderHistory((prev) => [order, ...prev])}
         onUpdateQty={handleUpdateQty}

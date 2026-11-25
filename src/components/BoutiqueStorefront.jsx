@@ -5,8 +5,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Heart,
-  Plus,
-  Printer,
   SlidersHorizontal,
   ShoppingBag,
   Pause,
@@ -15,6 +13,8 @@ import {
 import { CATEGORIES } from "../data/catalog";
 import { formatPrice, formatNumber } from "../utils/pricing";
 import Reveal from "./Reveal";
+import ProductCard from "./ProductCard";
+import { CategoryIndex, ProductRail, GalleryMosaic, AtelierIntro, TrustSection } from "./StorefrontSections";
 import BoutiqueExtras from "./BoutiqueExtras";
 
 export default function BoutiqueStorefront({
@@ -38,12 +38,14 @@ export default function BoutiqueStorefront({
   onAddGiftCard,
   onQuickView,
   onEnterServices,
+  onOpenProduct,
+  shipping,
+  contact,
 }) {
   const [slideIdx, setSlideIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [sortBy, setSortBy] = useState("featured");
   const [activePinIdx, setActivePinIdx] = useState(0);
-  const [cardVariants, setCardVariants] = useState({});
   const isRtl = lang === "fa";
 
   const slides = heroSlides.length
@@ -70,6 +72,9 @@ export default function BoutiqueStorefront({
   const visibleProducts = products.filter((p) => p.visible !== false);
   const bestsellers = visibleProducts.filter((p) => p.badge === "bestseller");
   const favorites = (bestsellers.length >= 4 ? bestsellers : visibleProducts).slice(0, 4);
+
+  const newArrivals = visibleProducts.filter((p) => p.badge === "new").slice(0, 4);
+  const cardProps = { lang, t, wishlist, onToggleWishlist, onAddToBag, onQuickView, onOpenProduct };
 
   const pins = t.lookbook?.pins || [];
   const activePin = pins[activePinIdx] || pins[0];
@@ -250,120 +255,12 @@ export default function BoutiqueStorefront({
         </div>
       </section>
 
-      {/* 2. Architectural Numbered Manifesto Strip */}
-      <section
-        className="text-[#FAF6EE] border-b border-[var(--accent-gold)]/25"
-        style={{ backgroundColor: "var(--strip-bg)" }}
-      >
-        <div className="mx-auto grid max-w-7xl divide-y divide-white/15 px-4 py-5 sm:px-6 md:grid-cols-3 md:divide-y-0 md:divide-x rtl:md:divide-x-reverse">
-          {activeValueStrip.map((item, i) => (
-            <div
-              key={i}
-              className="flex items-start gap-4 py-3 md:px-6 md:py-1 first:md:ps-0 last:md:pe-0"
-            >
-              <div>
-                <h2 className="text-sm font-bold text-white">{item.title}</h2>
-                <p className="mt-1 text-xs leading-relaxed text-[#D7E3DC]">
-                  {item.desc}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* 2. Category index */}
+      <CategoryIndex t={t} lang={lang} counts={countByCategory} onSelectCategory={onSelectCategory} />
 
-      {/* 3. Bestsellers Showcase ("NOS FAVORIS") */}
-      <section id="favorites" className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="mb-8 text-center space-y-1.5">
-          <p className="eyebrow text-[var(--accent-gold)]">
-            {t.favoritesEyebrow}
-          </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
-            {t.favoritesTitle}
-          </h2>
-          <p className="text-xs sm:text-sm text-[var(--ink-sub)]">
-            {t.favoritesSubtitle}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-          {favorites.map((product) => {
-            const loc = product[lang] || product.fa;
-            const activeVariantIdx = cardVariants[product.id] || 0;
-            const activeImage =
-              product.variantImages?.[activeVariantIdx] || product.image;
-            return (
-              <div
-                key={product.id}
-                className="group flex flex-col items-center text-center"
-              >
-                <div className="relative w-full aspect-square overflow-hidden rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-soft)] transition-colors group-hover:border-[var(--accent-gold)]">
-                  <button
-                    type="button"
-                    onClick={() => onQuickView(product, activeVariantIdx)}
-                    aria-label={loc.title}
-                    className="block h-full w-full"
-                  >
-                    <img
-                      src={activeImage}
-                      alt={loc.title}
-                      loading="lazy"
-                      decoding="async"
-                      width="400"
-                      height="400"
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                    />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onAddToBag(product, activeVariantIdx, 1)}
-                    className="hidden sm:inline-flex absolute inset-x-3 bottom-3 translate-y-2 opacity-0 items-center justify-center gap-1.5 rounded-[3px] bg-[var(--accent-deep)] py-2 text-xs font-bold text-[#FAF6EE] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100 border border-[#D6B36A]/45"
-                  >
-                    <Plus className="h-3.5 w-3.5 text-[#E7D19F]" aria-hidden="true" />
-                    <span>{t.addToBag}</span>
-                  </button>
-                </div>
-
-                {product.swatches?.length > 1 && (
-                  <div className="mt-2.5 flex items-center justify-center gap-2">
-                    {product.swatches.map((hex, idx) => (
-                      <button
-                        key={hex + idx}
-                        type="button"
-                        onClick={() =>
-                          setCardVariants((prev) => ({
-                            ...prev,
-                            [product.id]: idx,
-                          }))
-                        }
-                        aria-label={loc.variants[idx] || hex}
-                        title={loc.variants[idx] || hex}
-                        className={`h-3.5 w-3.5 rounded-full border transition ${
-                          activeVariantIdx === idx
-                            ? "scale-110 border-[var(--ink-main)] ring-2 ring-[var(--accent-gold)]/70"
-                            : "border-black/25 hover:scale-105"
-                        }`}
-                        style={{ backgroundColor: hex }}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => onQuickView(product, activeVariantIdx)}
-                  className="mt-2 text-xs sm:text-sm font-bold text-[var(--ink-main)] hover:text-[var(--accent-gold)] line-clamp-1"
-                >
-                  {loc.title}
-                </button>
-                <p className="tabular-nums mt-1 text-xs sm:text-sm font-bold text-[var(--accent-pine)]">
-                  {formatPrice(product.price, lang)}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      {/* 3. Bestsellers & new arrivals */}
+      <ProductRail id="favorites" eyebrow={t.favoritesEyebrow} title={t.favoritesTitle} subtitle={t.favoritesSubtitle} products={favorites} cardProps={cardProps} />
+      <ProductRail id="new-arrivals" tone="surface" eyebrow={t.newArrivals.eyebrow} title={t.newArrivals.title} subtitle={t.newArrivals.subtitle} products={newArrivals} cardProps={cardProps} />
 
       {/* 5. Interactive "Shop the Desk" Editorial Lookbook Band */}
       {t.lookbook && activePinProduct && (
@@ -616,136 +513,9 @@ export default function BoutiqueStorefront({
               </div>
             ) : (
               <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
-                {filteredProducts.map((product) => {
-                  const loc = product[lang] || product.fa;
-                  const isWished = wishlist.includes(product.id);
-                  const activeVariantIdx = cardVariants[product.id] || 0;
-                  const variants = loc.variants || [];
-                  const activeVariantName =
-                    variants[activeVariantIdx] || variants[0] || "";
-                  const activeImage =
-                    product.variantImages?.[activeVariantIdx] || product.image;
-                  return (
-                    <article
-                      key={product.id}
-                      className="group flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="relative aspect-square overflow-hidden rounded-[3px] bg-[var(--bg-soft)]">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onQuickView(product, activeVariantIdx)
-                            }
-                            aria-label={loc.title}
-                            className="block h-full w-full"
-                          >
-                            <img
-                              src={activeImage}
-                              alt={loc.title}
-                              loading="lazy"
-                              decoding="async"
-                              width="450"
-                              height="450"
-                              className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                            />
-                          </button>
-
-                          {(product.badge === "new" ||
-                            product.badge === "limited") && (
-                            <span
-                              className={`pointer-events-none absolute top-2.5 start-2.5 rounded-[2px] px-2 py-0.5 text-[11px] font-bold ${badgeStyle(
-                                product.badge
-                              )}`}
-                            >
-                              {t.badges[product.badge]}
-                            </span>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() => onToggleWishlist(product.id)}
-                            aria-label={t.wishlist}
-                            aria-pressed={isWished}
-                            className={`absolute top-2.5 end-2.5 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--bg-page)]/90 transition ${
-                              isWished
-                                ? "text-[#AE3322]"
-                                : "text-[#4B574F] hover:text-[#AE3322]"
-                            }`}
-                          >
-                            <Heart
-                              aria-hidden="true"
-                              className={`h-4 w-4 ${
-                                isWished ? "fill-current" : ""
-                              }`}
-                            />
-                          </button>
-                        </div>
-
-                        <div className="pt-3.5 space-y-1.5">
-                          <div className="flex items-start justify-between gap-2">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                onQuickView(product, activeVariantIdx)
-                              }
-                              className="text-start text-sm sm:text-[15px] font-bold text-[var(--ink-main)] leading-snug hover:text-[var(--accent-gold)]"
-                            >
-                              {loc.title}
-                            </button>
-                            <span className="tabular-nums text-xs sm:text-sm font-bold text-[var(--accent-pine)] whitespace-nowrap shrink-0">
-                              {formatPrice(product.price, lang)}
-                            </span>
-                          </div>
-                          <p className="text-xs text-[var(--ink-sub)] line-clamp-1">
-                            {loc.subtitle}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mt-3 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            {product.swatches.map((hex, sIdx) => (
-                              <button
-                                key={hex + sIdx}
-                                type="button"
-                                title={loc.variants[sIdx]}
-                                aria-label={loc.variants[sIdx]}
-                                onClick={() =>
-                                  setCardVariants((prev) => ({
-                                    ...prev,
-                                    [product.id]: sIdx,
-                                  }))
-                                }
-                                className={`h-3.5 w-3.5 rounded-full border transition ${
-                                  activeVariantIdx === sIdx
-                                    ? "scale-120 border-[var(--ink-main)] ring-2 ring-[var(--accent-gold)]"
-                                    : "border-black/25 hover:scale-105"
-                                }`}
-                                style={{ backgroundColor: hex }}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs font-medium text-[var(--ink-sub)] truncate">
-                            {activeVariantName}
-                          </span>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onAddToBag(product, activeVariantIdx, 1)
-                          }
-                          className="shrink-0 whitespace-nowrap inline-flex items-center justify-center gap-1 rounded-[3px] border border-[var(--ink-main)] px-3.5 py-2 text-xs font-semibold text-[var(--ink-main)] transition hover:bg-[var(--ink-main)] hover:text-[var(--bg-page)]"
-                        >
-                          <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                          <span>{t.addToBag}</span>
-                        </button>
-                      </div>
-                    </article>
-                  );
-                })}
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} {...cardProps} isWished={wishlist.includes(product.id)} />
+                ))}
               </div>
             )}
           </div>
@@ -763,6 +533,10 @@ export default function BoutiqueStorefront({
         onAddGiftCard={onAddGiftCard}
         onQuickView={onQuickView}
       />
+
+      <GalleryMosaic t={t} lang={lang} tiles={socialGallery} products={visibleProducts} onQuickView={onQuickView} />
+
+      <AtelierIntro t={t} lang={lang} onEnterServices={onEnterServices} />
 
       {/* 7. Editorial Heritage Story Section */}
       <section
@@ -800,34 +574,7 @@ export default function BoutiqueStorefront({
         </Reveal>
       </section>
 
-      {/* 8. Separated Services Portal Gateway */}
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <div className="flex flex-col items-start justify-between gap-5 rounded-[4px] border border-[var(--accent-gold)]/45 bg-[var(--accent-deep)] px-6 py-7 text-[#FAF6EE] sm:flex-row sm:items-center sm:px-8">
-          <div className="flex items-start gap-4">
-            <Printer className="mt-1 h-6 w-6 shrink-0 text-[#E7D19F]" aria-hidden="true" />
-            <div>
-              <p className="eyebrow text-[#E7D19F]">
-                {t.gatewayEyebrow}
-              </p>
-              <h2 className="mt-1 text-base sm:text-lg font-bold text-white">
-                {t.gatewayTitle}
-              </h2>
-              <p className="mt-1 text-xs text-[#D7E3DC] max-w-2xl">
-                {t.gatewayDesc}
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => onEnterServices()}
-            className="shrink-0 inline-flex items-center gap-2 rounded-[3px] border border-[#E7D19F]/50 bg-[#183E30] px-6 py-3 text-xs sm:text-sm font-bold text-[#FAF6EE] transition hover:bg-[var(--accent-crimson)]"
-          >
-            <span>{t.gatewayButton}</span>
-            <ArrowForward className="h-4 w-4 text-[#E7D19F]" aria-hidden="true" />
-          </button>
-        </div>
-      </section>
+      <TrustSection t={t} lang={lang} values={activeValueStrip} shipping={shipping} contact={contact} />
     </main>
   );
 }

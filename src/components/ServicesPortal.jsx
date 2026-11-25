@@ -616,7 +616,7 @@ export default function ServicesPortal({
                 <div className="flex justify-between text-[#9BD4B8]">
                   <span>{t.orderSummary.discount}</span>
                   <span className="tabular-nums font-bold">
-                    -{Math.round(quote.discountRate * 100)}% (-
+                    −{formatNumber(Math.round(quote.discountRate * 100), lang)}{lang === "fa" ? "٪" : "%"} (−
                     {formatPrice(quote.discountAmount, lang)})
                   </span>
                 </div>
@@ -635,7 +635,7 @@ export default function ServicesPortal({
                 <div className="flex justify-between text-[#E7D19F]">
                   <span>
                     {lang === "fa"
-                      ? `تا تخفیف ${Math.round(quote.nextTier.rate * 100)}٪ پلکانی`
+                      ? `تا تخفیف ${formatNumber(Math.round(quote.nextTier.rate * 100), lang)}٪ پلکانی`
                       : `Next ${Math.round(quote.nextTier.rate * 100)}% tier`}
                   </span>
                   <span className="tabular-nums font-bold font-latin-ui">

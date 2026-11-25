@@ -14,6 +14,8 @@ import {
   History,
   Printer,
   Store,
+  Mail,
+  MessageSquare,
 } from "lucide-react";
 import { formatPrice, formatNumber } from "../utils/pricing";
 
@@ -84,6 +86,7 @@ export default function OrderBagDrawer({
   onNavigate,
   lang,
   t,
+  contact,
 }) {
   const [tab, setTab] = useState("bag");
   const [checkoutMode, setCheckoutMode] = useState(false);
@@ -96,6 +99,7 @@ export default function OrderBagDrawer({
   const [deliveryMethod, setDeliveryMethod] = useState(0);
   const [notes, setNotes] = useState("");
   const [confirmedRef, setConfirmedRef] = useState(null);
+  const [confirmedSummary, setConfirmedSummary] = useState("");
   const [copiedRef, setCopiedRef] = useState(false);
 
   const resetAndClose = () => {
@@ -185,6 +189,21 @@ export default function OrderBagDrawer({
       status: "pending",
       createdAt: new Date().toLocaleDateString(lang === "fa" ? "fa-IR" : "en-US"),
     });
+    // No backend: the order is kept on this device and the customer sends this summary to the shop.
+    const B = t.bagDrawer;
+    setConfirmedSummary(
+      [
+        `${B.summaryHeading} — ${refId}`,
+        `${B.nameLabel}: ${customerName.trim()}`,
+        `${B.phoneLabel}: ${customerPhone.trim()}`,
+        `${B.deliveryLabel}: ${B.deliveryOptions[deliveryMethod] || ""}`,
+        "",
+        ...lineSummaries.map((l) => `• ${l.title}${l.meta ? ` (${l.meta})` : ""} × ${l.qty} — ${formatPrice(l.unitPrice * l.qty, lang)}`),
+        "",
+        `${B.subtotal}: ${formatPrice(grandTotal, lang)}`,
+        notes.trim() ? `${B.notesLabel}: ${notes.trim()}` : "",
+      ].filter((line, i, arr) => line !== "" || arr[i - 1] !== "").join("\n")
+    );
     setConfirmedRef(refId);
     onClearBag();
     setGiftWrap(false);
@@ -364,10 +383,44 @@ export default function OrderBagDrawer({
                       )}
                     </button>
                   </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {contact?.email && (
+                      <a
+                        className="btn-primary"
+                        href={`mailto:${contact.email}?subject=${encodeURIComponent(`${t.bagDrawer.summaryHeading} — ${confirmedRef}`)}&body=${encodeURIComponent(confirmedSummary)}`}
+                      >
+                        <Mail className="h-4 w-4" aria-hidden="true" />
+                        <span>{t.bagDrawer.sendByEmail}</span>
+                      </a>
+                    )}
+                    {contact?.phone && (
+                      <a
+                        className="btn-quiet !min-h-12"
+                        href={`sms:${contact.phone.replace(/[^d+]/g, "")}?body=${encodeURIComponent(confirmedSummary)}`}
+                      >
+                        <MessageSquare className="h-4 w-4" aria-hidden="true" />
+                        <span>{t.bagDrawer.sendBySms}</span>
+                      </a>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(confirmedSummary);
+                        setCopiedRef(true);
+                      } catch {
+                        setCopiedRef(false);
+                      }
+                    }}
+                    className="text-sm text-[var(--ink-sub)] underline underline-offset-4 hover:text-[var(--ink-main)]"
+                  >
+                    {copiedRef ? t.bagDrawer.summaryCopied : t.bagDrawer.copySummary}
+                  </button>
                   <button
                     type="button"
                     onClick={resetAndClose}
-                    className="w-full rounded-[3px] bg-[var(--accent-deep)] py-3 text-sm font-semibold text-white hover:bg-[var(--accent-pine)]"
+                    className="block w-full py-2 text-sm font-semibold text-[var(--accent-pine)] hover:underline"
                   >
                     {t.bagDrawer.newOrder}
                   </button>
