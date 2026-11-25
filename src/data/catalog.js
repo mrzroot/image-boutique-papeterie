@@ -15,8 +15,6 @@ export const PRODUCTS = [
     category: "notebooks",
     badge: "bestseller",
     price: 890000,
-    rating: 4.9,
-    reviewCount: 48,
     image: "./images/cat-notebooks.jpg",
     variantImages: [
       "./images/cat-notebooks.jpg",
@@ -47,8 +45,6 @@ export const PRODUCTS = [
     category: "notebooks",
     badge: "new",
     price: 1150000,
-    rating: 4.8,
-    reviewCount: 24,
     image: "./images/prod-planner-pine.jpg",
     variantImages: [
       "./images/prod-planner-pine.jpg",
@@ -78,8 +74,6 @@ export const PRODUCTS = [
     category: "papers",
     badge: "limited",
     price: 740000,
-    rating: 5.0,
-    reviewCount: 31,
     image: "./images/prod-florentine-pine.jpg",
     variantImages: [
       "./images/prod-florentine-pine.jpg",
@@ -139,8 +133,6 @@ export const PRODUCTS = [
     category: "pens",
     badge: "bestseller",
     price: 2450000,
-    rating: 4.9,
-    reviewCount: 62,
     image: "./images/cat-pens.jpg",
     variantImages: [
       "./images/cat-pens.jpg",
@@ -248,7 +240,7 @@ export const PRODUCTS = [
       subtitle: "15mm × 10m Rolls · Japanese Rice Paper",
       origin: "Residue-Free Peel · Gold Foil Accent",
       description:
-        "Semi-translucent rice paper tapes with subtle metallic stamping—essential for journaling borders, polaroids, and gift sealing.",
+        "Semi-translucent rice paper tapes with subtle metallic stamping, essential for journaling borders, polaroids, and gift sealing.",
       variants: ["Forest & Gold", "Terracotta Cream"],
     },
   },
@@ -258,8 +250,6 @@ export const PRODUCTS = [
     category: "packaging",
     badge: "bestseller",
     price: 1290000,
-    rating: 4.9,
-    reviewCount: 39,
     image: "./images/cat-gift-packaging.jpg",
     variantImages: [
       "./images/cat-gift-packaging.jpg",
@@ -470,7 +460,7 @@ export const TIERED_PRICE_ROWS = [
     tier: { fa: "تک‌نسخه (۱ تا ۹۹ صفحه)", en: "Single & Short Run (1–99)" },
     bwA4: 1800,
     colorA4: 5200,
-    discount: "—",
+    discount: "-",
   },
   {
     tier: { fa: "تخفیف دانشجویی و استودیو (۱۰۰ تا ۴۹۹)", en: "Studio Tier (100–499)" },
@@ -511,7 +501,7 @@ export const SERVICES_FAQ = [
     },
     en: {
       q: "Can I combine boutique products and custom print jobs in one bag?",
-      a: "Yes. Both experiences share a unified order bag—add ready-made notebooks or paper sets from the boutique alongside custom print quotes in a single checkout.",
+      a: "Yes. Both experiences share a unified order bag: add ready-made notebooks or paper sets from the boutique alongside custom print quotes in a single checkout.",
     },
   },
   {
@@ -599,51 +589,6 @@ export const BUNDLES = [
       title: "Geneva Executive Wax-Seal Coffret",
       items: "Swiss Hexagonal 849 Pen + Rigid Linen Keepsake Box & Brass Seal",
       tag: "Gift Ready",
-    },
-  },
-];
-
-export const CLIENT_REVIEWS = [
-  {
-    id: "rev-1",
-    rating: 5,
-    fa: {
-      name: "سارا معتمدی",
-      role: "معمار و طراح داخلی",
-      text: "بافت کاغذ ۱۲۰ گرم دفتر ورسا فوق‌العاده است؛ حتی با خودنویس و راپید هیچ نشتی به پشت صفحه ندارد و بسته‌بندی کاغذ فلورانس مثل یک هدیه واقعی از ایتالیا بود.",
-    },
-    en: {
-      name: "Sara Motamedi",
-      role: "Interior Architect",
-      text: "The 120gsm cotton stock handles fountain pens and technical ink with zero bleed-through. Arrived wrapped like a real Florentine keepsake.",
-    },
-  },
-  {
-    id: "rev-2",
-    rating: 5,
-    fa: {
-      name: "امیرحسین شریفی",
-      role: "مدیر خلاقیت استودیو",
-      text: "خودکار سوئیسی ۸۴۹ و باکس مهر موم را برای هدیه مدیران گرفتیم. کیفیت جزئیات، ارسال سریع و ظاهر شیک جعبه‌ها همه تیم را شگفت‌زده کرد.",
-    },
-    en: {
-      name: "Amir Sharifi",
-      role: "Creative Director",
-      text: "Ordered the Swiss 849 pens with wax-sealed keepsake boxes for our studio partners. The tactile presentation and swift delivery were unmatched.",
-    },
-  },
-  {
-    id: "rev-3",
-    rating: 5,
-    fa: {
-      name: "مهسا کریمی",
-      role: "علاقه‌مند بولت‌ژورنال",
-      text: "استیکرهای بوتانیکال و واشی‌تیپ‌های طلاکوب دقیقاً همان حس بوتیک‌های فرانسوی را دارند. چسبندگی ملایم و کیفیت چاپشان بی‌نظیر است.",
-    },
-    en: {
-      name: "Mahsa Karimi",
-      role: "Journaling Enthusiast",
-      text: "The botanical stickers and foil washi tapes bring pure Parisian stationery joy. Clean kiss-cut edges and delicate gold shimmer.",
     },
   },
 ];

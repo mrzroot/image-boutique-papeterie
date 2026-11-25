@@ -8,11 +8,10 @@ import {
   Check,
   Share2,
   CheckCircle2,
-  Star,
   Move3d,
   Image as ImageIcon,
 } from "lucide-react";
-import { formatPrice, formatNumber } from "../utils/pricing";
+import { formatPrice } from "../utils/pricing";
 import Live3DPreview from "./Live3DPreview";
 
 export default function ProductModal({
@@ -30,30 +29,20 @@ export default function ProductModal({
   const [viewMode, setViewMode] = useState("photo");
   const [qty, setQty] = useState(1);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [reviewOpen, setReviewOpen] = useState(false);
-  const [reviewRating, setReviewRating] = useState(5);
-  const [reviewName, setReviewName] = useState("");
-  const [reviewNote, setReviewNote] = useState("");
-  const [sessionReviews, setSessionReviews] = useState([]);
 
   useEffect(() => {
     setSelectedVariantIdx(initialVariantIdx);
     setViewMode("photo");
     setQty(1);
-    setReviewOpen(false);
   }, [product.id, initialVariantIdx]);
 
-  const handleReviewSubmit = (e) => {
-    e.preventDefault();
-    if (!reviewName.trim() || !reviewNote.trim()) return;
-    setSessionReviews((prev) => [
-      { id: Date.now(), name: reviewName.trim(), note: reviewNote.trim(), rating: reviewRating },
-      ...prev,
-    ]);
-    setReviewName("");
-    setReviewNote("");
-    setReviewOpen(false);
-  };
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
 
   const selectedVariant =
     localized.variants[selectedVariantIdx] || localized.variants[0];
@@ -84,11 +73,14 @@ export default function ProductModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
       onClick={onClose}
     >
       <div
-        className="animate-modal-in relative grid w-full max-w-3xl overflow-hidden rounded-[28px] border border-[var(--border-subtle)] bg-[var(--bg-page)] shadow-2xl md:grid-cols-2"
+        role="dialog"
+        aria-modal="true"
+        aria-label={localized.title}
+        className="animate-modal-in relative grid w-full max-w-3xl overflow-hidden rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-page)] shadow-2xl md:grid-cols-2"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="absolute top-4 end-4 z-10 flex items-center gap-2">
@@ -96,56 +88,56 @@ export default function ProductModal({
             type="button"
             onClick={handleShare}
             aria-label="Share"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#14201A] shadow-sm transition hover:bg-[#1B4636] hover:text-white cursor-pointer"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-[3px] border border-[var(--border-subtle)] bg-white text-[#14201A] transition hover:bg-[#183E30] hover:text-white"
           >
             {copiedLink ? (
-              <Check className="h-4 w-4 text-[#1B4636]" />
+              <Check className="h-4 w-4 text-[#183E30]" aria-hidden="true" />
             ) : (
-              <Share2 className="h-4 w-4" />
+              <Share2 className="h-4 w-4" aria-hidden="true" />
             )}
           </button>
           <button
             type="button"
             onClick={onClose}
             aria-label={t.modal.close}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#14201A] shadow-sm transition hover:bg-[#14201A] hover:text-white cursor-pointer"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-[3px] border border-[var(--border-subtle)] bg-white text-[#14201A] transition hover:bg-[#14201A] hover:text-white"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
 
         <div className="relative bg-[var(--bg-soft)] p-6 flex flex-col items-center justify-center gap-3">
           {supports3D && (
-            <div className="inline-flex rounded-full border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-1 text-[11px] font-bold shadow-2xs">
+            <div className="inline-flex rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-1 text-[11px] font-bold">
               <button
                 type="button"
                 onClick={() => setViewMode("photo")}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 transition cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 rounded-[2px] px-3 py-1.5 transition ${
                   viewMode === "photo"
                     ? "bg-[var(--accent-pine)] text-white"
                     : "text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
                 }`}
               >
-                <ImageIcon className="h-3.5 w-3.5" />
+                <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{lang === "fa" ? "عکس استودیو" : "Studio Photo"}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode("3d")}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 transition cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 rounded-[2px] px-3 py-1.5 transition ${
                   viewMode === "3d"
                     ? "bg-[var(--accent-pine)] text-white"
                     : "text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
                 }`}
               >
-                <Move3d className="h-3.5 w-3.5" />
+                <Move3d className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{lang === "fa" ? "نمای ۳۶۰° واقعی" : "360° 3D View"}</span>
               </button>
             </div>
           )}
 
           {supports3D && viewMode === "3d" ? (
-            <div className="w-full rounded-2xl bg-[#123126] p-1 shadow-md">
+            <div className="w-full rounded-[4px] bg-[#123126] p-1 border border-[var(--border-subtle)]">
               <Live3DPreview
                 compact
                 config={{
@@ -162,14 +154,16 @@ export default function ProductModal({
               />
             </div>
           ) : (
-            <div className="relative w-full overflow-hidden rounded-2xl shadow-md">
+            <div className="relative w-full overflow-hidden rounded-[4px] border border-[var(--border-subtle)]">
               <img
                 src={activeImage}
                 alt={localized.title}
-                className="aspect-square max-h-[360px] w-full object-cover transition duration-500 hover:scale-105"
+                width="480"
+                height="480"
+                className="aspect-square max-h-[360px] w-full object-cover"
               />
               {selectedSwatchHex && (
-                <div className="absolute bottom-3 start-3 inline-flex items-center gap-2 rounded-full bg-[#FAF6EE]/92 px-3 py-1 text-[11px] font-bold text-[#14201A] shadow-sm backdrop-blur-xs">
+                <div className="absolute bottom-3 start-3 inline-flex items-center gap-2 rounded-[3px] border border-[var(--border-subtle)] bg-[#FAF6EE] px-3 py-1 text-[11px] font-bold text-[#14201A]">
                   <span
                     className="h-3 w-3 rounded-full border border-black/20"
                     style={{ backgroundColor: selectedSwatchHex }}
@@ -183,10 +177,10 @@ export default function ProductModal({
 
         <div className="flex flex-col justify-between p-6 sm:p-8">
           <div className="space-y-4">
-            <div className="flex items-center justify-between gap-2 pe-20 text-[11px] uppercase tracking-widest text-[var(--ink-sub)] font-latin-ui">
+            <div className="flex items-center justify-between gap-2 pe-24 text-[11px] uppercase tracking-widest text-[var(--ink-sub)] font-latin-ui">
               <span>{product.sku}</span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--accent-pine)]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[var(--accent-pine)]">
-                <CheckCircle2 className="h-3 w-3" />
+              <span className="inline-flex items-center gap-1 rounded-[2px] bg-[var(--accent-pine)]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[var(--accent-pine)]">
+                <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
                 <span>{lang === "fa" ? "موجود · ارسال فوری" : "In Stock"}</span>
               </span>
             </div>
@@ -201,81 +195,6 @@ export default function ProductModal({
             </div>
 
             <p className="text-xs text-[var(--ink-sub)]">{localized.origin}</p>
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-              <span className="inline-flex items-center gap-1 font-semibold text-[var(--accent-gold)]">
-                <Star className="h-3.5 w-3.5 fill-current" />
-                <span>{formatNumber(product.rating || 4.9, lang)}</span>
-                <span className="text-[var(--ink-sub)] font-normal">
-                  ({formatNumber((product.reviewCount || 18) + sessionReviews.length, lang)}{" "}
-                  {lang === "fa" ? "دیدگاه" : "reviews"})
-                </span>
-              </span>
-              <button
-                type="button"
-                onClick={() => setReviewOpen((o) => !o)}
-                className="text-[11px] font-semibold text-[var(--accent-pine)] underline underline-offset-4 cursor-pointer"
-              >
-                {lang === "fa" ? "ثبت دیدگاه سریع" : "Write a Review"}
-              </button>
-            </div>
-
-            {reviewOpen && (
-              <form
-                onSubmit={handleReviewSubmit}
-                className="space-y-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-soft)] p-3 text-xs"
-              >
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      onClick={() => setReviewRating(n)}
-                      className={`cursor-pointer ${
-                        n <= reviewRating ? "text-[var(--accent-gold)]" : "text-[var(--border-strong)]"
-                      }`}
-                    >
-                      <Star className="h-3.5 w-3.5 fill-current" />
-                    </button>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  required
-                  value={reviewName}
-                  onChange={(e) => setReviewName(e.target.value)}
-                  placeholder={lang === "fa" ? "نام شما" : "Your name"}
-                  className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs text-[var(--ink-main)] outline-none"
-                />
-                <input
-                  type="text"
-                  required
-                  value={reviewNote}
-                  onChange={(e) => setReviewNote(e.target.value)}
-                  placeholder={lang === "fa" ? "نظر کوتاه درباره این محصول..." : "Short note about this item..."}
-                  className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs text-[var(--ink-main)] outline-none"
-                />
-                <button
-                  type="submit"
-                  className="rounded-full bg-[var(--accent-pine)] px-3.5 py-1 text-[11px] font-bold text-white cursor-pointer"
-                >
-                  {lang === "fa" ? "ارسال دیدگاه" : "Post Review"}
-                </button>
-              </form>
-            )}
-
-            {sessionReviews.length > 0 && (
-              <div className="space-y-1.5 max-h-24 overflow-y-auto">
-                {sessionReviews.map((rev) => (
-                  <div
-                    key={rev.id}
-                    className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-soft)] px-3 py-1.5 text-[11px]"
-                  >
-                    <span className="font-bold text-[var(--ink-main)]">{rev.name}: </span>
-                    <span className="text-[var(--ink-body)]">{rev.note}</span>
-                  </div>
-                ))}
-              </div>
-            )}
 
             <p className="text-sm leading-relaxed text-[var(--ink-body)]">
               {localized.description}
@@ -293,9 +212,9 @@ export default function ProductModal({
                     key={variant}
                     type="button"
                     onClick={() => setSelectedVariantIdx(idx)}
-                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition cursor-pointer ${
+                    className={`inline-flex items-center gap-2 rounded-[3px] border px-3 py-1.5 text-xs font-medium transition ${
                       selectedVariantIdx === idx
-                        ? "border-[var(--accent-pine)] bg-[var(--accent-pine)] text-white shadow-xs"
+                        ? "border-[var(--accent-pine)] bg-[var(--accent-pine)] text-white"
                         : "border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
                     }`}
                   >
@@ -306,60 +225,65 @@ export default function ProductModal({
                       />
                     )}
                     <span>{variant}</span>
-                    {selectedVariantIdx === idx && <Check className="h-3 w-3" />}
+                    {selectedVariantIdx === idx && <Check className="h-3 w-3" aria-hidden="true" />}
                   </button>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="mt-6 border-t border-[var(--border-subtle)] pt-5 space-y-4">
+          <div className="mt-6 space-y-4 border-t border-[var(--border-subtle)] pt-5">
             <div className="flex items-center justify-between">
-              <span className="text-xl font-bold text-[var(--accent-pine)]">
+              <span className="tabular-nums text-xl font-bold text-[var(--accent-pine)]">
                 {formatPrice(product.price * qty, lang)}
               </span>
 
-              <div className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[var(--bg-surface)] px-2 py-1 text-[var(--ink-main)]">
+              <div className="inline-flex items-center rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] p-1">
                 <button
                   type="button"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="p-1 text-[var(--ink-main)] hover:text-[var(--accent-gold)] cursor-pointer"
+                  className="p-2 text-[var(--ink-main)] hover:text-[var(--accent-crimson)]"
+                  aria-label="Decrease quantity"
                 >
-                  <Minus className="h-3.5 w-3.5" />
+                  <Minus className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
-                <span className="w-8 text-center text-sm font-semibold">
+                <span className="tabular-nums w-8 text-center text-sm font-semibold text-[var(--ink-main)]">
                   {qty}
                 </span>
                 <button
                   type="button"
                   onClick={() => setQty((q) => q + 1)}
-                  className="p-1 text-[var(--ink-main)] hover:text-[var(--accent-gold)] cursor-pointer"
+                  className="p-2 text-[var(--ink-main)] hover:text-[var(--accent-pine)]"
+                  aria-label="Increase quantity"
                 >
-                  <Plus className="h-3.5 w-3.5" />
+                  <Plus className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5">
+            <div className="flex gap-2.5">
               <button
                 type="button"
                 onClick={handleAdd}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--accent-deep)] border border-[var(--accent-gold)]/35 px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent-pine)] cursor-pointer"
+                className="flex flex-1 items-center justify-center gap-2 rounded-[3px] bg-[var(--accent-crimson)] px-6 py-3.5 text-sm font-semibold text-white transition hover:opacity-90"
               >
-                <ShoppingBag className="h-4 w-4 text-[#E7D19F]" />
+                <ShoppingBag className="h-4 w-4" aria-hidden="true" />
                 <span>{t.addToBag}</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => onToggleWishlist(product.id)}
-                className={`inline-flex h-11 w-11 items-center justify-center rounded-full border transition cursor-pointer ${
+                className={`inline-flex h-12 w-12 items-center justify-center rounded-[3px] border transition ${
                   isWishlisted
-                    ? "border-[#BF3927] bg-[#BF3927]/10 text-[#BF3927]"
-                    : "border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:border-[#BF3927]"
+                    ? "border-[var(--accent-crimson)] bg-[var(--accent-crimson)]/10 text-[var(--accent-crimson)]"
+                    : "border-[var(--border-strong)] text-[var(--ink-sub)] hover:text-[var(--accent-crimson)]"
                 }`}
+                aria-label={t.wishlist}
               >
                 <Heart
-                  className={`h-4 w-4 ${isWishlisted ? "fill-current" : ""}`}
+                  aria-hidden="true"
+                  className={`h-5 w-5 ${isWishlisted ? "fill-current" : ""}`}
                 />
               </button>
             </div>

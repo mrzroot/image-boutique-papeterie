@@ -1,19 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   X,
   Trash2,
   Plus,
   Minus,
   ShoppingBag,
-  Printer,
   CheckCircle2,
-  Store,
   Gift,
+  Tag,
   Truck,
   Copy,
   Check,
-  Tag,
   History,
+  Printer,
+  Store,
 } from "lucide-react";
 import { formatPrice, formatNumber } from "../utils/pricing";
 import { PRODUCTS, BUNDLES } from "../data/catalog";
@@ -60,8 +60,8 @@ function resolveBagDisplay(item, lang, t) {
       `${formatNumber(s.pages, lang)} ${lang === "fa" ? "صفحه" : "p"} × ${formatNumber(s.copies, lang)} ${lang === "fa" ? "نسخه" : "copies"}`,
       stockName,
       bindingName,
-      s.customTitle ? `✦ ${s.customTitle}` : null,
-      s.fileName ? `📎 ${s.fileName}` : null,
+      s.customTitle ? s.customTitle : null,
+      s.fileName ? s.fileName : null,
     ].filter(Boolean);
     return { title: `${typeName} (${s.size})`, meta: parts.join(" · ") };
   }
@@ -93,6 +93,22 @@ export default function OrderBagDrawer({
   const [notes, setNotes] = useState("");
   const [confirmedRef, setConfirmedRef] = useState(null);
   const [copiedRef, setCopiedRef] = useState(false);
+
+  const resetAndClose = () => {
+    setConfirmedRef(null);
+    setCheckoutMode(false);
+    setCopiedRef(false);
+    onClose();
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") resetAndClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
 
   if (!isOpen) return null;
 
@@ -150,13 +166,6 @@ export default function OrderBagDrawer({
     setCheckoutMode(false);
   };
 
-  const resetAndClose = () => {
-    setConfirmedRef(null);
-    setCheckoutMode(false);
-    setCopiedRef(false);
-    onClose();
-  };
-
   const copyTrackingId = async () => {
     if (!confirmedRef) return;
     try {
@@ -170,10 +179,13 @@ export default function OrderBagDrawer({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex justify-end bg-black/55"
       onClick={resetAndClose}
     >
       <aside
+        role="dialog"
+        aria-modal="true"
+        aria-label={t.bagDrawer.title}
         className="animate-drawer-in flex h-full w-full max-w-md flex-col bg-[var(--bg-page)] text-[var(--ink-main)] shadow-2xl border-s border-[var(--border-subtle)]"
         onClick={(e) => e.stopPropagation()}
       >
@@ -181,7 +193,7 @@ export default function OrderBagDrawer({
         <div className="border-b border-[var(--border-subtle)] px-5 py-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <ShoppingBag className="h-5 w-5 text-[var(--accent-pine)]" />
+              <ShoppingBag className="h-5 w-5 text-[var(--accent-pine)]" aria-hidden="true" />
               <h2 className="text-base font-bold text-[var(--ink-main)]">
                 {t.bagDrawer.title}
               </h2>
@@ -189,19 +201,20 @@ export default function OrderBagDrawer({
             <button
               type="button"
               onClick={resetAndClose}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-subtle)] text-[var(--ink-main)] hover:bg-[var(--bg-soft)] cursor-pointer"
+              aria-label={t.modal.close}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-[3px] border border-[var(--border-subtle)] text-[var(--ink-main)] hover:bg-[var(--bg-soft)]"
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-1.5 rounded-full bg-[var(--bg-soft)] p-1 text-xs font-bold">
+          <div className="grid grid-cols-2 gap-1.5 rounded-[3px] bg-[var(--bg-soft)] p-1 text-xs font-bold">
             <button
               type="button"
               onClick={() => setTab("bag")}
-              className={`rounded-full py-1.5 transition cursor-pointer ${
+              className={`rounded-[2px] py-2 transition ${
                 tab === "bag"
-                  ? "bg-[var(--accent-deep)] text-white shadow-2xs border border-[var(--accent-gold)]/30"
+                  ? "bg-[var(--accent-deep)] text-white border border-[var(--accent-gold)]/35"
                   : "text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
               }`}
             >
@@ -210,13 +223,13 @@ export default function OrderBagDrawer({
             <button
               type="button"
               onClick={() => setTab("history")}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-full py-1.5 transition cursor-pointer ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-[2px] py-2 transition ${
                 tab === "history"
-                  ? "bg-[var(--accent-deep)] text-white shadow-2xs border border-[var(--accent-gold)]/30"
+                  ? "bg-[var(--accent-deep)] text-white border border-[var(--accent-gold)]/35"
                   : "text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
               }`}
             >
-              <History className="h-3.5 w-3.5" />
+              <History className="h-3.5 w-3.5" aria-hidden="true" />
               <span>
                 {t.bagDrawer.ordersHistoryTab} ({formatNumber(orderHistory?.length || 0, lang)})
               </span>
@@ -228,18 +241,18 @@ export default function OrderBagDrawer({
           <div className="flex-1 overflow-y-auto p-5 space-y-3">
             {!orderHistory?.length ? (
               <div className="flex h-full flex-col items-center justify-center text-center text-sm text-[var(--ink-sub)] py-12 space-y-2">
-                <History className="h-8 w-8 text-[#B89352]" />
+                <History className="h-8 w-8 text-[var(--accent-gold)]" aria-hidden="true" />
                 <p>{t.bagDrawer.noHistory}</p>
               </div>
             ) : (
               orderHistory.map((ord) => (
                 <div
                   key={ord.refId}
-                  className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 space-y-2 shadow-2xs"
+                  className="rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 space-y-2"
                 >
                   <div className="flex items-center justify-between">
                     <span
-                      className="font-latin-ui text-xs font-bold tracking-wider text-[#1B4636]"
+                      className="font-latin-ui text-xs font-bold tracking-wider text-[var(--accent-pine)]"
                       dir="ltr"
                     >
                       {ord.refId}
@@ -252,11 +265,11 @@ export default function OrderBagDrawer({
                     {ord.customerName} · {formatNumber(ord.itemCount, lang)}{" "}
                     {lang === "fa" ? "قلم" : "items"}
                   </p>
-                  <div className="flex items-center justify-between border-t border-[#F1EBE0] pt-2 text-xs">
-                    <span className="text-[#1B4636] font-bold">
+                  <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-2 text-xs">
+                    <span className="tabular-nums text-[var(--accent-pine)] font-bold">
                       {formatPrice(ord.total, lang)}
                     </span>
-                    <span className="rounded-full bg-[#1B4636]/10 px-2.5 py-0.5 text-[10px] font-semibold text-[#1B4636]">
+                    <span className="rounded-[2px] bg-[var(--accent-pine)]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[var(--accent-pine)]">
                       {lang === "fa" ? "ثبت‌شده" : "Confirmed"}
                     </span>
                   </div>
@@ -269,17 +282,17 @@ export default function OrderBagDrawer({
             {/* Complimentary Shipping Progress Bar */}
             {items.length > 0 && !confirmedRef && (
               <div className="border-b border-[var(--border-subtle)] bg-[var(--bg-soft)] px-5 py-3 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#1B4636]">
-                  <Truck className="h-3.5 w-3.5 shrink-0" />
+                <div className="flex items-center gap-2 text-xs font-semibold text-[var(--accent-pine)]">
+                  <Truck className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                   <span>
                     {remaining === 0
                       ? t.bagDrawer.freeShippingUnlocked
                       : `${formatPrice(remaining, lang)} ${t.bagDrawer.freeShippingRemaining}`}
                   </span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#DFD6C3]">
+                <div className="h-1.5 w-full overflow-hidden rounded-[2px] bg-[var(--border-strong)]">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#1B4636] to-[#B89352] transition-all duration-500"
+                    className="h-full bg-[var(--accent-pine)] transition-all duration-300"
                     style={{ width: `${shippingProgress}%` }}
                   />
                 </div>
@@ -289,9 +302,9 @@ export default function OrderBagDrawer({
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-5">
               {confirmedRef ? (
-                <div className="rounded-3xl border border-[#1B4636]/25 bg-[var(--bg-surface)] p-6 text-center space-y-4 shadow-sm animate-modal-in">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1B4636]/10 text-[#1B4636]">
-                    <CheckCircle2 className="h-8 w-8" />
+                <div className="rounded-[4px] border border-[var(--accent-pine)]/35 bg-[var(--bg-surface)] p-6 text-center space-y-4 animate-modal-in">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[4px] bg-[var(--accent-pine)]/15 text-[var(--accent-pine)]">
+                    <CheckCircle2 className="h-8 w-8" aria-hidden="true" />
                   </div>
                   <h3 className="text-lg font-bold text-[var(--ink-main)]">
                     {t.bagDrawer.orderConfirmedTitle}
@@ -299,13 +312,13 @@ export default function OrderBagDrawer({
                   <p className="text-sm text-[var(--ink-sub)] leading-relaxed">
                     {t.bagDrawer.orderConfirmedDesc}
                   </p>
-                  <div className="flex items-center justify-between rounded-2xl bg-[var(--bg-soft)] px-4 py-3">
+                  <div className="flex items-center justify-between rounded-[3px] bg-[var(--bg-soft)] px-4 py-3">
                     <div className="text-start">
                       <p className="text-[11px] text-[var(--ink-sub)]">
                         {t.bagDrawer.trackingCode}
                       </p>
                       <p
-                        className="mt-0.5 font-latin-ui text-lg font-bold tracking-widest text-[#1B4636]"
+                        className="mt-0.5 font-latin-ui text-lg font-bold tracking-widest text-[var(--accent-pine)]"
                         dir="ltr"
                       >
                         {confirmedRef}
@@ -314,28 +327,28 @@ export default function OrderBagDrawer({
                     <button
                       type="button"
                       onClick={copyTrackingId}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-surface)] border border-[var(--border-strong)] text-[var(--ink-main)] hover:border-[#1B4636] cursor-pointer"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-[3px] bg-[var(--bg-surface)] border border-[var(--border-strong)] text-[var(--ink-main)] hover:border-[var(--accent-pine)]"
                       aria-label="Copy"
                     >
                       {copiedRef ? (
-                        <Check className="h-4 w-4 text-[#1B4636]" />
+                        <Check className="h-4 w-4 text-[var(--accent-pine)]" aria-hidden="true" />
                       ) : (
-                        <Copy className="h-4 w-4" />
+                        <Copy className="h-4 w-4" aria-hidden="true" />
                       )}
                     </button>
                   </div>
                   <button
                     type="button"
                     onClick={resetAndClose}
-                    className="w-full rounded-full bg-[#14201A] py-3 text-sm font-semibold text-white hover:bg-[#1B4636] cursor-pointer"
+                    className="w-full rounded-[3px] bg-[var(--accent-deep)] py-3 text-sm font-semibold text-white hover:bg-[var(--accent-pine)]"
                   >
                     {t.bagDrawer.newOrder}
                   </button>
                 </div>
               ) : items.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center text-center space-y-5 py-12">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#EFE8DA] text-[#1B4636]">
-                    <ShoppingBag className="h-7 w-7" />
+                  <div className="flex h-16 w-16 items-center justify-center rounded-[4px] bg-[var(--bg-soft)] text-[var(--accent-pine)] border border-[var(--border-subtle)]">
+                    <ShoppingBag className="h-7 w-7" aria-hidden="true" />
                   </div>
                   <p className="text-sm text-[var(--ink-sub)]">{t.bagDrawer.empty}</p>
                   <div className="flex flex-col gap-2.5 w-full max-w-xs">
@@ -345,9 +358,9 @@ export default function OrderBagDrawer({
                         onClose();
                         onNavigate("store", "catalog");
                       }}
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1B4636] px-5 py-2.5 text-sm font-medium text-white cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 rounded-[3px] bg-[var(--accent-pine)] px-5 py-2.5 text-sm font-medium text-white"
                     >
-                      <Store className="h-4 w-4" />
+                      <Store className="h-4 w-4" aria-hidden="true" />
                       <span>{t.bagDrawer.exploreBoutique}</span>
                     </button>
                     <button
@@ -356,9 +369,9 @@ export default function OrderBagDrawer({
                         onClose();
                         onNavigate("services");
                       }}
-                      className="inline-flex items-center justify-center gap-2 rounded-full border border-[#1B4636] px-5 py-2.5 text-sm font-medium text-[#1B4636] cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-[var(--accent-pine)] px-5 py-2.5 text-sm font-medium text-[var(--accent-pine)]"
                     >
-                      <Printer className="h-4 w-4" />
+                      <Printer className="h-4 w-4" aria-hidden="true" />
                       <span>{t.bagDrawer.exploreServices}</span>
                     </button>
                   </div>
@@ -366,46 +379,54 @@ export default function OrderBagDrawer({
               ) : checkoutMode ? (
                 <form onSubmit={handleConfirm} className="space-y-4">
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]">
+                    <label
+                      htmlFor="checkout-name"
+                      className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]"
+                    >
                       {t.bagDrawer.nameLabel}
                     </label>
                     <input
+                      id="checkout-name"
                       type="text"
                       required
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
-                      className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm outline-none focus:border-[#1B4636]"
+                      className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm text-[var(--ink-main)]"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]">
+                    <label
+                      htmlFor="checkout-phone"
+                      className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]"
+                    >
                       {t.bagDrawer.phoneLabel}
                     </label>
                     <input
+                      id="checkout-phone"
                       type="tel"
                       required
                       dir="ltr"
                       placeholder="09353834393"
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm outline-none focus:border-[#1B4636] font-latin-ui"
+                      className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm text-[var(--ink-main)] font-latin-ui"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]">
+                    <span className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]">
                       {t.bagDrawer.deliveryLabel}
-                    </label>
+                    </span>
                     <div className="space-y-2">
                       {t.bagDrawer.deliveryOptions.map((opt, idx) => (
                         <button
                           key={opt}
                           type="button"
                           onClick={() => setDeliveryMethod(idx)}
-                          className={`w-full rounded-xl border px-3.5 py-2.5 text-start text-xs font-medium transition cursor-pointer ${
+                          className={`w-full rounded-[3px] border px-3.5 py-2.5 text-start text-xs font-medium transition ${
                             deliveryMethod === idx
-                              ? "border-[#1B4636] bg-[#1B4636]/10 text-[#1B4636]"
+                              ? "border-[var(--accent-pine)] bg-[var(--accent-pine)]/15 text-[var(--accent-pine)] font-bold"
                               : "border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)]"
                           }`}
                         >
@@ -416,14 +437,18 @@ export default function OrderBagDrawer({
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]">
+                    <label
+                      htmlFor="checkout-notes"
+                      className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]"
+                    >
                       {t.bagDrawer.notesLabel}
                     </label>
                     <textarea
+                      id="checkout-notes"
                       rows={2}
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2 text-sm outline-none focus:border-[#1B4636]"
+                      className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2 text-sm text-[var(--ink-main)]"
                     />
                   </div>
 
@@ -431,13 +456,13 @@ export default function OrderBagDrawer({
                     <button
                       type="button"
                       onClick={() => setCheckoutMode(false)}
-                      className="rounded-full border border-[var(--border-strong)] px-4 py-3 text-xs font-semibold text-[var(--ink-main)] cursor-pointer"
+                      className="rounded-[3px] border border-[var(--border-strong)] px-4 py-3 text-xs font-semibold text-[var(--ink-main)]"
                     >
                       {lang === "fa" ? "بازگشت" : "Back"}
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 rounded-full bg-[#BF3927] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#A62E1E] cursor-pointer"
+                      className="flex-1 rounded-[3px] bg-[var(--accent-crimson)] px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
                     >
                       {t.bagDrawer.confirmOrder}
                     </button>
@@ -450,21 +475,23 @@ export default function OrderBagDrawer({
                     return (
                       <div
                         key={item.key}
-                        className="flex gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 shadow-2xs"
+                        className="flex gap-3 rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3"
                       >
                         <img
                           src={display.image || item.image}
                           alt={display.title}
-                          className="h-20 w-20 shrink-0 rounded-xl object-cover bg-[#EFE8DA]"
+                          width="80"
+                          height="80"
+                          className="h-20 w-20 shrink-0 rounded-[3px] object-cover bg-[var(--bg-soft)]"
                         />
                         <div className="flex flex-1 flex-col justify-between min-w-0">
                           <div>
                             <div className="flex items-start justify-between gap-2">
                               <span
-                                className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                className={`inline-flex rounded-[2px] px-2 py-0.5 text-[10px] font-semibold ${
                                   item.kind === "service"
-                                    ? "bg-[#BF3927]/10 text-[#BF3927]"
-                                    : "bg-[#1B4636]/10 text-[#1B4636]"
+                                    ? "bg-[var(--accent-crimson)]/15 text-[var(--accent-crimson)]"
+                                    : "bg-[var(--accent-pine)]/15 text-[var(--accent-pine)]"
                                 }`}
                               >
                                 {item.kind === "service"
@@ -477,10 +504,11 @@ export default function OrderBagDrawer({
                               </span>
                               <button
                                 type="button"
+                                aria-label={lang === "fa" ? "حذف" : "Remove"}
                                 onClick={() => onRemoveItem(item.key)}
-                                className="text-[#8E968F] hover:text-[#BF3927] cursor-pointer"
+                                className="text-[var(--ink-sub)] hover:text-[var(--accent-crimson)]"
                               >
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                               </button>
                             </div>
                             <h4 className="mt-1 truncate text-sm font-bold text-[var(--ink-main)]">
@@ -492,31 +520,33 @@ export default function OrderBagDrawer({
                           </div>
 
                           <div className="mt-2 flex items-center justify-between">
-                            <span className="text-xs font-bold text-[var(--accent-pine)]">
+                            <span className="tabular-nums text-xs font-bold text-[var(--accent-pine)]">
                               {formatPrice(item.unitPrice * item.qty, lang)}
                             </span>
                             {item.kind !== "service" && (
-                              <div className="inline-flex items-center rounded-full border border-[var(--border-subtle)] bg-[var(--bg-page)] px-1.5 py-0.5">
+                              <div className="inline-flex items-center rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-page)] px-1 py-0.5">
                                 <button
                                   type="button"
+                                  aria-label="Decrease quantity"
                                   onClick={() =>
                                     onUpdateQty(item.key, item.qty - 1)
                                   }
-                                  className="p-1 cursor-pointer"
+                                  className="p-1.5"
                                 >
-                                  <Minus className="h-3 w-3" />
+                                  <Minus className="h-3 w-3" aria-hidden="true" />
                                 </button>
-                                <span className="w-6 text-center text-xs font-semibold">
+                                <span className="tabular-nums w-6 text-center text-xs font-semibold">
                                   {item.qty}
                                 </span>
                                 <button
                                   type="button"
+                                  aria-label="Increase quantity"
                                   onClick={() =>
                                     onUpdateQty(item.key, item.qty + 1)
                                   }
-                                  className="p-1 cursor-pointer"
+                                  className="p-1.5"
                                 >
-                                  <Plus className="h-3 w-3" />
+                                  <Plus className="h-3 w-3" aria-hidden="true" />
                                 </button>
                               </div>
                             )}
@@ -530,67 +560,72 @@ export default function OrderBagDrawer({
                   <button
                     type="button"
                     onClick={() => setGiftWrap((g) => !g)}
-                    className={`flex w-full items-center justify-between gap-3 rounded-2xl border p-3.5 text-start transition cursor-pointer ${
+                    aria-pressed={giftWrap}
+                    className={`flex w-full items-center justify-between gap-3 rounded-[4px] border p-3.5 text-start transition ${
                       giftWrap
-                        ? "border-[#B89352] bg-[#F3ECE0]"
-                        : "border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[#B89352]"
+                        ? "border-[var(--accent-gold)] bg-[var(--bg-soft)]"
+                        : "border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--accent-gold)]"
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] ${
                           giftWrap
-                            ? "bg-[#1B4636] text-[#E7D19F]"
-                            : "bg-[var(--bg-soft)] text-[#1B4636]"
+                            ? "bg-[var(--accent-pine)] text-[#E7D19F]"
+                            : "bg-[var(--bg-soft)] text-[var(--accent-pine)]"
                         }`}
                       >
-                        <Gift className="h-4 w-4" />
+                        <Gift className="h-4 w-4" aria-hidden="true" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-[var(--ink-main)]">
                           {t.bagDrawer.giftWrapTitle}
                         </p>
-                        <p className="text-[11px] font-semibold text-[#1B4636]">
+                        <p className="tabular-nums text-[11px] font-semibold text-[var(--accent-pine)]">
                           +{formatPrice(t.bagDrawer.giftWrapPrice, lang)}
                         </p>
                       </div>
                     </div>
                     <span
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[3px] border ${
                         giftWrap
-                          ? "border-[#1B4636] bg-[#1B4636] text-white"
-                          : "border-[#C8C0B2]"
+                          ? "border-[var(--accent-pine)] bg-[var(--accent-pine)] text-white"
+                          : "border-[var(--border-strong)]"
                       }`}
                     >
-                      {giftWrap && <Check className="h-3 w-3" />}
+                      {giftWrap && <Check className="h-3 w-3" aria-hidden="true" />}
                     </span>
                   </button>
 
                   {/* Live Promo Code Form */}
                   <form onSubmit={handlePromoApply} className="space-y-1.5">
-                    <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3 py-1.5">
-                      <Tag className="h-3.5 w-3.5 text-[#B89352]" />
+                    <div className="flex items-center gap-2 rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3 py-1.5">
+                      <Tag className="h-3.5 w-3.5 text-[var(--accent-gold)]" aria-hidden="true" />
+                      <label htmlFor="bag-promo-code" className="sr-only">
+                        {t.bagDrawer.promoPlaceholder}
+                      </label>
                       <input
+                        id="bag-promo-code"
                         type="text"
                         value={promoInput}
                         onChange={(e) => setPromoInput(e.target.value)}
                         placeholder={t.bagDrawer.promoPlaceholder}
-                        className="flex-1 bg-transparent text-xs text-[var(--ink-main)] outline-none placeholder:text-[#8E968F]"
+                        className="flex-1 bg-transparent text-xs text-[var(--ink-main)] placeholder:text-[var(--ink-sub)]"
                       />
                       <button
                         type="submit"
-                        className="rounded-full bg-[#1B4636] px-3 py-1 text-[11px] font-bold text-white cursor-pointer"
+                        className="rounded-[2px] bg-[var(--accent-pine)] px-3 py-1.5 text-[11px] font-bold text-white"
                       >
                         {t.bagDrawer.promoApply}
                       </button>
                     </div>
                     {promoApplied && (
-                      <p className="text-[11px] font-semibold text-[#1B4636] px-1">
+                      <p className="tabular-nums text-[11px] font-semibold text-[var(--accent-pine)] px-1">
                         ✓ {t.bagDrawer.promoApplied} (-{formatPrice(promoDiscount, lang)})
                       </p>
                     )}
                     {promoError && (
-                      <p className="text-[11px] text-[#BF3927] px-1">
+                      <p className="text-[11px] text-[var(--accent-crimson)] px-1">
                         {t.bagDrawer.promoInvalid}
                       </p>
                     )}
@@ -604,7 +639,7 @@ export default function OrderBagDrawer({
               <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 space-y-2.5">
                 <div className="flex items-center justify-between text-xs text-[var(--ink-sub)]">
                   <span>{t.bagDrawer.shippingLabel}</span>
-                  <span className="font-semibold text-[#1B4636]">
+                  <span className="tabular-nums font-semibold text-[var(--accent-pine)]">
                     {shippingCost === 0
                       ? t.bagDrawer.shippingFree
                       : formatPrice(shippingCost, lang)}
@@ -612,14 +647,14 @@ export default function OrderBagDrawer({
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-[var(--ink-sub)]">{t.bagDrawer.subtotal}</span>
-                  <span className="text-lg font-bold text-[var(--ink-main)]">
+                  <span className="tabular-nums text-lg font-bold text-[var(--ink-main)]">
                     {formatPrice(grandTotal, lang)}
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setCheckoutMode(true)}
-                  className="w-full rounded-full bg-[#14201A] py-3.5 text-sm font-semibold text-white transition hover:bg-[#1B4636] cursor-pointer"
+                  className="w-full rounded-[3px] bg-[var(--accent-deep)] border border-[var(--accent-gold)]/35 py-3.5 text-sm font-semibold text-[#FAF6EE] transition hover:bg-[var(--accent-pine)]"
                 >
                   {t.bagDrawer.checkoutBtn}
                 </button>

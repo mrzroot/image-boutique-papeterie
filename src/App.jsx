@@ -51,8 +51,8 @@ export default function App() {
     document.documentElement.dir = lang === "fa" ? "rtl" : "ltr";
     document.title =
       lang === "fa"
-        ? "ایمیج بوتیک | Image Boutique — La Boutique Papeterie"
-        : "Image Boutique | La Boutique Papeterie — Fine Stationery & Print Atelier";
+        ? "ایمیج بوتیک | Image Boutique · La Boutique Papeterie"
+        : "Image Boutique | La Boutique Papeterie · Fine Stationery & Print Atelier";
     try {
       localStorage.setItem("ib_lang", JSON.stringify(lang));
     } catch {
@@ -298,53 +298,56 @@ export default function App() {
         onSelectCategory={setSelectedCategory}
       />
 
-      {/* Floating Glassmorphic Mobile Navigation Dock (< 768px phones only) */}
-      <div className="fixed bottom-3 inset-x-3 z-40 grid grid-cols-4 rounded-full border border-[var(--accent-gold)]/35 bg-[#123126]/92 py-1 text-[#FAF6EE] shadow-2xl backdrop-blur-xl md:hidden">
+      {/* Flush Mobile Bottom Navigation (< 768px phones only) */}
+      <nav
+        aria-label={lang === "fa" ? "ناوبری موبایل" : "Mobile navigation"}
+        className="fixed bottom-0 inset-x-0 z-40 grid grid-cols-4 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--ink-main)] md:hidden"
+      >
         <button
           type="button"
           onClick={() => handleNavigate("store")}
-          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 text-[10px] font-semibold ${
-            view === "store" ? "text-[#E7D19F]" : "text-[#CFD8D2]"
+          className={`flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold ${
+            view === "store" ? "text-[var(--accent-pine)] font-bold" : "text-[var(--ink-sub)]"
           }`}
         >
-          <Store className="h-4 w-4" />
+          <Store className="h-4 w-4" aria-hidden="true" />
           <span>{lang === "fa" ? "فروشگاه" : "Boutique"}</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleNavigate("store", "catalog")}
-          className="flex flex-col items-center justify-center gap-0.5 py-1.5 text-[10px] font-semibold text-[#CFD8D2]"
+          className="flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-[var(--ink-sub)]"
         >
-          <LayoutGrid className="h-4 w-4" />
+          <LayoutGrid className="h-4 w-4" aria-hidden="true" />
           <span>{lang === "fa" ? "دسته‌ها" : "Catalog"}</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleNavigate("services")}
-          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 text-[10px] font-semibold ${
-            view === "services" ? "text-[#F2B8A8]" : "text-[#CFD8D2]"
+          className={`flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold ${
+            view === "services" ? "text-[var(--accent-crimson)] font-bold" : "text-[var(--ink-sub)]"
           }`}
         >
-          <Printer className="h-4 w-4" />
+          <Printer className="h-4 w-4" aria-hidden="true" />
           <span>{lang === "fa" ? "بخش خدماتی" : "Services"}</span>
         </button>
 
         <button
           type="button"
           onClick={() => setBagOpen(true)}
-          className="relative flex flex-col items-center justify-center gap-0.5 py-1.5 text-[10px] font-semibold text-[#FAF6EE]"
+          className="relative flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-[var(--ink-main)]"
         >
-          <ShoppingBag className="h-4 w-4 text-[#E7D19F]" />
+          <ShoppingBag className="h-4 w-4 text-[var(--accent-gold)]" aria-hidden="true" />
           <span>{lang === "fa" ? "سبد خرید" : "Bag"}</span>
           {totalBagCount > 0 && (
-            <span className="absolute top-1 end-4 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#BF3927] px-1 text-[9px] font-bold text-white font-latin-ui">
+            <span className="tabular-nums absolute top-1.5 end-4 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent-crimson)] px-1 text-[9px] font-bold text-white font-latin-ui">
               {totalBagCount}
             </span>
           )}
         </button>
-      </div>
+      </nav>
 
       {/* Quick View Modal */}
       {activeProduct && (
@@ -375,21 +378,25 @@ export default function App() {
         t={t}
       />
 
-      {/* Floating Back-to-Top Pill */}
+      {/* Solid Back-to-Top Button */}
       {showScrollTop && (
         <button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top"
-          className="fixed bottom-20 end-5 z-30 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--accent-gold)]/45 bg-[var(--accent-deep)]/92 text-[#E7D19F] shadow-xl backdrop-blur-md transition hover:scale-105 cursor-pointer md:bottom-6"
+          className="fixed bottom-18 end-4 z-30 inline-flex h-11 w-11 items-center justify-center rounded-[3px] border border-[var(--accent-gold)]/50 bg-[var(--accent-deep)] text-[#E7D19F] shadow-lg transition hover:bg-[var(--accent-pine)] md:bottom-6"
         >
-          <ArrowUp className="h-4 w-4" />
+          <ArrowUp className="h-4 w-4" aria-hidden="true" />
         </button>
       )}
 
       {/* Toast Feedback */}
       {toastMsg && (
-        <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#14201A] px-5 py-2.5 text-xs font-semibold text-white shadow-xl border border-[#C8A258]/40 md:bottom-6">
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-18 left-1/2 z-50 -translate-x-1/2 rounded-[4px] bg-[#14201A] px-5 py-2.5 text-xs font-semibold text-white shadow-xl border border-[#C8A258]/45 md:bottom-6"
+        >
           {toastMsg}
         </div>
       )}

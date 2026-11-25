@@ -9,10 +9,6 @@ import {
   Minus,
   CheckCircle2,
   ChevronDown,
-  Clock,
-  Receipt,
-  Sparkles,
-  Award,
   Type,
   Palette,
 } from "lucide-react";
@@ -164,8 +160,8 @@ export default function ServicesPortal({
       }`,
       stockName,
       bindingName,
-      customTitle.trim() ? `✦ ${customTitle.trim()}` : null,
-      uploadedFile ? `📎 ${uploadedFile.name}` : null,
+      customTitle.trim() ? customTitle.trim() : null,
+      uploadedFile ? uploadedFile.name : null,
     ].filter(Boolean);
 
     onAddServiceJob({
@@ -194,9 +190,9 @@ export default function ServicesPortal({
           <button
             type="button"
             onClick={onBackToStore}
-            className="inline-flex items-center gap-2 rounded-full bg-[var(--bg-surface)] px-4 py-1.5 text-xs font-bold text-[var(--accent-pine)] border border-[var(--border-strong)] shadow-2xs transition hover:bg-[var(--accent-pine)] hover:text-white cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-[3px] bg-[var(--bg-surface)] px-4 py-2 text-xs font-bold text-[var(--accent-pine)] border border-[var(--border-strong)] transition hover:bg-[var(--accent-pine)] hover:text-white"
           >
-            <BackArrow className="h-3.5 w-3.5" />
+            <BackArrow className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{t.backToStorefront}</span>
           </button>
           <span className="font-latin-ui text-[11px] font-semibold tracking-wider text-[var(--ink-sub)]">
@@ -207,13 +203,17 @@ export default function ServicesPortal({
 
       {/* Atelier Hero */}
       <section className="mx-auto max-w-7xl px-4 pt-6 pb-8 sm:px-6">
-        <div className="overflow-hidden rounded-[32px] border border-[#C8A258]/40 bg-[#123126] text-[#FAF6EE] shadow-atelier">
+        <div className="overflow-hidden rounded-[4px] border border-[#C8A258]/40 bg-[#123126] text-[#FAF6EE]">
           <div className="grid items-stretch md:grid-cols-12">
             <div className="space-y-4 p-7 sm:p-9 md:col-span-7">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#E7D19F]/30 bg-white/10 px-3.5 py-1 text-[11px] font-semibold tracking-wider text-foil">
-                ✦ {t.servicesHeroEyebrow}
-              </span>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-snug text-white">
+              <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[#E7D19F]">
+                {t.servicesHeroEyebrow}
+              </p>
+              <h1
+                className={`text-2xl sm:text-3xl lg:text-4xl font-bold leading-snug text-white ${
+                  isRtl ? "" : "font-editorial"
+                }`}
+              >
                 {t.servicesHeroTitle}
               </h1>
               <p className="max-w-2xl text-sm sm:text-base leading-relaxed text-[#CFD8D2]">
@@ -224,48 +224,41 @@ export default function ServicesPortal({
               <img
                 src="./images/atelier-services.jpg"
                 alt={t.servicesHeroTitle}
+                width="800"
+                height="600"
+                fetchPriority="high"
+                decoding="sync"
                 className="h-full w-full object-cover"
               />
             </div>
           </div>
         </div>
 
-        {/* 4-Column Trust Bar */}
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Hairline 4-Column Atelier Specifications Strip */}
+        <div className="mt-5 grid divide-y divide-[var(--border-subtle)] rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] sm:grid-cols-2 lg:grid-cols-4 lg:divide-y-0 lg:divide-x rtl:lg:divide-x-reverse">
           {t.trustBar.map((item, idx) => (
-            <div
-              key={idx}
-              className="flex items-center gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-3.5 shadow-2xs"
-            >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--bg-soft)] text-[#1B4636]">
-                {idx === 0 ? (
-                  <Clock className="h-4 w-4" />
-                ) : idx === 1 ? (
-                  <Receipt className="h-4 w-4" />
-                ) : idx === 2 ? (
-                  <Sparkles className="h-4 w-4" />
-                ) : (
-                  <Award className="h-4 w-4" />
-                )}
-              </div>
+            <div key={idx} className="flex items-start gap-3 px-4 py-4">
+              <span className="tabular-nums font-latin-ui text-xs font-bold text-[var(--accent-gold)]">
+                0{idx + 1}
+              </span>
               <div>
-                <h3 className="text-xs font-bold text-[var(--ink-main)]">
+                <h2 className="text-xs font-bold text-[var(--ink-main)]">
                   {item.title}
-                </h3>
-                <p className="text-[11px] text-[var(--ink-sub)]">{item.sub}</p>
+                </h2>
+                <p className="mt-0.5 text-[11px] text-[var(--ink-sub)]">{item.sub}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Instant Print Quote Calculator + Live Mockup Preview */}
+      {/* Instant Print Quote Calculator + Live 3D Bindery Preview */}
       <section
         id="quote-calculator"
         className="mx-auto max-w-7xl px-4 py-8 sm:px-6"
       >
         <div className="mb-6">
-          <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[#BF3927]">
+          <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-crimson)]">
             {t.calcEyebrow}
           </p>
           <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
@@ -275,22 +268,22 @@ export default function ServicesPortal({
 
         <div className="grid gap-6 md:grid-cols-12 items-start">
           {/* Configurator Form */}
-          <div className="min-w-0 space-y-6 rounded-[28px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 sm:p-8 shadow-sm md:col-span-7 lg:col-span-8">
+          <div className="min-w-0 space-y-6 rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 sm:p-8 md:col-span-7 lg:col-span-8">
             {/* Print Type */}
             <div>
-              <label className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
+              <span className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
                 {t.calcLabels.printType}
-              </label>
+              </span>
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
                 {PRINT_TYPES.map((pt) => (
                   <button
                     key={pt.id}
                     type="button"
                     onClick={() => handlePrintTypeChange(pt.id)}
-                    className={`rounded-2xl border px-3 py-3 text-start text-xs font-semibold transition cursor-pointer ${
+                    className={`rounded-[3px] border px-3 py-3 text-start text-xs font-semibold transition ${
                       config.printType === pt.id
-                        ? "border-[#1B4636] bg-[#1B4636] text-white shadow-sm"
-                        : "border-[var(--border-subtle)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[#B89352]"
+                        ? "border-[#183E30] bg-[#183E30] text-white"
+                        : "border-[var(--border-subtle)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
                     }`}
                   >
                     {t.printTypeNames[pt.id]}
@@ -302,9 +295,9 @@ export default function ServicesPortal({
             {/* Size & Sides */}
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <label className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
+                <span className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
                   {t.calcLabels.size}
-                </label>
+                </span>
                 <div className="grid grid-cols-4 gap-2">
                   {PAPER_SIZES.map((s) => (
                     <button
@@ -313,10 +306,10 @@ export default function ServicesPortal({
                       onClick={() =>
                         setConfig((prev) => ({ ...prev, size: s.id }))
                       }
-                      className={`font-latin-ui rounded-full border py-2 text-center text-xs font-bold transition cursor-pointer ${
+                      className={`font-latin-ui rounded-[3px] border py-2 text-center text-xs font-bold transition ${
                         config.size === s.id
-                          ? "border-[#14201A] bg-[#14201A] text-[#E7D19F] shadow-xs"
-                          : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[#B89352]"
+                          ? "border-[#14201A] bg-[#14201A] text-[#E7D19F]"
+                          : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
                       }`}
                     >
                       {s.id}
@@ -326,9 +319,9 @@ export default function ServicesPortal({
               </div>
 
               <div>
-                <label className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
+                <span className="mb-2.5 block text-xs font-bold text-[var(--ink-main)]">
                   {t.calcLabels.sides}
-                </label>
+                </span>
                 <div className="grid grid-cols-2 gap-2">
                   {["single", "double"].map((side) => (
                     <button
@@ -338,10 +331,10 @@ export default function ServicesPortal({
                       onClick={() =>
                         setConfig((prev) => ({ ...prev, sides: side }))
                       }
-                      className={`rounded-full border px-4 py-2 text-xs font-semibold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                      className={`rounded-[3px] border px-4 py-2 text-xs font-semibold transition disabled:opacity-40 ${
                         config.sides === side &&
                         !(duplexDisabled && side === "double")
-                          ? "border-[#1B4636] bg-[#1B4636] text-white"
+                          ? "border-[#183E30] bg-[#183E30] text-white"
                           : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)]"
                       }`}
                     >
@@ -355,10 +348,14 @@ export default function ServicesPortal({
             {/* Paper Stock & Binding */}
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <label className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
+                <label
+                  htmlFor="calc-paper-stock"
+                  className="mb-2 block text-xs font-bold text-[var(--ink-main)]"
+                >
                   {t.calcLabels.paperStock}
                 </label>
                 <select
+                  id="calc-paper-stock"
                   value={config.paperStock}
                   onChange={(e) =>
                     setConfig((prev) => ({
@@ -366,10 +363,10 @@ export default function ServicesPortal({
                       paperStock: e.target.value,
                     }))
                   }
-                  className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm font-medium text-[var(--ink-main)] outline-none focus:border-[#1B4636]"
+                  className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm font-medium text-[var(--ink-main)]"
                 >
                   {PAPER_STOCKS.map((st) => (
-                    <option key={st.id} value={st.id}>
+                    <option key={st.id} value={st.id} className="bg-[var(--bg-surface)] text-[var(--ink-main)]">
                       {t.paperStockNames[st.id]}
                     </option>
                   ))}
@@ -377,10 +374,14 @@ export default function ServicesPortal({
               </div>
 
               <div>
-                <label className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
+                <label
+                  htmlFor="calc-binding"
+                  className="mb-2 block text-xs font-bold text-[var(--ink-main)]"
+                >
                   {t.calcLabels.binding}
                 </label>
                 <select
+                  id="calc-binding"
                   disabled={duplexDisabled}
                   value={config.binding}
                   onChange={(e) => {
@@ -391,10 +392,10 @@ export default function ServicesPortal({
                     }));
                     if (nextBinding === "hardcover") setCoverTheme("pine");
                   }}
-                  className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm font-medium text-[var(--ink-main)] outline-none focus:border-[#1B4636] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm font-medium text-[var(--ink-main)] disabled:opacity-50"
                 >
                   {BINDING_OPTIONS.map((b) => (
-                    <option key={b.id} value={b.id}>
+                    <option key={b.id} value={b.id} className="bg-[var(--bg-surface)] text-[var(--ink-main)]">
                       {t.bindingNames[b.id]}
                     </option>
                   ))}
@@ -402,12 +403,12 @@ export default function ServicesPortal({
               </div>
             </div>
 
-            {/* Cover Color Theme Picker (syncs live with 3D Mockup) */}
+            {/* Cover Color Theme Picker */}
             <div>
-              <label className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[var(--ink-main)]">
-                <Palette className="h-3.5 w-3.5 text-[#B89352]" />
+              <span className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[var(--ink-main)]">
+                <Palette className="h-3.5 w-3.5 text-[var(--accent-gold)]" aria-hidden="true" />
                 <span>{t.calcLabels.coverThemeLabel}</span>
-              </label>
+              </span>
               <div className="flex flex-wrap gap-2">
                 {COVER_THEMES.map((theme) => {
                   const selected = coverTheme === theme.id;
@@ -416,14 +417,14 @@ export default function ServicesPortal({
                       key={theme.id}
                       type="button"
                       onClick={() => setCoverTheme(theme.id)}
-                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
+                      className={`inline-flex items-center gap-2 rounded-[3px] border px-3 py-1.5 text-xs font-semibold transition ${
                         selected
-                          ? "border-[#14201A] bg-[#14201A] text-white shadow-xs"
-                          : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[#B89352]"
+                          ? "border-[#14201A] bg-[#14201A] text-white"
+                          : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
                       }`}
                     >
                       <span
-                        className="h-3.5 w-3.5 rounded-full border border-white/40 shadow-2xs"
+                        className="h-3.5 w-3.5 rounded-full border border-white/40"
                         style={{ backgroundColor: theme.bg }}
                       />
                       <span>{lang === "fa" ? theme.labelFa : theme.labelEn}</span>
@@ -440,23 +441,28 @@ export default function ServicesPortal({
                 { field: "copies", label: t.calcLabels.copies, max: 2000 },
               ].map(({ field, label, max }) => (
                 <div key={field}>
-                  <label className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
+                  <label
+                    htmlFor={`calc-${field}`}
+                    className="mb-2 block text-xs font-bold text-[var(--ink-main)]"
+                  >
                     {label}
                   </label>
-                  <div className="flex items-center justify-between rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-page)] p-1.5">
+                  <div className="flex items-center justify-between rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] p-1.5">
                     <button
                       type="button"
+                      aria-label={`Decrease ${field}`}
                       onClick={() =>
                         setConfig((prev) => ({
                           ...prev,
                           [field]: Math.max(1, prev[field] - 1),
                         }))
                       }
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-surface)] text-[var(--ink-main)] shadow-2xs hover:bg-[#1B4636] hover:text-white cursor-pointer"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-[2px] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:bg-[#183E30] hover:text-white"
                     >
-                      <Minus className="h-4 w-4" />
+                      <Minus className="h-4 w-4" aria-hidden="true" />
                     </button>
                     <input
+                      id={`calc-${field}`}
                       type="number"
                       min={1}
                       max={max}
@@ -470,19 +476,20 @@ export default function ServicesPortal({
                           ),
                         }))
                       }
-                      className="w-24 bg-transparent text-center font-latin-ui text-base font-bold text-[var(--ink-main)] outline-none"
+                      className="tabular-nums w-24 bg-transparent text-center font-latin-ui text-base font-bold text-[var(--ink-main)]"
                     />
                     <button
                       type="button"
+                      aria-label={`Increase ${field}`}
                       onClick={() =>
                         setConfig((prev) => ({
                           ...prev,
                           [field]: Math.min(max, prev[field] + 1),
                         }))
                       }
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-surface)] text-[var(--ink-main)] shadow-2xs hover:bg-[#1B4636] hover:text-white cursor-pointer"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-[2px] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:bg-[#183E30] hover:text-white"
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -491,36 +498,42 @@ export default function ServicesPortal({
 
             {/* Custom Foil / Cover Title Live Input */}
             <div>
-              <label className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[var(--ink-main)]">
-                <Type className="h-3.5 w-3.5 text-[#B89352]" />
+              <label
+                htmlFor="calc-monogram"
+                className="mb-2 flex items-center gap-1.5 text-xs font-bold text-[var(--ink-main)]"
+              >
+                <Type className="h-3.5 w-3.5 text-[var(--accent-gold)]" aria-hidden="true" />
                 <span>{t.calcLabels.monogramTitle}</span>
               </label>
               <input
+                id="calc-monogram"
                 type="text"
                 maxLength={42}
                 value={customTitle}
                 onChange={(e) => setCustomTitle(e.target.value)}
                 placeholder={t.calcLabels.monogramPlaceholder}
-                className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm text-[var(--ink-main)] outline-none focus:border-[#B89352] placeholder:text-[#8E968F]"
+                className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-3 text-sm text-[var(--ink-main)] placeholder:text-[var(--ink-sub)]"
               />
             </div>
 
             {/* File Attachment Dropzone */}
             <div>
-              <label className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
+              <span className="mb-2 block text-xs font-bold text-[var(--ink-main)]">
                 {t.calcLabels.uploadTitle}
-              </label>
+              </span>
               {uploadedFile ? (
-                <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#1B4636]/35 bg-[#1B4636]/5 px-4 py-3.5">
+                <div className="flex items-center justify-between gap-3 rounded-[3px] border border-[var(--accent-pine)]/40 bg-[var(--bg-soft)] px-4 py-3.5">
                   <div className="flex items-center gap-3 min-w-0">
                     {uploadedFile.previewUrl ? (
                       <img
                         src={uploadedFile.previewUrl}
                         alt={uploadedFile.name}
-                        className="h-10 w-10 shrink-0 rounded-lg object-cover border border-[var(--border-strong)]"
+                        width="40"
+                        height="40"
+                        className="h-10 w-10 shrink-0 rounded-[2px] object-cover border border-[var(--border-strong)]"
                       />
                     ) : (
-                      <FileText className="h-5 w-5 shrink-0 text-[#1B4636]" />
+                      <FileText className="h-5 w-5 shrink-0 text-[var(--accent-pine)]" aria-hidden="true" />
                     )}
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold text-[var(--ink-main)] font-latin-ui">
@@ -534,15 +547,15 @@ export default function ServicesPortal({
                   <button
                     type="button"
                     onClick={() => setUploadedFile(null)}
-                    className="inline-flex items-center gap-1 rounded-full border border-[#BF3927]/30 px-3 py-1 text-xs font-semibold text-[#BF3927] hover:bg-[#BF3927] hover:text-white cursor-pointer"
+                    className="inline-flex items-center gap-1 rounded-[3px] border border-[var(--accent-crimson)]/40 px-3 py-1.5 text-xs font-semibold text-[var(--accent-crimson)] hover:bg-[var(--accent-crimson)] hover:text-white"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>{t.calcLabels.removeFile}</span>
                   </button>
                 </div>
               ) : (
-                <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#D3C9B6] bg-[var(--bg-page)] px-4 py-6 text-center transition hover:border-[#1B4636] hover:bg-[#F5EFE3]">
-                  <Upload className="h-6 w-6 text-[#1B4636]" />
+                <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[4px] border border-dashed border-[var(--border-strong)] bg-[var(--bg-page)] px-4 py-6 text-center transition hover:border-[var(--accent-pine)] hover:bg-[var(--bg-soft)]">
+                  <Upload className="h-6 w-6 text-[var(--accent-pine)]" aria-hidden="true" />
                   <span className="text-xs font-bold text-[var(--ink-main)]">
                     {t.calcLabels.chooseFile}
                   </span>
@@ -553,15 +566,15 @@ export default function ServicesPortal({
                     type="file"
                     accept=".pdf,.png,.jpg,.jpeg,.ai,.zip"
                     onChange={handleFileChange}
-                    className="hidden"
+                    className="sr-only"
                   />
                 </label>
               )}
             </div>
           </div>
 
-          {/* Sticky Dark Order Summary + Live Bindery Preview */}
-          <aside className="min-w-0 rounded-[28px] border border-[#C8A258]/35 bg-[#123126] p-6 sm:p-7 text-[#FAF6EE] shadow-atelier md:col-span-5 lg:col-span-4 md:sticky md:top-32 space-y-5">
+          {/* Sticky Dark Order Summary + Live Bindery 3D Preview */}
+          <aside className="min-w-0 rounded-[4px] border border-[#C8A258]/40 bg-[#123126] p-6 sm:p-7 text-[#FAF6EE] md:col-span-5 lg:col-span-4 md:sticky md:top-32 space-y-5">
             <div>
               <p className="font-latin-ui text-[10px] font-bold tracking-[0.22em] text-[#E7D19F]">
                 {t.orderSummary.eyebrow}
@@ -582,95 +595,75 @@ export default function ServicesPortal({
             <div className="space-y-3 border-y border-white/15 py-4 text-xs">
               <div className="flex justify-between text-[#D0D9D3]">
                 <span>{t.orderSummary.impressions}</span>
-                <span className="font-bold text-white">
+                <span className="tabular-nums font-bold text-white">
                   {formatNumber(quote.totalImpressions, lang)}
                 </span>
               </div>
               <div className="flex justify-between text-[#D0D9D3]">
                 <span>{t.orderSummary.sheets}</span>
-                <span className="font-bold text-white">
+                <span className="tabular-nums font-bold text-white">
                   {formatNumber(quote.totalSheets, lang)}
                 </span>
               </div>
               <div className="flex justify-between text-[#D0D9D3]">
                 <span>{t.orderSummary.perCopy}</span>
-                <span className="font-bold text-white">
+                <span className="tabular-nums font-bold text-white">
                   {formatPrice(quote.perCopy, lang)}
                 </span>
               </div>
-              <div className="flex justify-between text-[#D0D9D3]">
-                <span>{t.orderSummary.discount}</span>
-                <span className="font-bold text-[#F2B8A8]">
-                  {quote.discountRate > 0
-                    ? lang === "fa"
-                      ? `${formatNumber(
-                          Math.round(quote.discountRate * 100),
-                          lang
-                        )}٪ (${formatPrice(quote.discountAmount, lang)} کسر)`
-                      : `${Math.round(quote.discountRate * 100)}% (-${formatPrice(
-                          quote.discountAmount,
-                          lang
-                        )})`
-                    : "—"}
-                </span>
-              </div>
+              {quote.discountRate > 0 && (
+                <div className="flex justify-between text-[#9BD4B8]">
+                  <span>{t.orderSummary.discount}</span>
+                  <span className="tabular-nums font-bold">
+                    -{Math.round(quote.discountRate * 100)}% (-
+                    {formatPrice(quote.discountAmount, lang)})
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between text-[#D0D9D3]">
                 <span>{t.orderSummary.turnaround}</span>
-                <span className="font-bold text-[#9BD4B8]">
+                <span className="tabular-nums font-semibold text-[#E7D19F]">
                   {t.orderSummary.approxPrefix}{" "}
-                  {formatNumber(quote.turnaroundHours, lang)}{" "}
-                  {t.orderSummary.hours}
+                  {formatNumber(quote.estimatedHours, lang)} {t.orderSummary.hours}
                 </span>
               </div>
             </div>
 
-            {/* Volume Tier Progress Indicator */}
-            {quote.totalImpressions < 1000 && (
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-[11px]">
-                {(() => {
-                  const nextTarget =
-                    quote.totalImpressions < 100
-                      ? 100
-                      : quote.totalImpressions < 500
-                      ? 500
-                      : 1000;
-                  const nextRate =
-                    nextTarget === 100 ? 10 : nextTarget === 500 ? 20 : 30;
-                  const pct = Math.min(
-                    100,
-                    Math.round((quote.totalImpressions / nextTarget) * 100)
-                  );
-                  return (
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-[#E7D19F]">
-                        <span>
-                          {lang === "fa"
-                            ? `تا تخفیف ${formatNumber(nextRate, lang)}٪ پلکانی`
-                            : `Toward ${nextRate}% volume tier`}
-                        </span>
-                        <span className="font-semibold">
-                          {formatNumber(quote.totalImpressions, lang)} /{" "}
-                          {formatNumber(nextTarget, lang)}
-                        </span>
-                      </div>
-                      <div className="h-1 w-full overflow-hidden rounded-full bg-white/15">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-[#E7D19F] to-[#9BD4B8] transition-all duration-500"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })()}
+            {quote.nextTier && (
+              <div className="rounded-[3px] bg-white/10 px-3.5 py-2.5 text-[11px] space-y-1.5">
+                <div className="flex justify-between text-[#E7D19F]">
+                  <span>
+                    {lang === "fa"
+                      ? `تا تخفیف ${Math.round(quote.nextTier.rate * 100)}٪ پلکانی`
+                      : `Next ${Math.round(quote.nextTier.rate * 100)}% tier`}
+                  </span>
+                  <span className="tabular-nums font-bold font-latin-ui">
+                    {formatNumber(quote.totalImpressions, lang)} /{" "}
+                    {formatNumber(quote.nextTier.minImpressions, lang)}
+                  </span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-[2px] bg-white/15">
+                  <div
+                    className="h-full bg-[#E7D19F] transition-all duration-300"
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        Math.round(
+                          (quote.totalImpressions / quote.nextTier.minImpressions) *
+                            100
+                        )
+                      )}%`,
+                    }}
+                  />
+                </div>
               </div>
             )}
 
             <div>
-              <p className="text-xs text-[#B7C3BC]">{t.orderSummary.total}</p>
-              <p
-                key={quote.total}
-                className="mt-1 text-2xl sm:text-3xl font-bold text-white animate-price-pop"
-              >
+              <p className="text-[11px] text-[#D0D9D3]">
+                {t.orderSummary.total}
+              </p>
+              <p className="tabular-nums mt-1 text-3xl font-bold text-white">
                 {formatPrice(quote.total, lang)}
               </p>
             </div>
@@ -678,14 +671,18 @@ export default function ServicesPortal({
             <button
               type="button"
               onClick={handleAddToBag}
-              className="w-full rounded-full bg-[#BF3927] px-5 py-3.5 text-sm font-bold text-white shadow-md transition hover:bg-[#D54431] cursor-pointer"
+              className="w-full rounded-[3px] bg-[var(--accent-crimson)] px-5 py-3.5 text-sm font-bold text-white transition hover:opacity-90"
             >
               {t.orderSummary.addJobBtn}
             </button>
 
             {justAdded && (
-              <div className="flex items-center gap-2 rounded-2xl bg-[#1B4636] border border-white/15 px-3.5 py-2.5 text-xs font-medium text-white">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-[#9BD4B8]" />
+              <div
+                role="status"
+                aria-live="polite"
+                className="flex items-center gap-2 rounded-[3px] bg-[#183E30] border border-white/20 px-3.5 py-2.5 text-xs font-medium text-white"
+              >
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-[#9BD4B8]" aria-hidden="true" />
                 <span>{t.orderSummary.jobAddedToast}</span>
               </div>
             )}
@@ -693,10 +690,10 @@ export default function ServicesPortal({
         </div>
       </section>
 
-      {/* 6 Numbered Services Catalog */}
+      {/* 6 Numbered Services Catalog (Semantic Buttons) */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="mb-6">
-          <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[#1B4636]">
+          <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[var(--accent-pine)]">
             {t.servicesSectionEyebrow}
           </p>
           <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
@@ -708,17 +705,18 @@ export default function ServicesPortal({
           {SERVICES_LIST.map((srv, idx) => {
             const loc = srv[lang];
             return (
-              <Reveal key={srv.id} delayMs={idx * 60}>
-                <div
+              <Reveal key={srv.id} delayMs={idx * 50}>
+                <button
+                  type="button"
                   onClick={() => applyServicePreset(srv.id)}
-                  className="group flex h-full flex-col justify-between rounded-[24px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--accent-gold)] hover:shadow-atelier cursor-pointer"
+                  className="group flex h-full w-full flex-col justify-between rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 text-start transition-colors hover:border-[var(--accent-gold)]"
                 >
-                  <div>
+                  <div className="w-full">
                     <div className="flex items-center justify-between">
-                      <span className="font-latin-ui text-2xl font-bold text-[var(--accent-gold)]/55 group-hover:text-[var(--accent-crimson)] transition">
+                      <span className="font-latin-ui text-2xl font-bold text-[var(--accent-gold)] group-hover:text-[var(--accent-crimson)] transition">
                         {srv.code}
                       </span>
-                      <span className="rounded-full bg-[var(--bg-soft)] px-3 py-1 text-[11px] font-semibold text-[var(--ink-main)]">
+                      <span className="tabular-nums rounded-[2px] bg-[var(--bg-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--ink-main)]">
                         {t.startingFrom} {formatPrice(srv.startingPrice, lang)}
                       </span>
                     </div>
@@ -729,19 +727,19 @@ export default function ServicesPortal({
                       {loc.desc}
                     </p>
                   </div>
-                  <p className="mt-4 border-t border-[var(--border-subtle)] pt-3 text-[11px] font-semibold text-[var(--accent-pine)]">
-                    {loc.unit} ↗
-                  </p>
-                </div>
+                  <span className="mt-4 block w-full border-t border-[var(--border-subtle)] pt-3 text-[11px] font-semibold text-[var(--accent-pine)]">
+                    {loc.unit}
+                  </span>
+                </button>
               </Reveal>
             );
           })}
         </div>
       </section>
 
-      {/* Tiered Pricing & Wholesale KPIs */}
+      {/* Tiered Pricing & Atelier Specifications */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 space-y-10">
-        <div className="overflow-hidden rounded-[26px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 sm:p-8 shadow-2xs">
+        <div className="overflow-hidden rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 sm:p-8">
           <h3 className="mb-5 text-xl font-bold text-[var(--ink-main)]">
             {t.priceTableTitle}
           </h3>
@@ -763,22 +761,22 @@ export default function ServicesPortal({
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1EBE0]">
+              <tbody className="divide-y divide-[var(--border-subtle)]">
                 {TIERED_PRICE_ROWS.map((row, idx) => (
                   <tr
                     key={idx}
-                    className={row.best ? "bg-[#BF3927]/5 font-bold" : ""}
+                    className={row.best ? "bg-[var(--accent-crimson)]/10 font-bold" : ""}
                   >
                     <td className="py-3.5 text-[var(--ink-main)]">{row.tier[lang]}</td>
-                    <td className="py-3.5">{formatPrice(row.bwA4, lang)}</td>
-                    <td className="py-3.5">{formatPrice(row.colorA4, lang)}</td>
-                    <td className="py-3.5">
+                    <td className="tabular-nums py-3.5 text-[var(--ink-main)]">{formatPrice(row.bwA4, lang)}</td>
+                    <td className="tabular-nums py-3.5 text-[var(--ink-main)]">{formatPrice(row.colorA4, lang)}</td>
+                    <td className="tabular-nums py-3.5">
                       {row.best ? (
-                        <span className="inline-flex rounded-full bg-[#BF3927] px-2.5 py-0.5 text-xs font-bold text-white">
-                          BEST · {row.discount}
+                        <span className="inline-flex rounded-[2px] bg-[var(--accent-crimson)] px-2.5 py-0.5 text-xs font-bold text-white">
+                          {row.discount}
                         </span>
                       ) : (
-                        <span className="text-[#1B4636] font-semibold">
+                        <span className="text-[var(--accent-pine)] font-semibold">
                           {row.discount}
                         </span>
                       )}
@@ -790,8 +788,8 @@ export default function ServicesPortal({
           </div>
         </div>
 
-        {/* Wholesale KPI Banner */}
-        <div className="rounded-[28px] bg-[#1B4636] p-7 sm:p-10 text-[#FAF6EE]">
+        {/* Corporate & Atelier Specs Band */}
+        <div className="rounded-[4px] border border-[#C8A258]/35 bg-[#123126] p-7 sm:p-10 text-[#FAF6EE]">
           <div className="grid gap-8 lg:grid-cols-12 items-center">
             <div className="space-y-3 lg:col-span-6">
               <p className="font-latin-ui text-[11px] font-bold tracking-[0.2em] text-[#E7D19F]">
@@ -808,9 +806,9 @@ export default function ServicesPortal({
               {t.kpis.map((kpi, idx) => (
                 <div
                   key={idx}
-                  className="rounded-2xl border border-white/15 bg-white/10 p-4 text-center"
+                  className="rounded-[3px] border border-white/15 bg-white/10 p-4 text-center"
                 >
-                  <p className="text-xl sm:text-2xl font-bold text-white">
+                  <p className="tabular-nums text-lg sm:text-xl font-bold text-white">
                     {kpi.value}
                   </p>
                   <p className="mt-1 text-[11px] leading-snug text-[#D7E3DC]">
@@ -835,22 +833,24 @@ export default function ServicesPortal({
             return (
               <div
                 key={idx}
-                className="overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]"
+                className="overflow-hidden rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]"
               >
                 <button
                   type="button"
+                  aria-expanded={isOpen}
                   onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start text-sm font-bold text-[var(--ink-main)] cursor-pointer"
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start text-sm font-bold text-[var(--ink-main)]"
                 >
                   <span>{loc.q}</span>
                   <ChevronDown
-                    className={`h-4 w-4 shrink-0 text-[#1B4636] transition-transform ${
+                    aria-hidden="true"
+                    className={`h-4 w-4 shrink-0 text-[var(--accent-pine)] transition-transform ${
                       isOpen ? "rotate-180" : ""
                     }`}
                   />
                 </button>
                 {isOpen && (
-                  <div className="border-t border-[#F1EBE0] px-5 py-4 text-xs sm:text-sm leading-relaxed text-[#4C5850]">
+                  <div className="border-t border-[var(--border-subtle)] px-5 py-4 text-xs sm:text-sm leading-relaxed text-[var(--ink-body)]">
                     {loc.a}
                   </div>
                 )}

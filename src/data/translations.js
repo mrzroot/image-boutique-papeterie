@@ -20,14 +20,6 @@
     searchTags: ["فلورانس", "خودنویس", "بولت‌ژورنال", "واشی‌تیپ", "باکس هدیه"],
     bag: "سبد سفارش",
     wishlist: "علاقه‌مندی‌ها",
-    marqueeItems: [
-      "کاغذهای کتان فلورانس ایتالیا",
-      "LA BOUTIQUE PAPETERIE",
-      "خودنویس و قلم‌های مهندسی سوئیس",
-      "صحافی تخت دست‌دوز آتلیه",
-      "بسته‌بندی هدیه و مهر موم لاکی",
-      "آتلیه چاپ دیجیتال و طلاکوب",
-    ],
     lookbook: {
       eyebrow: "CURATED DESK ATELIER · تور تعاملی میز کار",
       title: "چیدمان «میز خلاقیتِ فلورانس» را لمس کنید",
@@ -123,10 +115,6 @@
       addCardBtn: "افزودن کارت هدیه به سبد خرید",
       cardBadge: "کارت هدیه دیجیتال",
     },
-    reviewsSection: {
-      eyebrow: "VERIFIED COLLECTORS · دیدگاه مشتریان بوتیک",
-      title: "تجربه واقعی دوست‌داران کاغذ و نوشت‌افزار",
-    },
     socialSection: {
       eyebrow: "@IMAGEBOUTIQUE.PAPETERIE · گالری الهام روزانه",
       title: "از میز کار مشتریان و کلکسیون‌های جدید",
@@ -199,7 +187,7 @@
       copies: "تعداد نسخه / جلد",
       uploadTitle: "آپلود فایل چاپی (اختیاری برای برآورد و ثبت)",
       uploadHint:
-        "PDF، PNG، JPG، AI یا ZIP تا ۵۰ مگابایت — فایل به‌صورت امن ضمیمه سفارش می‌شود",
+        "PDF، PNG، JPG، AI یا ZIP تا ۵۰ مگابایت؛ فایل به‌صورت امن ضمیمه سفارش می‌شود",
       chooseFile: "انتخاب فایل از سیستم",
       removeFile: "حذف فایل",
       monogramTitle: "عنوان یا مونوگرام اختصاصی جلد (اختیاری)",
@@ -269,10 +257,10 @@
     wholesaleDesc:
       "تأمین ست هدیه مدیران، دفترهای اختصاصی با نشان شرکت، چاپ کاتالوگ گالری‌ها و پاکت‌های ممهور با تخفیف قرارداد سالانه.",
     kpis: [
-      { value: "+۱۲", label: "جنس کاغذ اروپایی و استاندارد" },
-      { value: "+۸۵۰", label: "پروژه موفق بوتیک و سازمانی" },
-      { value: "۳ ساعت", label: "تحویل فوری چاپ دیجیتال" },
-      { value: "۴.۹ / ۵", label: "رضایت مشتریان اختصاصی" },
+      { value: "۸۰–۳۰۰g", label: "گرماژ کاغذ تحریر، گلاسه و کتان" },
+      { value: "A5–A3", label: "قطع‌های چاپ دیجیتال و پلات" },
+      { value: "۱۰ عدد", label: "حداقل تیراژ طلاکوب و باکس بوتیک" },
+      { value: "۳ ساعت", label: "تحویل فوری چاپ دیجیتال زیر ۶۰۰ برگ" },
     ],
     faqTitle: "پرسش‌های متداول فروشگاه و بخش خدماتی",
     newsletterTitle: "عضویت در خبرنامه کاغذ و کلکسیون‌های محدود",
@@ -282,7 +270,7 @@
     newsletterBtn: "عضویت",
     newsletterSuccess: "ایمیل شما با موفقیت در خبرنامه ایمیج بوتیک ثبت شد.",
     footerAbout:
-      "ایمیج بوتیک (La Boutique Papeterie) — ویترین تخصصی نوشت‌افزار هنری و کاغذهای فاخر به همراه آتلیه خدمات چاپ، صحافی و بسته‌بندی اختصاصی.",
+      "ایمیج بوتیک (La Boutique Papeterie): ویترین تخصصی نوشت‌افزار هنری و کاغذهای فاخر به همراه آتلیه خدمات چاپ، صحافی و بسته‌بندی اختصاصی.",
     footerCols: {
       boutique: "بخش فروشگاهی",
       services: "بخش خدماتی",
@@ -300,7 +288,7 @@
       subtotal: "جمع کل سفارش",
       freeShippingThreshold: 2500000,
       freeShippingRemaining: "تا ارسال رایگان بوتیک مانده",
-      freeShippingUnlocked: "ارسال رایگان بوتیک برای شما فعال شد ✦",
+      freeShippingUnlocked: "ارسال رایگان بوتیک برای شما فعال شد",
       giftWrapTitle: "بسته‌بندی کادویی با کاغذ فلورانس و مهر موم لاکی",
       giftWrapPrice: 85000,
       promoPlaceholder: "کد تخفیف (مثلاً BOUTIQUE10)",
@@ -358,14 +346,6 @@
     searchTags: ["Florentine", "Brass Pen", "Journal", "Washi", "Gift Box"],
     bag: "Order Bag",
     wishlist: "Saved",
-    marqueeItems: [
-      "FLORENCE ARCHIVAL COTTON",
-      "LA BOUTIQUE PAPETERIE",
-      "SWISS PRECISION 849",
-      "LAY-FLAT THREAD BINDING",
-      "HAND-POURED WAX SEALS",
-      "BESPOKE GOLD FOIL ATELIER",
-    ],
     lookbook: {
       eyebrow: "CURATED DESK ATELIER · INTERACTIVE LOOKBOOK",
       title: "Touch & Shop the Florentine Desk Edit",
@@ -429,7 +409,7 @@
         desc: "Lay-flat linen journals and structured planners built for daily clarity",
       },
       {
-        title: "Spark Your Creativity",
+        title: "Florentine & Archival Papers",
         desc: "Florentine papers, botanical stickers, and foil washi tapes",
       },
       {
@@ -442,7 +422,7 @@
     favoritesSubtitle: "Ready-to-ship bestsellers curated by Image Boutique",
     bundles: {
       eyebrow: "COFFRETS & LOTS · CURATED GIFT SETS",
-      title: "Signature Boutique Coffrets — Save 15%",
+      title: "Signature Boutique Coffrets (Save 15%)",
       subtitle: "Thoughtfully paired stationery sets wrapped and ready for gifting",
       saveLabel: "Save 15%",
       addBundleBtn: "Add Coffret to Bag",
@@ -450,7 +430,7 @@
     giftCard: {
       eyebrow: "CARTE-CADEAU · DIGITAL GIFT CARD",
       title: "Gift the Joy of Fine Paper with an Image Boutique E-Card",
-      desc: "Personalize the card finish, denomination, and recipient name—added immediately to your order bag.",
+      desc: "Personalize the card finish, denomination, and recipient name, added immediately to your order bag.",
       amountLabel: "Select Gift Card Value",
       recipientLabel: "Recipient Name (Optional)",
       recipientPlaceholder: "e.g. For Sara",
@@ -460,10 +440,6 @@
       designs: { pine: "Botanical Pine Foil", ivory: "Florentine Ivory", obsidian: "Obsidian Gold" },
       addCardBtn: "Add Gift Card to Order Bag",
       cardBadge: "Digital Gift Card",
-    },
-    reviewsSection: {
-      eyebrow: "VERIFIED COLLECTORS · BOUTIQUE REVIEWS",
-      title: "Loved by Architects, Designers & Paper Lovers",
     },
     socialSection: {
       eyebrow: "@IMAGEBOUTIQUE.PAPETERIE · STUDIO JOURNAL",
@@ -482,7 +458,7 @@
       printmaking: "Printmaking Studio",
     },
     catalogEyebrow: "BOUTIQUE SHOWCASE",
-    catalogTitle: "Explore Image Boutique",
+    catalogTitle: "Boutique Collection",
     sortOptions: {
       featured: "Boutique Curated",
       priceAsc: "Price: Low to High",
@@ -537,7 +513,7 @@
       copies: "Copies / Books",
       uploadTitle: "Attach Print Artwork (Optional for Instant Quote)",
       uploadHint:
-        "PDF, PNG, JPG, AI or ZIP up to 50MB — attached cleanly to your order spec",
+        "PDF, PNG, JPG, AI or ZIP up to 50MB, attached cleanly to your order spec",
       chooseFile: "Select File",
       removeFile: "Remove",
       monogramTitle: "Optional Cover Title / Foil Monogram",
@@ -607,10 +583,10 @@
     wholesaleDesc:
       "Equip your studio or company with foil-stamped notebooks, gallery catalogs, custom wax-sealed welcome kits, and priority monthly print retainers.",
     kpis: [
-      { value: "12+", label: "European & Specialty Paper Stocks" },
-      { value: "850+", label: "Completed Boutique & Studio Orders" },
-      { value: "3h", label: "Express Digital Turnaround" },
-      { value: "4.9/5", label: "Client Craftsmanship Rating" },
+      { value: "80–300g", label: "Uncoated, Silk & Cotton Stocks" },
+      { value: "A5–A3", label: "Digital Press & Archival Plot Sizes" },
+      { value: "10 pcs", label: "Minimum Boutique Foil & Box Run" },
+      { value: "3 hrs", label: "Express Digital Turnaround (<600p)" },
     ],
     faqTitle: "Storefront & Print Atelier FAQ",
     newsletterTitle: "Join the Papeterie Dispatch",
@@ -619,9 +595,9 @@
     newsletterPlaceholder: "Enter your email address...",
     newsletterBtn: "Subscribe",
     newsletterSuccess:
-      "Thank you — you are subscribed to Image Boutique dispatches.",
+      "Thank you, you are subscribed to Image Boutique dispatches.",
     footerAbout:
-      "Image Boutique (La Boutique Papeterie) — curated European stationery and decorative paper storefront with an integrated bespoke print & bindery atelier.",
+      "Image Boutique (La Boutique Papeterie): curated European stationery and decorative paper storefront with an integrated bespoke print & bindery atelier.",
     footerCols: {
       boutique: "Storefront",
       services: "Print Atelier",
@@ -639,7 +615,7 @@
       subtotal: "Order Subtotal",
       freeShippingThreshold: 2500000,
       freeShippingRemaining: "away from complimentary shipping",
-      freeShippingUnlocked: "Complimentary Boutique Delivery Unlocked ✦",
+      freeShippingUnlocked: "Complimentary Boutique Delivery Unlocked",
       giftWrapTitle: "Florentine Paper Gift Wrap & Hand-Poured Wax Seal",
       giftWrapPrice: 85000,
       promoPlaceholder: "Promo code (try BOUTIQUE10)",
