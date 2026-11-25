@@ -8,11 +8,9 @@ import {
   Check,
   Share2,
   CheckCircle2,
-  Move3d,
-  Image as ImageIcon,
 } from "lucide-react";
 import { formatPrice } from "../utils/pricing";
-import Live3DPreview from "./Live3DPreview";
+import ProductMedia from "./ProductMedia";
 
 export default function ProductModal({
   product,
@@ -26,13 +24,11 @@ export default function ProductModal({
 }) {
   const localized = product[lang] || product.fa;
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(initialVariantIdx);
-  const [viewMode, setViewMode] = useState("photo");
   const [qty, setQty] = useState(1);
   const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     setSelectedVariantIdx(initialVariantIdx);
-    setViewMode("photo");
     setQty(1);
   }, [product.id, initialVariantIdx]);
 
@@ -46,10 +42,6 @@ export default function ProductModal({
 
   const variants = localized.variants || [];
   const selectedVariant = variants[selectedVariantIdx] || variants[0] || "";
-  const selectedSwatchHex =
-    product.swatches?.[selectedVariantIdx] || product.swatches?.[0];
-  const activeImage =
-    product.variantImages?.[selectedVariantIdx] || product.image;
   const inStock = product.inStock !== false;
 
   const handleAdd = () => {
@@ -105,66 +97,10 @@ export default function ProductModal({
           </button>
         </div>
 
-        {/* Media Column: Studio Photo + Real Product-Specific 360° 3D Viewer */}
-        <div className="relative bg-[var(--bg-soft)] p-4 sm:p-5 flex flex-col items-center justify-center gap-2.5">
-          <div className="inline-flex rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-0.5 text-xs font-bold">
-            <button
-              type="button"
-              onClick={() => setViewMode("photo")}
-              className={`inline-flex items-center gap-1.5 rounded-[2px] px-2.5 py-1 transition ${
-                viewMode === "photo"
-                  ? "bg-[var(--accent-pine)] text-white"
-                  : "text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
-              }`}
-            >
-              <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>{lang === "fa" ? "عکس استودیو" : "Studio Photo"}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("3d")}
-              className={`inline-flex items-center gap-1.5 rounded-[2px] px-2.5 py-1 transition ${
-                viewMode === "3d"
-                  ? "bg-[var(--accent-pine)] text-white"
-                  : "text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
-              }`}
-            >
-              <Move3d className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>{lang === "fa" ? "نمای ۳۶۰° واقعی" : "360° 3D View"}</span>
-            </button>
-          </div>
-
-          {viewMode === "3d" ? (
-            <div className="w-full rounded-[4px] bg-[#123126] p-1 border border-[var(--border-subtle)]">
-              <Live3DPreview
-                mode="product"
-                compact
-                product={product}
-                variantIdx={selectedVariantIdx}
-                lang={lang}
-                t={t}
-              />
-            </div>
-          ) : (
-            <div className="relative w-full overflow-hidden rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-              <img
-                src={activeImage}
-                alt={localized.title}
-                width="420"
-                height="420"
-                className="aspect-square max-h-[270px] sm:max-h-[295px] w-full object-cover"
-              />
-              {selectedSwatchHex && selectedVariant && (
-                <div className="absolute bottom-2.5 start-2.5 inline-flex items-center gap-1.5 rounded-[3px] border border-[var(--border-subtle)] bg-[#FAF6EE] px-2.5 py-1 text-xs font-bold text-[#14201A]">
-                  <span
-                    className="h-2.5 w-2.5 rounded-full border border-black/20"
-                    style={{ backgroundColor: selectedSwatchHex }}
-                  />
-                  <span>{selectedVariant}</span>
-                </div>
-              )}
-            </div>
-          )}
+        {/* Media Column: real photo, 3D presentation of it, accurate 360° only when real data exists */}
+        {/* On one-column (mobile) layout the mode tabs keep clear of the share/close buttons */}
+        <div className="relative bg-[var(--bg-soft)] p-4 sm:p-5 [&_[role=radiogroup]]:me-20 md:[&_[role=radiogroup]]:me-0">
+          <ProductMedia product={product} variantIdx={selectedVariantIdx} lang={lang} compact />
         </div>
 
         {/* Details Column */}
