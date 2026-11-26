@@ -16,6 +16,7 @@ import Reveal from "./Reveal";
 import ProductCard from "./ProductCard";
 import { CategoryIndex, ProductRail, GalleryMosaic, AtelierIntro, TrustSection } from "./StorefrontSections";
 import BoutiqueExtras from "./BoutiqueExtras";
+import MaterialSampler from "./MaterialSampler";
 
 export default function BoutiqueStorefront({
   t,
@@ -373,6 +374,8 @@ export default function BoutiqueStorefront({
 
       {/* 2. Category index */}
       <CategoryIndex t={t} lang={lang} counts={countByCategory} onSelectCategory={onSelectCategory} />
+
+      <MaterialSampler products={visibleProducts} lang={lang} onOpenProduct={onOpenProduct} />
 
       {/* 3. Bestsellers & new arrivals */}
       <ProductRail id="favorites" eyebrow={t.favoritesEyebrow} title={t.favoritesTitle} subtitle={t.favoritesSubtitle} products={favorites} cardProps={cardProps} />
