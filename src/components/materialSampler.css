@@ -23,3 +23,9 @@
 @keyframes material-reveal{from{opacity:.2;transform:translateY(.6rem) rotate(-3deg) scale(.95)}to{opacity:1;transform:none}}
 @media(max-width:47rem){.material-sampler{grid-template-columns:1fr}.material-sampler__image{min-height:15rem;padding:1rem}.material-sampler__image figure,.material-sampler__paper{width:min(66%,19rem)}}
 @media(prefers-reduced-motion:reduce){.material-sampler *{animation:none!important;transition:none!important}}
+.material-sampler__depth{grid-area:1/1;width:100%;min-width:0;position:relative}
+.material-sampler__depth>p{color:#fff2db;padding:.75rem;text-align:center}
+.material-sampler__image[data-depth=true] .material-sampler__paper{opacity:.21}
+.material-sampler__copy .material-sampler__toggle{background:#f2dcb3;color:#281c19;font-weight:700}
+.material-sampler__copy .material-sampler__toggle[aria-pressed=true]{background:#e6b87d;color:#281c19}
+.material-sampler__note{font-size:.77rem;color:#e0c6b0}

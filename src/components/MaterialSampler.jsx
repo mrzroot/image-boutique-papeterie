@@ -1,6 +1,17 @@
-import { useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { ArrowUpLeft, ArrowUpRight } from "lucide-react";
 import "./materialSampler.css";
+
+const MaterialStage = lazy(() =>
+  import("./ProductMedia3D")
+    .then((module) => ({ default: module.PhotoStage3D }))
+    .catch(() => ({ default: UnavailableStage }))
+);
+
+function UnavailableStage({ onFail }) {
+  useEffect(() => onFail(true), [onFail]);
+  return null;
+}
 
 const trays = [
   { id: "notebooks", fa: "دفتر و کاغذ", en: "Notebook & paper", color: "#c9a976", backing: "#1e493d" },
@@ -11,6 +22,8 @@ const trays = [
 export default function MaterialSampler({ products, lang, onOpenProduct }) {
   const [activeCategory, setActiveCategory] = useState(trays[0].id);
   const [selectedVariant, setSelectedVariant] = useState(0);
+  const [showDepth, setShowDepth] = useState(false);
+  const [depthUnavailable, setDepthUnavailable] = useState(false);
   const isPersian = lang === "fa";
   const available = trays.flatMap((tray) => {
     const product = products.find((item) => item.category === tray.id && item.image);
@@ -32,19 +45,33 @@ export default function MaterialSampler({ products, lang, onOpenProduct }) {
       style={{ "--sample-color": active.color, "--sample-backing": active.backing }}
       aria-labelledby="material-sampler-title"
     >
-      <div className="material-sampler__image">
+      <div className="material-sampler__image" data-depth={showDepth && !depthUnavailable}>
         <div className="material-sampler__paper material-sampler__paper--back" aria-hidden="true" />
         <div className="material-sampler__paper material-sampler__paper--front" aria-hidden="true" />
-        <figure key={picture}>
-          <img
-            src={picture}
-            alt={sampleLabel ? details.title + " · " + sampleLabel : details.title}
-            width="600"
-            height="600"
-            loading="lazy"
-            decoding="async"
-          />
-        </figure>
+        {showDepth && !depthUnavailable ? (
+          <div className="material-sampler__depth">
+            <Suspense fallback={<p role="status">{isPersian ? "در حال آماده‌سازی نما…" : "Preparing the view…"}</p>}>
+              <MaterialStage
+                key={picture}
+                src={picture}
+                lang={lang}
+                onFail={setDepthUnavailable}
+                heightClass="h-64 sm:h-72"
+              />
+            </Suspense>
+          </div>
+        ) : (
+          <figure key={picture}>
+            <img
+              src={picture}
+              alt={sampleLabel ? details.title + " · " + sampleLabel : details.title}
+              width="600"
+              height="600"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        )}
       </div>
       <div className="material-sampler__copy">
         <h2 id="material-sampler-title">{isPersian ? "نمونه‌ها را از نزدیک ببینید" : "The material sampler"}</h2>
@@ -64,6 +91,24 @@ export default function MaterialSampler({ products, lang, onOpenProduct }) {
           ))}
         </div>
         <p aria-live="polite"><strong>{details.title}</strong>{sampleLabel && <span>{sampleLabel}</span>}</p>
+        <button
+          type="button"
+          className="material-sampler__toggle"
+          aria-pressed={showDepth && !depthUnavailable}
+          onClick={() => {
+            setDepthUnavailable(false);
+            setShowDepth(!showDepth || Boolean(depthUnavailable));
+          }}
+        >
+          {isPersian ? "نمایش سه‌بعدی عکس محصول" : "Show the product photo in 3D"}
+        </button>
+        {showDepth && (
+          <p className="material-sampler__note" role="status">
+            {depthUnavailable
+              ? (isPersian ? "نمای سه‌بعدی در دسترس نیست. عکس محصول نمایش داده می‌شود." : "The 3D view is unavailable. The product photo is shown.")
+              : (isPersian ? "عکس همین طرح روی یک صفحهٔ سه‌بعدی نمایش داده می‌شود." : "The selected variant’s photo appears on a 3D panel.")}
+          </p>
+        )}
         {product.variantImages?.length > 1 && (
           <div className="material-sampler__variants" role="group" aria-label={isPersian ? "رنگ یا طرح" : "Color or finish"}>
             {product.variantImages.map((image, index) => (
