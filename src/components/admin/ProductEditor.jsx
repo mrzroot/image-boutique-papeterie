@@ -6,13 +6,25 @@ import { cls, useAdmin, Card, JumpNav, TextField, LocFields, ImgPreview, ImageFi
 const SPIN_MIN = 8;
 
 export default function ProductEditor({ product: p, isNew, dirty, onChange, onSave, onCancel }) {
-  const { s, t, lang } = useAdmin();
+  const { s, t, lang, notify } = useAdmin();
   const set = (patch) => onChange((prev) => ({ ...prev, ...patch }));
+  // ImageListField may pass an updater fn(prevList) after async uploads
+  const setList = (key) => (v) => onChange((prev) => ({ ...prev, [key]: typeof v === "function" ? v(prev[key]) : v }));
+  // The main photo IS the first variant's photo (the storefront shows variantImages[0] first); `image` mirrors it
+  const mainImage = p.variantImages?.[0] || p.image;
+  const setVariantImage = (vIdx, val) =>
+    onChange((prev) => {
+      const next = [...(prev.variantImages || [])];
+      next[vIdx] = val;
+      return vIdx === 0 ? { ...prev, image: val, variantImages: next } : { ...prev, variantImages: next };
+    });
   const setLoc = (l, key, val) => onChange((prev) => ({ ...prev, [l]: { ...prev[l], [key]: val } }));
   const variants = p.fa.variants || [];
   const spinCount = (p.spinImages || []).filter((x) => x?.trim()).length;
   const modelUrl = p.model3dUrl || "";
   const modelExtOk = !modelUrl.trim() || /\.(glb|gltf)([?#].*)?$/i.test(modelUrl.trim());
+  // Only site-relative paths or https URLs (no javascript:, data:, http: or protocol-relative //host)
+  const modelUrlOk = !modelUrl.trim() || /^(\.\/|\/(?!\/)|https:\/\/)/i.test(modelUrl.trim());
 
   const copyFields = (l) => [
     ["title", s.fTitle, false, l === "fa"],
@@ -34,13 +46,18 @@ export default function ProductEditor({ product: p, isNew, dirty, onChange, onSa
     <form
       onSubmit={(e) => {
         e.preventDefault();
+        if (!modelUrlOk) {
+          notify(s.model3dUrlInvalid);
+          document.getElementById("pe-model-url")?.focus();
+          return;
+        }
         onSave();
       }}
       className="space-y-4"
     >
       <div className={`${cls.card} space-y-3`}>
         <div className="flex items-center gap-3">
-          <ImgPreview src={p.image} className="h-12 w-12" />
+          <ImgPreview src={mainImage} className="h-12 w-12" />
           <div className="min-w-0 flex-1">
             <p className={cls.hint}>{isNew ? s.newProduct : s.editProduct}</p>
             <h2 className={`${cls.h2} truncate`}>{p[lang]?.title || p.fa.title || p.sku}</h2>
@@ -82,7 +99,7 @@ export default function ProductEditor({ product: p, isNew, dirty, onChange, onSa
       <Card id="pe-pricing" title={s.gPricing}>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <TextField label={s.priceToman} type="number" min={1000} required value={p.price} onChange={(v) => set({ price: Math.max(0, v) })} />
+            <TextField label={s.priceToman} type="number" min={0} required value={p.price} onChange={(v) => set({ price: v })} />
             <p className={`${cls.hint} mt-1 tabular-nums`}>{formatPrice(p.price, lang)}</p>
           </div>
           <label className="inline-flex items-center gap-2 self-start pt-6 text-sm font-semibold">
@@ -163,13 +180,7 @@ export default function ProductEditor({ product: p, isNew, dirty, onChange, onSa
                 compact
                 label={s.variantImage}
                 value={p.variantImages?.[vIdx] || p.image}
-                onChange={(val) =>
-                  onChange((prev) => {
-                    const next = [...(prev.variantImages || [])];
-                    next[vIdx] = val;
-                    return { ...prev, variantImages: next };
-                  })
-                }
+                onChange={(val) => setVariantImage(vIdx, val)}
               />
               {variants.length > 1 && (
                 <button type="button" onClick={() => removeVariant(vIdx)} className={`${cls.iconDanger} md:mt-5`} aria-label={s.removeVariant}>
@@ -182,20 +193,13 @@ export default function ProductEditor({ product: p, isNew, dirty, onChange, onSa
       </Card>
 
       <Card id="pe-media" title={s.gMedia}>
-        <ImageField
-          label={s.mainImage}
-          value={p.image}
-          onChange={(val) =>
-            onChange((prev) => {
-              const next = [...(prev.variantImages || [])];
-              next[0] = val;
-              return { ...prev, image: val, variantImages: next };
-            })
-          }
-        />
-        <ImageListField label={s.gallery} hint={s.galleryHint} value={p.gallery} onChange={(v) => set({ gallery: v })} />
+        <div className="space-y-1">
+          <ImageField label={s.mainImage} value={mainImage} onChange={(val) => setVariantImage(0, val)} />
+          <p className={cls.hint}>{s.mainImageHint}</p>
+        </div>
+        <ImageListField label={s.gallery} hint={s.galleryHint} value={p.gallery} onChange={setList("gallery")} />
         <div className="space-y-2 border-t border-[var(--border-subtle)] pt-4">
-          <ImageListField label={s.spinImages} hint={s.spinHint} value={p.spinImages} onChange={(v) => set({ spinImages: v })} />
+          <ImageListField label={s.spinImages} hint={s.spinHint} value={p.spinImages} onChange={setList("spinImages")} />
           {spinCount > 0 && (
             <Tag tone={spinCount >= SPIN_MIN ? "pine" : "gold"}>
               {spinCount >= SPIN_MIN ? s.spinReady : s.spinNotReady.replace("{n}", spinCount).replace("{min}", SPIN_MIN)}
@@ -203,9 +207,21 @@ export default function ProductEditor({ product: p, isNew, dirty, onChange, onSa
           )}
         </div>
         <div className="space-y-2 border-t border-[var(--border-subtle)] pt-4">
-          <TextField label={s.model3dUrl} dir="ltr" placeholder="./models/product.glb" value={modelUrl} onChange={(v) => set({ model3dUrl: v })} />
+          <TextField
+            id="pe-model-url"
+            label={s.model3dUrl}
+            dir="ltr"
+            placeholder="./models/product.glb"
+            value={modelUrl}
+            aria-invalid={!modelUrlOk || undefined}
+            onChange={(v) => set({ model3dUrl: v })}
+          />
           <p className={cls.hint}>{s.model3dHint}</p>
-          {!modelExtOk && <p className="text-xs font-semibold text-[var(--accent-crimson)]">{s.model3dExtWarn}</p>}
+          {!modelUrlOk ? (
+            <p className="text-xs font-semibold text-[var(--accent-crimson)]">{s.model3dUrlInvalid}</p>
+          ) : (
+            !modelExtOk && <p className="text-xs font-semibold text-[var(--accent-crimson)]">{s.model3dExtWarn}</p>
+          )}
         </div>
         <div className="grid gap-3 border-t border-[var(--border-subtle)] pt-4 sm:grid-cols-3">
           <label className="block min-w-0">

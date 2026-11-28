@@ -27,6 +27,7 @@ export default function BoutiqueStorefront({
   selectedCategory,
   onSelectCategory,
   searchQuery,
+  onSearchChange,
   wishlist,
   wishlistOnly,
   onToggleWishlistOnly,
@@ -54,6 +55,9 @@ export default function BoutiqueStorefront({
     : t.heroSlides;
   const safeSlideIdx = slideIdx < slides.length ? slideIdx : 0;
   const activeSlide = slides[safeSlideIdx] || slides[0];
+  // the CTA opens the shop on the slide's category; CMS slides that predate the field match the default slide by image
+  const slideCategory =
+    activeSlide.category || t.heroSlides?.find((d) => d.image === activeSlide.image)?.category || "all";
 
   const ArrowForward = isRtl ? ArrowLeft : ArrowRight;
   const PrevIcon = isRtl ? ChevronRight : ChevronLeft;
@@ -66,10 +70,11 @@ export default function BoutiqueStorefront({
   const newArrivals = visibleProducts.filter((p) => p.badge === "new").slice(0, 4);
   const cardProps = { lang, t, wishlist, onToggleWishlist, onAddToBag, onQuickView, onOpenProduct };
 
-  const pins = t.lookbook?.pins || [];
+  // pins whose product the owner hid are dropped, so a pin never shows a different product
+  const pins = (t.lookbook?.pins || []).filter((pin) => visibleProducts.some((p) => p.id === pin.id));
   const activePin = pins[activePinIdx] || pins[0];
-  const activePinProduct =
-    visibleProducts.find((p) => p.id === activePin?.id) || visibleProducts[0];
+  const activePinProduct = visibleProducts.find((p) => p.id === activePin?.id);
+  const pinLoc = activePinProduct ? activePinProduct[lang] || activePinProduct.fa : null;
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const filteredProducts = visibleProducts.filter((p) => {
@@ -77,12 +82,9 @@ export default function BoutiqueStorefront({
       return false;
     if (wishlistOnly && !wishlist.includes(p.id)) return false;
     if (!normalizedQuery) return true;
-    const loc = p[lang] || p.fa;
-    return (
-      loc.title.toLowerCase().includes(normalizedQuery) ||
-      loc.subtitle.toLowerCase().includes(normalizedQuery) ||
-      loc.description.toLowerCase().includes(normalizedQuery) ||
-      p.sku.toLowerCase().includes(normalizedQuery)
+    const loc = p[lang] || p.fa || {};
+    return [loc.title, loc.subtitle, loc.description, p.sku].some((v) =>
+      (v || "").toLowerCase().includes(normalizedQuery)
     );
   }).sort((a, b) => {
     if (sortBy === "priceAsc") return a.price - b.price;
@@ -102,16 +104,8 @@ export default function BoutiqueStorefront({
     : t.valueStrip;
 
   const activeStory = story?.[lang] || story?.fa || {
-    eyebrow: t.storyEyebrow,
     title: t.storyTitle,
     body: t.storyBody,
-  };
-
-  const badgeStyle = (badge) => {
-    if (badge === "new") return "bg-[var(--accent-crimson)] text-white";
-    if (badge === "limited")
-      return "bg-[#123126] text-[#F3E4BD] border border-[#D6B36A]/50";
-    return "bg-[var(--bg-surface)] text-[var(--ink-main)] border border-[var(--border-subtle)]";
   };
 
   if (page === "shop") {
@@ -123,10 +117,7 @@ export default function BoutiqueStorefront({
       >
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--border-subtle)] pb-5">
           <div>
-            <p className="eyebrow text-[var(--accent-gold)]">
-              {t.catalogEyebrow}
-            </p>
-            <h1 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
               {t.catalogTitle}
             </h1>
           </div>
@@ -151,7 +142,7 @@ export default function BoutiqueStorefront({
             <div className="inline-flex h-10 items-center gap-2 rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 text-xs">
               <SlidersHorizontal className="h-3.5 w-3.5 text-[var(--ink-sub)]" aria-hidden="true" />
               <label htmlFor="catalog-sort" className="sr-only">
-                Sort
+                {isRtl ? "مرتب‌سازی" : "Sort"}
               </label>
               <select
                 id="catalog-sort"
@@ -179,6 +170,7 @@ export default function BoutiqueStorefront({
                     key={cat.id}
                     type="button"
                     onClick={() => onSelectCategory(cat.id)}
+                    aria-pressed={isSelected}
                     className={`flex shrink-0 items-center justify-between gap-3 border-b-2 px-1 py-3 text-sm transition md:border-b md:py-3.5 ${
                       isSelected
                         ? "border-[var(--accent-pine)] font-semibold text-[var(--accent-pine)]"
@@ -208,6 +200,7 @@ export default function BoutiqueStorefront({
                   type="button"
                   onClick={() => {
                     onSelectCategory("all");
+                    onSearchChange?.("");
                     if (wishlistOnly) onToggleWishlistOnly();
                   }}
                   className="rounded-[3px] bg-[var(--accent-pine)] px-5 py-2.5 text-xs font-semibold text-white"
@@ -241,11 +234,8 @@ export default function BoutiqueStorefront({
                 {activeSlide.eyebrow}
               </p>
 
-              <h1
-                className={`text-xl sm:text-2xl lg:text-[32px] font-bold leading-[1.28] text-[var(--ink-main)] ${
-                  isRtl ? "" : "font-editorial"
-                }`}
-              >
+              {/* size and leading come from .paper-studio-copy h1 */}
+              <h1 className="font-editorial font-bold text-[var(--ink-main)]">
                 {activeSlide.title}
               </h1>
 
@@ -258,18 +248,20 @@ export default function BoutiqueStorefront({
               <div className="flex flex-wrap items-center gap-4">
                 <a
                   href="#/shop"
+                  onClick={() => onSelectCategory(slideCategory)}
                   className="inline-flex items-center gap-2 rounded-[3px] bg-[var(--accent-crimson)] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
                 >
                   <span>{activeSlide.ctaPrimary}</span>
                   <ArrowForward className="h-4 w-4" aria-hidden="true" />
                 </a>
 
-                <a
-                  href="#favorites"
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("favorites")?.scrollIntoView({ behavior: "smooth" })}
                   className="text-sm font-semibold text-[var(--ink-main)] underline underline-offset-4 transition hover:text-[var(--accent-gold)] py-1.5"
                 >
                   {t.nav.newArrivals}
-                </a>
+                </button>
               </div>
 
               {/* Manual only: no autoplay, the customer decides when the picture changes */}
@@ -282,7 +274,7 @@ export default function BoutiqueStorefront({
                           (prev) => (prev - 1 + slides.length) % slides.length
                         )
                       }
-                      aria-label="Previous slide"
+                      aria-label={isRtl ? "تصویر قبلی" : "Previous slide"}
                       className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
                     >
                       <PrevIcon className="h-4 w-4" aria-hidden="true" />
@@ -292,7 +284,7 @@ export default function BoutiqueStorefront({
                       onClick={() =>
                         setSlideIdx((prev) => (prev + 1) % slides.length)
                       }
-                      aria-label="Next slide"
+                      aria-label={isRtl ? "تصویر بعدی" : "Next slide"}
                       className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
                     >
                       <NextIcon className="h-4 w-4" aria-hidden="true" />
@@ -384,13 +376,13 @@ export default function BoutiqueStorefront({
                           className="group absolute -translate-x-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center"
                         >
                           <span
-                            className={`relative flex h-7 w-7 items-center justify-center rounded-full border-2 border-white font-latin-ui text-[11px] font-bold shadow-md transition-transform group-hover:scale-110 ${
+                            className={`relative flex h-7 w-7 items-center justify-center rounded-full border-2 border-white font-latin-ui text-xs font-bold shadow-md transition-transform group-hover:scale-110 ${
                               selected
                                 ? "bg-[var(--accent-crimson)] text-white scale-110"
                                 : "bg-[#123126] text-[#F3E4BD]"
                             }`}
                           >
-                            {idx + 1}
+                            {formatNumber(idx + 1, lang)}
                           </span>
                         </button>
                       );
@@ -414,12 +406,12 @@ export default function BoutiqueStorefront({
                     <button
                       type="button"
                       onClick={() => onQuickView(activePinProduct, 0)}
-                      aria-label={activePinProduct[lang].title}
+                      aria-label={pinLoc.title}
                       className="block w-full overflow-hidden rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]"
                     >
                       <img
                         src={activePinProduct.image}
-                        alt={activePinProduct[lang].title}
+                        alt={pinLoc.title}
                         loading="lazy"
                         decoding="async"
                         width="400"
@@ -430,15 +422,15 @@ export default function BoutiqueStorefront({
 
                     <div>
                       <h3 className="text-base sm:text-lg font-bold text-[var(--ink-main)]">
-                        {activePinProduct[lang].title}
+                        {pinLoc.title}
                       </h3>
                       <p className="mt-1 text-xs text-[var(--ink-sub)]">
-                        {activePinProduct[lang].subtitle}
+                        {pinLoc.subtitle}
                       </p>
                     </div>
 
                     <p className="text-xs leading-relaxed text-[var(--ink-body)]">
-                      {activePinProduct[lang].description}
+                      {pinLoc.description}
                     </p>
                   </div>
 
@@ -459,6 +451,7 @@ export default function BoutiqueStorefront({
                     <button
                       type="button"
                       onClick={() => onAddToBag(activePinProduct, 0, 1)}
+                      disabled={activePinProduct.inStock === false}
                       className="w-full inline-flex items-center justify-center gap-2 rounded-[3px] bg-[var(--accent-deep)] border border-[var(--accent-gold)]/40 py-3 text-xs sm:text-sm font-semibold text-[#FAF6EE] transition hover:bg-[var(--accent-pine)]"
                     >
                       <ShoppingBag className="h-4 w-4 text-[#E7D19F]" aria-hidden="true" />
@@ -476,12 +469,9 @@ export default function BoutiqueStorefront({
       <BoutiqueExtras
         t={t}
         lang={lang}
-        products={visibleProducts}
         bundles={bundles}
-        socialGallery={socialGallery}
         onAddBundle={onAddBundle}
         onAddGiftCard={onAddGiftCard}
-        onQuickView={onQuickView}
       />
 
       <GalleryMosaic t={t} lang={lang} tiles={socialGallery} products={visibleProducts} onQuickView={onQuickView} />
@@ -510,9 +500,6 @@ export default function BoutiqueStorefront({
             </div>
 
             <div className="space-y-4 md:col-span-7 md:ps-6">
-              <p className="eyebrow text-[var(--accent-gold)]">
-                {activeStory.eyebrow}
-              </p>
               <h2 className="text-2xl sm:text-3xl font-bold leading-snug text-[var(--ink-main)]">
                 {activeStory.title}
               </h2>

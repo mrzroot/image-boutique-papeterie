@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import "./productMedia.test.mjs"; // ProductMedia mode rules (getMediaModes)
-import { calculatePrintQuote, getVolumeDiscountRate, formatPrice } from "./pricing.js";
+import { calculatePrintQuote, getVolumeDiscountRate, formatPrice, clampCount } from "./pricing.js";
 import {
   buildDefaultSiteContent,
   mergeSiteContent,
   hashPasscode,
   DEFAULT_ADMIN_PASSCODE,
+  isDefaultPasscodeHash,
 } from "./cmsStore.js";
 
 // Verify tiered discount boundaries
@@ -47,6 +48,17 @@ const overridden = calculatePrintQuote(
   }
 );
 assert.equal(overridden.total, Math.round((100 * 3000 + 100 * 500) * 0.9));
+
+// Integer-only pages/copies: decimals floor, junk/zero clamps to 1
+const fractional = calculatePrintQuote({ printType: "bw", sides: "single", binding: "none", pages: 2.5, copies: 0.4 });
+assert.equal(fractional.totalImpressions, 2);
+assert.equal(clampCount("", 5000), 1);
+assert.equal(clampCount(9999, 5000), 5000);
+
+// An override missing a print type id keeps that type's default rate (not colour)
+const partial = { printTypes: [{ id: "color", baseRate: 9999 }] };
+const bwDefault = { printType: "bw", sides: "single", paperStock: "tahrir80", binding: "none", pages: 100, copies: 1 };
+assert.equal(calculatePrintQuote(bwDefault, partial).total, calculatePrintQuote(bwDefault).total);
 
 // Verify plot disables duplex splitting and applies minimum floor
 const plot = calculatePrintQuote({
@@ -102,5 +114,32 @@ assert.equal(roundTripped.products[1].visible, true);
 const hashedDefault = await hashPasscode(DEFAULT_ADMIN_PASSCODE);
 assert.equal(hashedDefault, baseCms.settings.adminPasscodeHash);
 assert.equal(hashedDefault.length, 64);
+assert.ok(isDefaultPasscodeHash(hashedDefault));
+assert.ok(!isDefaultPasscodeHash(await hashPasscode("a-much-longer-passcode")));
+
+// Imported JSON is a trust boundary: malformed items are dropped per collection
+const ownHash = await hashPasscode("owner-passcode-123");
+const current = { ...buildDefaultSiteContent(), settings: { adminPasscodeHash: ownHash } };
+const imported = mergeSiteContent(current, {
+  products: [baseCms.products[0], { id: "no-title", fa: {} }, { fa: { title: "no id" } }, null, "x"],
+  servicesList: [baseCms.servicesList[0], { id: "no-fa" }],
+  tieredPriceRows: [baseCms.tieredPriceRows[0], { bwA4: 1 }],
+  heroSlides: [42],
+  promoCodes: [{ code: "OK5", percent: 5 }, { code: "BAD" }],
+  pricing: { printTypes: [{ id: "bw", baseRate: 2000 }, { baseRate: 1 }] },
+  shipping: { fee: "free", freeThreshold: 100 },
+});
+assert.deepEqual(imported.products.map((p) => p.id), [baseCms.products[0].id]);
+assert.equal(imported.servicesList.length, 1);
+assert.equal(imported.tieredPriceRows.length, 1);
+assert.equal(imported.heroSlides.length, baseCms.heroSlides.length); // all-invalid list keeps the current slides
+assert.deepEqual(imported.promoCodes, [{ code: "OK5", percent: 5 }]);
+assert.deepEqual(imported.pricing.printTypes, [{ id: "bw", baseRate: 2000 }]);
+assert.equal(imported.shipping.fee, baseCms.shipping.fee);
+assert.equal(imported.shipping.freeThreshold, 100);
+// No settings (or a malformed hash) in the import keeps the current passcode, never the public default
+assert.equal(imported.settings.adminPasscodeHash, ownHash);
+assert.equal(mergeSiteContent(current, { settings: { adminPasscodeHash: "1405" } }).settings.adminPasscodeHash, ownHash);
+assert.equal(mergeSiteContent(current, { settings: { adminPasscodeHash: hashedDefault } }).settings.adminPasscodeHash, hashedDefault);
 
 console.log("All pricing, CMS store, and formatting assertions passed.");

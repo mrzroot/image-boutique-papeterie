@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { Lock, Unlock, LayoutDashboard, Package, ShoppingBag, FileText, Printer, Images, UploadCloud, Store, Plus } from "lucide-react";
 import { STUDIO_IMAGE_PRESETS } from "../data/catalog";
 import { formatPrice, formatNumber } from "../utils/pricing";
-import { CMS_GH_KEY, hashPasscode, normalizeProduct } from "../utils/cmsStore";
+import { CMS_GH_KEY, hashPasscode, normalizeProduct, isDefaultPasscodeHash } from "../utils/cmsStore";
 import { ADMIN_STRINGS } from "./admin/strings";
 import { AdminCtx, cls, Card, photoIssue } from "./admin/ui";
 import ProductsPanel from "./admin/ProductsPanel";
@@ -22,9 +22,10 @@ function cloneObj(o) {
 }
 
 function createEmptyProduct() {
+  const stamp = Date.now().toString(36);
   return {
-    id: `prod-${Date.now().toString(36)}`,
-    sku: `IB-NEW-${Math.floor(100 + Math.random() * 899)}`,
+    id: `prod-${stamp}`,
+    sku: `IB-NEW-${stamp.toUpperCase()}`,
     category: "notebooks",
     modelType: "framed-box",
     specs3d: { fa: "نسخه جدید بوتیک", en: "New Boutique Edition" },
@@ -99,6 +100,7 @@ export default function AdminDashboard({
   onUpdateOrders,
   onNavigate,
   showToast,
+  onDirtyChange,
 }) {
   const s = ADMIN_STRINGS[lang] || ADMIN_STRINGS.fa;
   const [unlocked, setUnlocked] = useState(() => {
@@ -118,7 +120,14 @@ export default function AdminDashboard({
 
   const markBroken = useCallback((src) => setBroken((prev) => (prev.has(src) ? prev : new Set(prev).add(src))), []);
   const ctx = useMemo(() => ({ lang, s, t, broken, markBroken, notify: showToast }), [lang, s, t, broken, markBroken, showToast]);
-  const dirty = Boolean(editing) && (editing.isNew || JSON.stringify(editing.product) !== editing.baseline);
+  // New products count as dirty only once they differ from the blank template
+  const dirty = Boolean(editing) && JSON.stringify(editing.product) !== editing.baseline;
+
+  // Lets App confirm before hash navigation away from an unsaved product
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
+  useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
 
   useEffect(() => {
     const { token, ...rest } = ghConfig;
@@ -200,7 +209,14 @@ export default function AdminDashboard({
     if (!cleaned.en.variants?.length) cleaned.en.variants = [...(cleaned.fa.variants || [])];
     cleaned.specs3d = { ...(cleaned.specs3d || {}) };
     if (!cleaned.specs3d.en?.trim()) cleaned.specs3d.en = cleaned.specs3d.fa || cleaned.sku;
-    if (cleaned.variantImages?.[0] && !cleaned.image) cleaned.image = cleaned.variantImages[0];
+    // The main photo is derived from the first variant photo (the editor edits both as one)
+    if (cleaned.variantImages?.[0]) cleaned.image = cleaned.variantImages[0];
+
+    const sku = String(cleaned.sku || "").trim();
+    cleaned.sku = sku;
+    const others = (cmsContent.products || []).filter((p) => editing.isNew || p.id !== cleaned.id);
+    if (others.some((p) => p.id === cleaned.id)) return showToast(s.errDuplicateId);
+    if (others.some((p) => String(p.sku || "").trim().toLowerCase() === sku.toLowerCase())) return showToast(s.errDuplicateSku.replace("{sku}", sku));
 
     onUpdateContent((prev) => ({
       ...prev,
@@ -250,6 +266,7 @@ export default function AdminDashboard({
   }
 
   const products = cmsContent.products || [];
+  const defaultPasscode = isDefaultPasscodeHash(cmsContent.settings?.adminPasscodeHash);
   const needPhotos = products.filter((p) => photoIssue(p, broken)).length;
   const totalRevenue = orderHistory.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
 
@@ -286,6 +303,8 @@ export default function AdminDashboard({
             onPublished={onPublished}
             onUpdateContent={onUpdateContent}
             onDiscardDraft={onDiscardDraft}
+            dirty={dirty}
+            onCloseEditor={() => setEditing(null)}
           />
         );
       default:
@@ -302,6 +321,12 @@ export default function AdminDashboard({
             >
               {/* Only what needs the owner's attention; nothing is listed when there is nothing to do */}
               <ul className="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]">
+                {defaultPasscode && (
+                  <li role="alert" className="flex flex-wrap items-center justify-between gap-3 py-3">
+                    <span className="text-sm font-bold text-[var(--accent-crimson)]">{s.defaultPasscodeWarn}</span>
+                    <button type="button" onClick={() => setSection("publish")} className={cls.btnDanger}>{s.changePasscode}</button>
+                  </li>
+                )}
                 {needPhotos > 0 && (
                   <li className="flex flex-wrap items-center justify-between gap-3 py-3">
                     <span className="text-sm text-[var(--ink-body)]">{s.kpiNeedPhotos}: {formatNumber(needPhotos, lang)}</span>
@@ -314,7 +339,7 @@ export default function AdminDashboard({
                     <button type="button" onClick={() => setSection("publish")} className={cls.btn}>{s.navPublish}</button>
                   </li>
                 )}
-                {!needPhotos && !hasLocalDraft && <li className="py-3 text-sm text-[var(--ink-sub)]">{s.nothingToDo}</li>}
+                {!defaultPasscode && !needPhotos && !hasLocalDraft && <li className="py-3 text-sm text-[var(--ink-sub)]">{s.nothingToDo}</li>}
               </ul>
               <dl className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
                 {[
@@ -353,7 +378,7 @@ export default function AdminDashboard({
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <button type="button" onClick={() => confirmLeaveEditor() && onNavigate("store")} className={cls.btn}>
+            <button type="button" onClick={() => onNavigate("store")} className={cls.btn}>
               <Store className="h-3.5 w-3.5" aria-hidden="true" />
               <span>{s.viewStore}</span>
             </button>
@@ -385,10 +410,13 @@ export default function AdminDashboard({
                       <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                       <span className="whitespace-nowrap">{s[`nav_${id}`]}</span>
                       {flag && (
-                        <span
-                          className={`ms-auto h-2 w-2 shrink-0 rounded-full ${id === "products" || id === "media" ? "bg-[var(--accent-crimson)]" : "bg-[var(--accent-gold)]"}`}
-                          aria-label={id === "products" ? s.unsavedChanges : id === "media" ? s.kpiNeedPhotos : s.draftPendingShort}
-                        />
+                        <>
+                          <span
+                            className={`ms-auto h-2 w-2 shrink-0 rounded-full ${id === "products" || id === "media" ? "bg-[var(--accent-crimson)]" : "bg-[var(--accent-gold)]"}`}
+                            aria-hidden="true"
+                          />
+                          <span className="sr-only">({id === "products" ? s.unsavedChanges : id === "media" ? s.kpiNeedPhotos : s.draftPendingShort})</span>
+                        </>
                       )}
                     </button>
                   </li>

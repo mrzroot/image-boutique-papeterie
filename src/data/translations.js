@@ -2,11 +2,8 @@
   fa: {
     brandMain: "ایمیج بوتیک",
     brandEn: "IMAGE BOUTIQUE",
-    brandSub: "La Boutique Papeterie · گالری کاغذ و نوشت‌افزار",
     announcement:
-      "ارسال رایگان برای سفارش‌های بالای ۲,۵۰۰,۰۰۰ تومان · بوتیک رسمی کاغذ و نوشت‌افزار",
-    switchToServicesTop: "بخش خدمات چاپ ↗",
-    switchToStoreTop: "بازگشت به فروشگاه",
+      "ارسال رایگان برای سفارش‌های بالای ۲٬۵۰۰٬۰۰۰ تومان · بوتیک رسمی کاغذ و نوشت‌افزار",
     themeLight: "تم روشن",
     themeDark: "تم مشکی",
     nav: {
@@ -21,9 +18,8 @@
     bag: "سبد سفارش",
     wishlist: "علاقه‌مندی‌ها",
     lookbook: {
-      eyebrow: "تور تعاملی میز کار",
       title: "چیدمان «میز خلاقیتِ فلورانس» را لمس کنید",
-      desc: "روی هر نقطه طلایی روی تصویر کلیک کنید تا مشخصات، قیمت و امکان افزودن آنی به سبد خرید را ببینید.",
+      desc: "روی هر نقطه شماره‌دار روی تصویر کلیک کنید تا مشخصات، قیمت و امکان افزودن آنی به سبد خرید را ببینید.",
       pins: [
         {
           id: "nb-linen-forest",
@@ -59,6 +55,7 @@
         ctaPrimary: "مشاهده محصولات فروشگاه",
         badge: "کلکسیون ۱۴۰۵",
         image: "./images/hero-boutique.jpg",
+        category: "all",
       },
       {
         eyebrow: "نوشت‌افزار کلکسیونی",
@@ -67,6 +64,7 @@
         ctaPrimary: "خرید نوشت‌افزار لوکس",
         badge: "ساخت سوئیس",
         image: "./images/cat-pens.jpg",
+        category: "pens",
       },
       {
         eyebrow: "خلاقیت و بسته‌بندی",
@@ -75,6 +73,7 @@
         ctaPrimary: "خرید استیکر و بسته‌بندی",
         badge: "منتخب بوتیک",
         image: "./images/cat-gift-packaging.jpg",
+        category: "stickers",
       },
     ],
     valueStrip: [
@@ -91,18 +90,15 @@
         desc: "مجموعه‌ای از برندها و ابزارهای برگزیده تحریر و هنرهای کاغذی",
       },
     ],
-    favoritesEyebrow: "محبوب‌ترین‌های بوتیک",
     favoritesTitle: "برگزیده‌های مشتریان در ویترین فروشگاه",
     favoritesSubtitle: "پرفروش‌ترین محصولات آماده ارسال در ایمیج بوتیک",
     bundles: {
-      eyebrow: "پک‌های هدیه و ست اقتصادی",
       title: "ست‌های دست‌چین بوتیک با ۱۵٪ تخفیف پکیج",
       subtitle: "ترکیب‌های هماهنگ برای هدیه‌دادن یا تکمیل میز کار با بسته‌بندی اختصاصی",
       saveLabel: "۱۵٪ تخفیف پک",
       addBundleBtn: "افزودن پک به سبد خرید",
     },
     giftCard: {
-      eyebrow: "کارت هدیه دیجیتال بوتیک",
       title: "هدیه‌ای به سلیقه خودشان با کارت هدیه ایمیج بوتیک",
       desc: "مبلغ، رنگ کارت و نام گیرنده را انتخاب کنید تا کارت هدیه به سبد شما اضافه شود. کد کارت پس از تأیید سفارش توسط بوتیک صادر می‌شود.",
       amountLabel: "انتخاب مبلغ اعتبار کارت هدیه",
@@ -116,20 +112,16 @@
       cardBadge: "کارت هدیه دیجیتال",
     },
     socialSection: {
-      eyebrow: "گالری الهام روزانه",
-      title: "از میز کار مشتریان و کلکسیون‌های جدید",
+      title: "از میز کار بوتیک و کلکسیون‌های جدید",
       hint: "برای مشاهده محصول روی هر تصویر کلیک کنید",
     },
     categoriesTitle: "کلکسیون‌های فروشگاه",
     categoriesSubtitle: "هر بخش با وسواس یک گالری کاغذ و نوشت‌افزار چیده شده است",
-    categoriesEyebrow: "دسته‌بندی‌ها",
     newArrivals: {
-      eyebrow: "تازه‌های ویترین",
       title: "تازه رسیده‌ها",
       subtitle: "جدیدترین کاغذها و ابزارهایی که به قفسه‌های بوتیک اضافه شده‌اند",
     },
     trust: {
-      eyebrow: "چرا ایمیج بوتیک",
       title: "خرید با خیال آسوده",
       shippingTitle: "ارسال رایگان",
       shipping: "برای سفارش‌های بالای",
@@ -161,7 +153,6 @@
       packaging: "باکس و بسته‌بندی",
       printmaking: "ابزار چاپ دستی",
     },
-    catalogEyebrow: "ویترین فروشگاهی",
     catalogTitle: "منتخب ویترین ایمیج بوتیک",
     sortOptions: {
       featured: "پیشنهاد بوتیک",
@@ -175,37 +166,26 @@
       limited: "نسخه محدود",
     },
     addToBag: "افزودن به سبد",
-    quickView: "جزئیات",
-    selectedColorLabel: "مدل:",
+    quickView: "مشاهده سریع",
     noProductsFound: "محصولی با این فیلتر یافت نشد. فیلترها را پاک کنید.",
     clearFilters: "نمایش همه محصولات",
-    storyEyebrow: "فلسفه ایمیج بوتیک",
     storyTitle: "جایی که بوتیک کاغذِ پاریس و فلورانس با دقتِ چاپ‌خانه تلاقی می‌کند",
     storyBody:
       "ایمیج بوتیک (La Boutique Papeterie) تنها یک فروشگاه لوازم‌التحریر نیست؛ پناهگاهی برای دوست‌داران بافت کاغذ، بوی مرکب، هدیه‌دادنِ باسلیقه و پروژه‌های خلاقانه است. علاوه بر ویترین آماده محصولات کلکسیونی، آتلیه خدمات چاپ و صحافی ما آماده اجرای دقیق ایده‌های چاپی و بسته‌بندی برند شماست.",
-    gatewayEyebrow: "مدخل بخش خدماتی",
     gatewayTitle: "نیاز به چاپ اختصاصی، صحافی پایان‌نامه یا بسته‌بندی برند دارید؟",
     gatewayDesc:
       "برای چاپ دیجیتال رنگی و سیاه‌وسفید، پلات معماری، صحافی جلد سخت، تولید استیکر اختصاصی و محاسبه آنلاین تعرفه وارد آتلیه خدمات چاپ شوید.",
-    gatewayChips: [
-      "چاپ دیجیتال A5 / A4 / A3",
-      "صحافی فنر دوبل و جلد سخت",
-      "برش استیکر و لیبل اختصاصی",
-      "طلاکوب ساک دستی و باکس هدیه",
-    ],
     gatewayButton: "ورود به بخش خدماتی و محاسبه‌گر تعرفه",
-    servicesHeroEyebrow: "بخش خدماتی ایمیج بوتیک",
     servicesHeroTitle: "آتلیه خدمات تخصصی چاپ، صحافی و بسته‌بندی سفارشی",
     servicesHeroDesc:
-      "تعرفه شفاف و پلکانی، کاغذهای استاندارد و فانتزی بوتیک، آپلود آنلاین فایل و ثبت سفارش فوری در یک سبد واحد.",
+      "تعرفه شفاف و پلکانی، کاغذهای استاندارد و فانتزی بوتیک، برآورد آنی قیمت و ثبت سفارش در همان سبد خرید فروشگاه.",
     backToStorefront: "بازگشت به ویترین فروشگاهی",
     trustBar: [
-      { title: "تحویل فوری از ۳ ساعت", sub: "پیک اختصاصی و تحویل حضوری" },
+      { title: "آماده‌سازی از ۴ ساعت", sub: "پیک اختصاصی و تحویل حضوری" },
       { title: "فاکتور رسمی سازمانی", sub: "مناسب شرکت‌ها و گالری‌ها" },
       { title: "تخفیف پلکانی تا ۳۰٪", sub: "محاسبه خودکار در تیراژ بالا" },
       { title: "تضمین کیفیت و کاغذ", sub: "کنترل رنگ قبل از چاپ نهایی" },
     ],
-    calcEyebrow: "محاسبه‌گر آنلاین تعرفه",
     calcTitle: "پیکربندی و محاسبه فوری هزینه چاپ",
     calcLabels: {
       printType: "نوع چاپ",
@@ -217,7 +197,7 @@
       copies: "تعداد نسخه / جلد",
       uploadTitle: "آپلود فایل چاپی (اختیاری برای برآورد و ثبت)",
       uploadHint:
-        "PDF، PNG، JPG، AI یا ZIP تا ۵۰ مگابایت؛ فایل به‌صورت امن ضمیمه سفارش می‌شود",
+        "PDF، PNG، JPG، AI یا ZIP؛ فقط نام فایل در سفارش ثبت می‌شود و خود فایل را بعد از ثبت برای بوتیک بفرستید",
       chooseFile: "انتخاب فایل از سیستم",
       removeFile: "حذف فایل",
       monogramTitle: "عنوان یا مونوگرام اختصاصی جلد (اختیاری)",
@@ -227,11 +207,11 @@
       previewDragHint: "برای چرخش سه‌بعدی بکشید",
       previewAngles: {
         iso: "سه‌بعدی",
-        front: "روبرو",
+        front: "روبه‌رو",
         spine: "عطف و صحافی",
         spin: "چرخش",
       },
-      previewDefaultTitle: "ATELIER EDITION",
+      previewDefaultTitle: "نسخه آتلیه",
     },
     printTypeNames: {
       bw: "سیاه‌وسفید دیجیتال",
@@ -258,7 +238,6 @@
       hardcover: "جلد سخت کتان + طلاکوب",
     },
     orderSummary: {
-      eyebrow: "خلاصه سفارش",
       title: "پیش‌فاکتور زنده سفارش چاپ",
       impressions: "مجموع ایمپرشن (صفحه × نسخه)",
       sheets: "تعداد شیت مصرفی",
@@ -272,8 +251,7 @@
       jobAddedToast: "سفارش چاپ با مشخصات فنی به سبد خرید اضافه شد.",
       nextTierHint: "برای دریافت تخفیف بیشتر، صفحه یا نسخه اضافه کنید:",
     },
-    servicesSectionEyebrow: "فهرست خدمات آتلیه",
-    servicesSectionTitle: "۶ سرویس اصلی بخش خدماتی",
+    servicesSectionTitle: "سرویس‌های اصلی بخش خدماتی",
     startingFrom: "شروع از",
     priceTableTitle: "جدول تعرفه پلکانی چاپ A4 (تومان)",
     priceTableCols: {
@@ -282,15 +260,14 @@
       color: "رنگی آتلیه",
       discount: "تخفیف",
     },
-    wholesaleEyebrow: "همکاری سازمانی",
     wholesaleTitle: "پکیج‌های سازمانی، نشر بوتیک و قراردادهای ماهانه",
     wholesaleDesc:
       "تأمین ست هدیه مدیران، دفترهای اختصاصی با نشان شرکت، چاپ کاتالوگ گالری‌ها و پاکت‌های ممهور با تخفیف قرارداد سالانه.",
     kpis: [
-      { value: "۸۰–۳۰۰g", label: "گرماژ کاغذ تحریر، گلاسه و کتان" },
+      { value: "۸۰–۳۰۰ گرم", label: "گرماژ کاغذ تحریر، گلاسه و کتان" },
       { value: "A5–A3", label: "قطع‌های چاپ دیجیتال و پلات" },
       { value: "۱۰ عدد", label: "حداقل تیراژ طلاکوب و باکس بوتیک" },
-      { value: "۳ ساعت", label: "تحویل فوری چاپ دیجیتال زیر ۶۰۰ برگ" },
+      { value: "۴ ساعت", label: "آماده‌سازی چاپ دیجیتال تا ۶۰۰ صفحه چاپی" },
     ],
     faqTitle: "پرسش‌های متداول فروشگاه و بخش خدماتی",
     newsletterTitle: "عضویت در خبرنامه کاغذ و کلکسیون‌های محدود",
@@ -321,10 +298,9 @@
       freeShippingUnlocked: "ارسال رایگان بوتیک برای شما فعال شد",
       giftWrapTitle: "بسته‌بندی کادویی با کاغذ فلورانس و مهر موم لاکی",
       giftWrapPrice: 85000,
-      promoPlaceholder: "کد تخفیف (مثلاً BOUTIQUE10)",
+      promoPlaceholder: "کد تخفیف",
       promoApply: "اعمال",
-      promoApplied: "تخفیف ۱۰٪ فعال شد",
-      promoInvalid: "کد نامعتبر (کد فعال: BOUTIQUE10)",
+      promoInvalid: "این کد معتبر نیست",
       shippingLabel: "هزینه ارسال",
       shippingFree: "رایگان",
       shippingFee: 95000,
@@ -363,11 +339,8 @@
   en: {
     brandMain: "Image Boutique",
     brandEn: "IMAGE BOUTIQUE",
-    brandSub: "La Boutique Papeterie · Fine Stationery & Print Atelier",
     announcement:
       "Complimentary delivery on orders over 2.5M Toman · Official Stationery Boutique",
-    switchToServicesTop: "Print Services Portal ↗",
-    switchToStoreTop: "Back to Storefront",
     themeLight: "Light",
     themeDark: "Obsidian",
     nav: {
@@ -378,13 +351,12 @@
       servicesPortal: "Services Portal",
     },
     searchPlaceholder: "Search boutique stationery (e.g. Florentine, Pen, Journal...)",
-    searchTags: ["Florentine", "Brass Pen", "Journal", "Washi", "Gift Box"],
+    searchTags: ["Florentine", "Fountain Pen", "Journal", "Washi", "Gift Box"],
     bag: "Order Bag",
     wishlist: "Saved",
     lookbook: {
-      eyebrow: "Interactive lookbook",
       title: "Touch & Shop the Florentine Desk Edit",
-      desc: "Select any brass pin on the flat-lay to inspect craftsmanship details, pricing, and add directly to your order bag.",
+      desc: "Select any numbered pin on the flat-lay to inspect craftsmanship details, pricing, and add directly to your order bag.",
       pins: [
         {
           id: "nb-linen-forest",
@@ -420,6 +392,7 @@
         ctaPrimary: "Shop Boutique Collection",
         badge: "Autumn Collection",
         image: "./images/hero-boutique.jpg",
+        category: "all",
       },
       {
         eyebrow: "Writing instruments",
@@ -428,6 +401,7 @@
         ctaPrimary: "Shop Writing Instruments",
         badge: "Swiss Heritage",
         image: "./images/cat-pens.jpg",
+        category: "pens",
       },
       {
         eyebrow: "Creative packaging",
@@ -436,6 +410,7 @@
         ctaPrimary: "Shop Stickers & Packaging",
         badge: "Boutique Curated",
         image: "./images/cat-gift-packaging.jpg",
+        category: "stickers",
       },
     ],
     valueStrip: [
@@ -452,18 +427,15 @@
         desc: "Curated writing instruments and tactile gift wrapping essentials",
       },
     ],
-    favoritesEyebrow: "Boutique favorites",
     favoritesTitle: "Client Favorites in the Boutique",
     favoritesSubtitle: "Ready-to-ship bestsellers curated by Image Boutique",
     bundles: {
-      eyebrow: "Curated gift sets",
       title: "Signature Boutique Coffrets (Save 15%)",
       subtitle: "Thoughtfully paired stationery sets wrapped and ready for gifting",
       saveLabel: "Save 15%",
       addBundleBtn: "Add Coffret to Bag",
     },
     giftCard: {
-      eyebrow: "Digital gift card",
       title: "Gift the Joy of Fine Paper with an Image Boutique E-Card",
       desc: "Personalize the card finish, denomination, and recipient name, then add it to your order bag. The card code is issued by the boutique once your order is confirmed.",
       amountLabel: "Select Gift Card Value",
@@ -477,20 +449,16 @@
       cardBadge: "Digital Gift Card",
     },
     socialSection: {
-      eyebrow: "Studio journal",
-      title: "From Our Community Desks",
+      title: "From the Boutique Desk",
       hint: "Click any photo to inspect the featured item",
     },
     categoriesTitle: "Curated Collections",
     categoriesSubtitle: "Every aisle curated like an independent European paper gallery",
-    categoriesEyebrow: "Categories",
     newArrivals: {
-      eyebrow: "Just in",
       title: "New arrivals",
       subtitle: "The latest papers and tools to reach the boutique shelves",
     },
     trust: {
-      eyebrow: "Why Image Boutique",
       title: "Shop with confidence",
       shippingTitle: "Free shipping",
       shipping: "On orders over",
@@ -498,7 +466,7 @@
     },
     atelierIntro: {
       eyebrow: "Print & bindery atelier",
-      points: ["Colour and mono digital print", "Hardcover and wire binding", "Sticker and label cutting", "Foil-stamped bags and boxes"],
+      points: ["Color and mono digital print", "Hardcover and wire binding", "Sticker and label cutting", "Foil-stamped bags and boxes"],
     },
     productPage: {
       back: "Back to the boutique",
@@ -522,7 +490,6 @@
       packaging: "Gift Boxes & Seals",
       printmaking: "Printmaking Studio",
     },
-    catalogEyebrow: "Boutique showcase",
     catalogTitle: "Boutique Collection",
     sortOptions: {
       featured: "Boutique Curated",
@@ -537,36 +504,25 @@
     },
     addToBag: "Add to Bag",
     quickView: "Quick View",
-    selectedColorLabel: "Edition:",
     noProductsFound: "No items match your current filter.",
     clearFilters: "Reset Filters",
-    storyEyebrow: "Heritage & craft",
     storyTitle: "Where Parisian & Florentine Paper Craft Meets Precision Printing",
     storyBody:
       "Image Boutique (La Boutique Papeterie) is both an aesthetic haven for paper lovers and a full-spectrum bespoke print atelier. Browse ready-to-ship European stationery in our storefront, or enter our dedicated Services Portal whenever you need calibrated digital printing, bookbinding, or foil-stamped brand packaging.",
-    gatewayEyebrow: "Services portal",
     gatewayTitle: "Looking for Custom Printing, Bookbinding or Branded Packaging?",
     gatewayDesc:
       "Enter our dedicated Print Atelier for live tiered quote calculation, digital color & B&W press, architectural plotting, hardcover thesis binding, and custom die-cut stickers.",
-    gatewayChips: [
-      "Digital Print A5 / A4 / A3",
-      "Spiral & Foil Hardcover Binding",
-      "Kiss-Cut Stickers & Labels",
-      "Branded Carry Bags & Boxes",
-    ],
     gatewayButton: "Enter Print & Bespoke Services",
-    servicesHeroEyebrow: "Services portal",
     servicesHeroTitle: "Bespoke Digital Printing, Bookbinding & Brand Packaging",
     servicesHeroDesc:
-      "Transparent tiered pricing, fine cotton & specialty paper stocks, instant file attachment, and unified checkout alongside your boutique cart.",
+      "Transparent tiered pricing, fine cotton & specialty paper stocks, an instant quote, and one checkout shared with your boutique cart.",
     backToStorefront: "Back to Boutique Storefront",
     trustBar: [
-      { title: "3-Hour Express Turnaround", sub: "Same-day courier or studio pickup" },
+      { title: "Ready in as Little as 4 Hours", sub: "Same-day courier or studio pickup" },
       { title: "Official Corporate Invoices", sub: "Tailored for studios & enterprises" },
       { title: "Up to 30% Tiered Savings", sub: "Automatic volume discounts" },
       { title: "Calibrated Quality Check", sub: "Pre-press inspection on every file" },
     ],
-    calcEyebrow: "Instant quote",
     calcTitle: "Configure & Price Your Custom Print Job",
     calcLabels: {
       printType: "Print Mode",
@@ -578,7 +534,7 @@
       copies: "Copies / Books",
       uploadTitle: "Attach Print Artwork (Optional for Instant Quote)",
       uploadHint:
-        "PDF, PNG, JPG, AI or ZIP up to 50MB, attached cleanly to your order spec",
+        "PDF, PNG, JPG, AI or ZIP. Only the file name is recorded with the order; send the file itself to the shop after ordering",
       chooseFile: "Select File",
       removeFile: "Remove",
       monogramTitle: "Optional Cover Title / Foil Monogram",
@@ -619,7 +575,6 @@
       hardcover: "Cloth Hardcover + Gold Foil",
     },
     orderSummary: {
-      eyebrow: "Order summary",
       title: "Live Print Estimate",
       impressions: "Total Impressions",
       sheets: "Physical Sheets",
@@ -633,8 +588,7 @@
       jobAddedToast: "Custom print job added to your order bag.",
       nextTierHint: "Next volume savings threshold:",
     },
-    servicesSectionEyebrow: "Our services",
-    servicesSectionTitle: "6 Specialized Atelier Capabilities",
+    servicesSectionTitle: "Specialized Atelier Services",
     startingFrom: "From",
     priceTableTitle: "A4 Tiered Print Rate Card (Toman)",
     priceTableCols: {
@@ -643,7 +597,6 @@
       color: "Fine Color",
       discount: "Savings",
     },
-    wholesaleEyebrow: "Wholesale & contracts",
     wholesaleTitle: "Corporate Gifting, Publishing & Retainer Accounts",
     wholesaleDesc:
       "Equip your studio or company with foil-stamped notebooks, gallery catalogs, custom wax-sealed welcome kits, and priority monthly print retainers.",
@@ -651,7 +604,7 @@
       { value: "80–300g", label: "Uncoated, Silk & Cotton Stocks" },
       { value: "A5–A3", label: "Digital Press & Archival Plot Sizes" },
       { value: "10 pcs", label: "Minimum Boutique Foil & Box Run" },
-      { value: "3 hrs", label: "Express Digital Turnaround (<600p)" },
+      { value: "4 hrs", label: "Digital Print Turnaround (up to 600 impressions)" },
     ],
     faqTitle: "Storefront & Print Atelier FAQ",
     newsletterTitle: "Join the Papeterie Dispatch",
@@ -683,10 +636,9 @@
       freeShippingUnlocked: "Complimentary Boutique Delivery Unlocked",
       giftWrapTitle: "Florentine Paper Gift Wrap & Hand-Poured Wax Seal",
       giftWrapPrice: 85000,
-      promoPlaceholder: "Promo code (try BOUTIQUE10)",
+      promoPlaceholder: "Promo code",
       promoApply: "Apply",
-      promoApplied: "10% discount applied",
-      promoInvalid: "Invalid code (try BOUTIQUE10)",
+      promoInvalid: "This code is not valid",
       shippingLabel: "Delivery",
       shippingFree: "Complimentary",
       shippingFee: 95000,

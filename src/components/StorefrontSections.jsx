@@ -4,9 +4,9 @@ import { CATEGORIES } from "../data/catalog";
 import { formatNumber, formatPrice } from "../utils/pricing";
 import ProductCard from "./ProductCard";
 
-export function SectionHead({ title, subtitle, align = "start", action = null }) {
+export function SectionHead({ title, subtitle, action = null }) {
   return (
-    <div className={`section-head ${align === "center" ? "items-center text-center" : ""}`}>
+    <div className="section-head">
       <div className="min-w-0">
         <h2 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">{title}</h2>
         {subtitle && <p className="mt-2 max-w-xl text-sm text-[var(--ink-sub)]">{subtitle}</p>}
@@ -125,8 +125,7 @@ export function AtelierIntro({ t, lang, onEnterServices }) {
         </div>
         <div className="flex items-center">
           <div className="atelier-copy py-12 lg:py-16">
-            <p className="eyebrow text-[#E7D19F]">{t.atelierIntro.eyebrow}</p>
-            <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-white">{t.gatewayTitle}</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">{t.gatewayTitle}</h2>
             <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#D7E3DC]">{t.gatewayDesc}</p>
             <ul className="mt-6 grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
               {t.atelierIntro.points.map((pt) => (

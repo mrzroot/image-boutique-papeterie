@@ -138,7 +138,7 @@ export default function ProductMedia({ product, variantIdx = 0, lang = "fa", com
         </div>
       )}
 
-      {!accurateMode && <p className="text-[11px] text-[var(--ink-sub)]">{s.noModel}</p>}
+      {!accurateMode && <p className="text-xs text-[var(--ink-sub)]">{s.noModel}</p>}
     </div>
   );
 }
@@ -185,7 +185,9 @@ function SpinViewer({ images, s, heightClass }) {
     images.forEach((src) => {
       new Image().src = src;
     });
-  }, [images]);
+    // keyed on the URLs, not the array identity: the parent builds a new array on every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images.join("|")]);
 
   const go = (f) => setFrame(((f % n) + n) % n);
   return (
@@ -216,7 +218,7 @@ function SpinViewer({ images, s, heightClass }) {
       className={`relative w-full overflow-hidden rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] cursor-grab active:cursor-grabbing touch-none select-none focus-visible:outline-2 focus-visible:outline-[var(--accent-pine)] ${heightClass}`}
     >
       <img src={images[frame]} alt="" draggable={false} className="h-full w-full object-contain" />
-      <span className="pointer-events-none absolute bottom-2 end-2 text-[11px] text-[var(--ink-sub)]">{s.spinHint}</span>
+      <span className="pointer-events-none absolute bottom-2 end-2 text-xs text-[var(--ink-sub)]">{s.spinHint}</span>
     </div>
   );
 }

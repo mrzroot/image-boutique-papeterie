@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Download, Trash2 } from "lucide-react";
-import { formatPrice } from "../../utils/pricing";
+import { formatPrice, formatNumber } from "../../utils/pricing";
 import { cls, useAdmin, Card, TextField } from "./ui";
 
 const STATUSES = ["pending", "preparing", "shipped", "delivered"];
@@ -10,8 +10,11 @@ export function downloadJson(data, filename) {
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+  // Firefox needs the anchor in the document; revoking right away can cancel the download
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export default function OrdersPanel({ cmsContent, orderHistory, onUpdateOrders, onUpdateContent }) {
@@ -102,7 +105,8 @@ export default function OrdersPanel({ cmsContent, orderHistory, onUpdateOrders, 
                   <ul className="space-y-0.5 border-t border-[var(--border-subtle)] pt-1.5 text-xs text-[var(--ink-body)]">
                     {ord.items.map((line, lIdx) => (
                       <li key={lIdx}>
-                        {line.qty}× {line.title} ({line.meta})
+                        {formatNumber(line.qty, lang)}× {line.title}
+                        {line.meta ? ` (${line.meta})` : ""}
                       </li>
                     ))}
                   </ul>
@@ -121,7 +125,7 @@ export default function OrdersPanel({ cmsContent, orderHistory, onUpdateOrders, 
         <Card title={s.promoCodes}>
           <div className="grid grid-cols-[minmax(0,1fr)_5rem_auto] items-end gap-2">
             <TextField label={s.code} dir="ltr" placeholder="SPRING15" value={newPromo.code} onChange={(v) => setNewPromo((p) => ({ ...p, code: v }))} />
-            <TextField label="%" type="number" min={1} max={90} value={newPromo.percent} onChange={(v) => setNewPromo((p) => ({ ...p, percent: v }))} />
+            <TextField label="%" type="number" min={0} max={90} value={newPromo.percent} onChange={(v) => setNewPromo((p) => ({ ...p, percent: v }))} />
             <button type="button" onClick={addPromo} className={cls.btnPrimary}>
               {s.add}
             </button>
@@ -129,8 +133,8 @@ export default function OrdersPanel({ cmsContent, orderHistory, onUpdateOrders, 
           <ul className="space-y-1.5">
             {promoCodes.map((pc, idx) => (
               <li key={pc.code + idx} className={`${cls.sub} flex items-center justify-between gap-2 py-2 text-sm`}>
-                <span className="font-bold" dir="ltr">
-                  {pc.code} ({pc.percent}%)
+                <span className="font-bold">
+                  <span dir="ltr">{pc.code}</span> ({formatNumber(pc.percent, lang)}{lang === "fa" ? "٪" : "%"})
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
@@ -177,6 +181,7 @@ export default function OrdersPanel({ cmsContent, orderHistory, onUpdateOrders, 
               key={key}
               label={label}
               type="number"
+              min={0}
               value={cmsContent.shipping?.[key] ?? 0}
               onChange={(v) => onUpdateContent((prev) => ({ ...prev, shipping: { ...prev.shipping, [key]: v } }))}
             />

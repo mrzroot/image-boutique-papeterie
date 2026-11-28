@@ -14,7 +14,7 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { CATEGORIES } from "../data/catalog";
-import { formatPrice } from "../utils/pricing";
+import { formatPrice, formatNumber } from "../utils/pricing";
 
 function BrandCrest() {
   return (
@@ -73,7 +73,11 @@ export default function Header({
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "Escape") setSearchOpen(false);
+      if (e.key === "Escape") {
+        setSearchOpen(false);
+        setCollectionsOpen(false);
+        setMobileMenuOpen(false);
+      }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setSearchOpen((prev) => !prev);
@@ -94,12 +98,8 @@ export default function Header({
     ? products.filter((p) => {
         if (p.visible === false) return false;
         const q = searchQuery.trim().toLowerCase();
-        const loc = p[lang] || p.fa;
-        return (
-          loc.title.toLowerCase().includes(q) ||
-          loc.subtitle.toLowerCase().includes(q) ||
-          p.sku.toLowerCase().includes(q)
-        );
+        const loc = p[lang] || p.fa || {};
+        return [loc.title, loc.subtitle, p.sku].some((v) => (v || "").toLowerCase().includes(q));
       }).slice(0, 4)
     : [];
 
@@ -115,8 +115,8 @@ export default function Header({
         className="text-[#FAF6EE] text-xs border-b border-[var(--accent-gold)]/25"
         style={{ backgroundColor: "var(--topbar-bg)" }}
       >
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-1.5 sm:px-6">
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-1.5 sm:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <a
               href={cleanTelHref}
               className="hidden items-center gap-1.5 text-[#D8E5DD] hover:text-white sm:inline-flex font-latin-ui transition"
@@ -126,12 +126,12 @@ export default function Header({
               <span>{contactPhone}</span>
             </a>
             <span className="hidden text-white/20 sm:inline" aria-hidden="true">|</span>
-            <p className="truncate max-w-[46vw] sm:max-w-none text-[#F2EFE8]">
+            <p className="min-w-0 truncate text-[#F2EFE8]">
               {announcement || t.announcement}
             </p>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             {/* Admin entry: owner-only (draft in this browser) — customers use the store */}
             {(hasLocalDraft || view === "admin") && (
             <button
@@ -159,7 +159,7 @@ export default function Header({
             <button
               type="button"
               onClick={onToggleTheme}
-              aria-label="Toggle Theme"
+              aria-label={theme === "light" ? t.themeDark : t.themeLight}
               className="inline-flex items-center gap-1 rounded-[3px] border border-white/25 bg-white/10 px-2 py-0.5 text-xs font-semibold text-[#FAF6EE] transition hover:bg-white/20"
             >
               {theme === "light" ? (
@@ -178,7 +178,7 @@ export default function Header({
             <button
               type="button"
               onClick={onToggleLang}
-              aria-label="Toggle Language"
+              aria-label={lang === "fa" ? "FA / EN، تغییر زبان به انگلیسی" : "FA / EN, switch to Persian"}
               className="inline-flex items-center gap-1 rounded-[3px] border border-[#D6B36A]/50 px-2 py-0.5 text-xs font-semibold tracking-wider text-white transition hover:bg-[#D6B36A] hover:text-[#123126] font-latin-ui"
             >
               <span
@@ -235,6 +235,7 @@ export default function Header({
             <button
               type="button"
               aria-expanded={collectionsOpen}
+              aria-haspopup="true"
               onClick={() => setCollectionsOpen((o) => !o)}
               className="inline-flex items-center gap-1 transition hover:text-[var(--accent-gold)] whitespace-nowrap"
             >
@@ -254,7 +255,7 @@ export default function Header({
                       <div className="flex items-center gap-3">
                         <img
                           src={cat.image}
-                          alt={t.categoryNames[cat.id]}
+                          alt=""
                           width="36"
                           height="36"
                           className="h-9 w-9 rounded-[3px] object-cover border border-[var(--border-subtle)]"
@@ -300,7 +301,7 @@ export default function Header({
           type="button"
           onClick={() => setMobileMenuOpen((v) => !v)}
           className="inline-flex h-11 w-11 items-center justify-center rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--ink-main)] md:hidden"
-          aria-label="Menu"
+          aria-label={lang === "fa" ? "منو" : "Menu"}
           aria-expanded={mobileMenuOpen}
         >
           {mobileMenuOpen ? (
@@ -323,7 +324,7 @@ export default function Header({
             <span className="brand-mark text-base sm:text-lg lg:text-xl text-[var(--ink-main)] group-hover:text-[var(--accent-gold)] transition">
               {t.brandEn}
             </span>
-            <span className="font-editorial italic text-xs sm:text-xs lg:text-[13px] text-[var(--accent-pine)] tracking-wide">
+            <span className="font-editorial italic text-xs lg:text-[13px] text-[var(--accent-pine)] tracking-wide">
               La Boutique Papeterie
             </span>
           </div>
@@ -334,7 +335,7 @@ export default function Header({
           <button
             type="button"
             onClick={() => setSearchOpen((prev) => !prev)}
-            aria-label="Search"
+            aria-label={lang === "fa" ? "جستجو" : "Search"}
             aria-expanded={searchOpen}
             className={`inline-flex h-11 w-11 sm:h-10 sm:w-10 items-center justify-center rounded-[3px] border transition ${
               searchOpen
@@ -363,8 +364,8 @@ export default function Header({
               className={`h-4 w-4 ${wishlistOnly ? "fill-current" : ""}`}
             />
             {wishlistCount > 0 && (
-              <span className="tabular-nums absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent-pine)] px-1 text-[11px] font-bold text-white font-latin-ui">
-                {wishlistCount}
+              <span className="tabular-nums absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent-pine)] px-1 text-xs font-bold text-white font-latin-ui">
+                {formatNumber(wishlistCount, lang)}
               </span>
             )}
           </button>
@@ -373,13 +374,13 @@ export default function Header({
             type="button"
             onClick={onOpenBag}
             aria-label={t.bag}
-            className="relative inline-flex h-11 sm:h-10 items-center gap-2 rounded-[3px] border border-[var(--accent-gold)]/45 bg-[var(--accent-deep)] px-3.5 text-xs sm:text-sm font-semibold text-[#FAF6EE] transition hover:bg-[var(--accent-pine)]"
+            className="relative inline-flex h-11 sm:h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-[3px] border border-[var(--accent-gold)]/45 bg-[var(--accent-deep)] px-3.5 text-xs sm:text-sm font-semibold text-[#FAF6EE] transition hover:bg-[var(--accent-pine)]"
           >
             <ShoppingBag className="h-4 w-4 text-[#E7D19F]" aria-hidden="true" />
             <span className="hidden sm:inline">{t.bag}</span>
             {cartCount > 0 && (
               <span className="tabular-nums inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--accent-crimson)] px-1.5 text-xs font-bold text-white font-latin-ui">
-                {cartCount}
+                {formatNumber(cartCount, lang)}
               </span>
             )}
           </button>
@@ -449,7 +450,7 @@ export default function Header({
                   >
                     <img
                       src={prod.image}
-                      alt={prod[lang].title}
+                      alt=""
                       width="48"
                       height="48"
                       className="h-12 w-12 rounded-[3px] object-cover bg-[var(--bg-soft)]"
@@ -458,7 +459,7 @@ export default function Header({
                       <p className="truncate text-xs font-bold text-[var(--ink-main)]">
                         {(prod[lang] || prod.fa).title}
                       </p>
-                      <p className="tabular-nums text-xs font-semibold text-[var(--accent-gold)]">
+                      <p className="tabular-nums text-xs font-semibold text-[var(--accent-gold-ink)]">
                         {formatPrice(prod.price, lang)}
                       </p>
                     </div>

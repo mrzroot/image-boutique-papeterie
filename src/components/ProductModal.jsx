@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   X,
   Heart,
@@ -9,7 +9,7 @@ import {
   Share2,
   CheckCircle2,
 } from "lucide-react";
-import { formatPrice } from "../utils/pricing";
+import { formatPrice, formatNumber } from "../utils/pricing";
 import ProductMedia from "./ProductMedia";
 
 export default function ProductModal({
@@ -27,18 +27,41 @@ export default function ProductModal({
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(initialVariantIdx);
   const [qty, setQty] = useState(1);
   const [copiedLink, setCopiedLink] = useState(false);
+  const dialogRef = useRef(null);
+  const fa = lang === "fa";
 
   useEffect(() => {
     setSelectedVariantIdx(initialVariantIdx);
     setQty(1);
   }, [product.id, initialVariantIdx]);
 
+  // Modal behaviour: focus moves in, Tab stays inside, Escape closes, page behind does not scroll, focus returns on close
   useEffect(() => {
+    const previouslyFocused = document.activeElement;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialogRef.current?.querySelector("button")?.focus();
     const onKeyDown = (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") return onClose();
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const items = [...dialogRef.current.querySelectorAll('button:not(:disabled), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')];
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = prevOverflow;
+      previouslyFocused?.focus?.();
+    };
   }, [onClose]);
 
   const variants = localized.variants || [];
@@ -54,7 +77,7 @@ export default function ProductModal({
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(
-        `${window.location.origin}${window.location.pathname}#/?item=${product.sku}`
+        `${window.location.origin}${window.location.pathname}${window.location.search}#/product/${product.id}`
       );
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2000);
@@ -69,6 +92,7 @@ export default function ProductModal({
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={localized.title}
@@ -79,11 +103,11 @@ export default function ProductModal({
           <button
             type="button"
             onClick={handleShare}
-            aria-label="Share"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] border border-[var(--border-subtle)] bg-white text-[#14201A] transition hover:bg-[#183E30] hover:text-white"
+            aria-label={copiedLink ? (fa ? "پیوند کپی شد" : "Link copied") : fa ? "کپی پیوند محصول" : "Copy product link"}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:bg-[var(--accent-deep)] hover:text-white"
           >
             {copiedLink ? (
-              <Check className="h-3.5 w-3.5 text-[#183E30]" aria-hidden="true" />
+              <Check className="h-3.5 w-3.5 text-[var(--accent-pine)]" aria-hidden="true" />
             ) : (
               <Share2 className="h-3.5 w-3.5" aria-hidden="true" />
             )}
@@ -92,7 +116,7 @@ export default function ProductModal({
             type="button"
             onClick={onClose}
             aria-label={t.modal.close}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] border border-[var(--border-subtle)] bg-white text-[#14201A] transition hover:bg-[#14201A] hover:text-white"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:bg-[var(--accent-deep)] hover:text-white"
           >
             <X className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
@@ -107,10 +131,10 @@ export default function ProductModal({
         {/* Details Column */}
         <div className="flex flex-col justify-between p-4 sm:p-6">
           <div className="space-y-3">
-            <div className="flex items-center justify-between gap-2 pe-20 text-xs uppercase tracking-widest text-[var(--ink-sub)] font-latin-ui">
-              <span>{product.sku}</span>
+            <div className="flex items-center justify-between gap-2 pe-20 text-xs text-[var(--ink-sub)] font-latin-ui">
+              <span dir="ltr">{product.sku}</span>
               <span
-                className={`inline-flex items-center gap-1 rounded-[2px] px-2 py-0.5 text-[11px] font-semibold ${
+                className={`inline-flex items-center gap-1 rounded-[2px] px-2 py-0.5 text-xs font-semibold ${
                   inStock
                     ? "bg-[var(--accent-pine)]/15 text-[var(--accent-pine)]"
                     : "bg-[var(--accent-crimson)]/15 text-[var(--accent-crimson)]"
@@ -130,9 +154,9 @@ export default function ProductModal({
             </div>
 
             <div>
-              <h3 className="text-lg sm:text-xl font-bold text-[var(--ink-main)] leading-snug">
+              <h2 className="text-lg sm:text-xl font-bold text-[var(--ink-main)] leading-snug">
                 {localized.title}
-              </h3>
+              </h2>
               <p className="mt-1 text-xs sm:text-sm text-[var(--accent-pine)] font-medium">
                 {localized.subtitle}
               </p>
@@ -159,6 +183,7 @@ export default function ProductModal({
                       key={variant + idx}
                       type="button"
                       onClick={() => setSelectedVariantIdx(idx)}
+                      aria-pressed={selectedVariantIdx === idx}
                       className={`inline-flex items-center gap-1.5 rounded-[3px] border px-2.5 py-1 text-xs font-medium transition ${
                         selectedVariantIdx === idx
                           ? "border-[var(--accent-pine)] bg-[var(--accent-pine)] text-white"
@@ -167,7 +192,7 @@ export default function ProductModal({
                     >
                       {product.swatches?.[idx] && (
                         <span
-                          className="h-2.5 w-2.5 rounded-full border border-white/50"
+                          className="h-2.5 w-2.5 rounded-full border border-[var(--border-strong)]"
                           style={{ backgroundColor: product.swatches[idx] }}
                         />
                       )}
@@ -191,18 +216,18 @@ export default function ProductModal({
                   type="button"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
                   className="p-1.5 text-[var(--ink-main)] hover:text-[var(--accent-crimson)]"
-                  aria-label="Decrease quantity"
+                  aria-label={fa ? "کم کردن تعداد" : "Decrease quantity"}
                 >
                   <Minus className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
                 <span className="tabular-nums w-7 text-center text-xs sm:text-sm font-semibold text-[var(--ink-main)]">
-                  {qty}
+                  {formatNumber(qty, lang)}
                 </span>
                 <button
                   type="button"
                   onClick={() => setQty((q) => q + 1)}
                   className="p-1.5 text-[var(--ink-main)] hover:text-[var(--accent-pine)]"
-                  aria-label="Increase quantity"
+                  aria-label={fa ? "افزایش تعداد" : "Increase quantity"}
                 >
                   <Plus className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
@@ -234,7 +259,8 @@ export default function ProductModal({
                     ? "border-[var(--accent-crimson)] bg-[var(--accent-crimson)]/10 text-[var(--accent-crimson)]"
                     : "border-[var(--border-strong)] text-[var(--ink-sub)] hover:text-[var(--accent-crimson)]"
                 }`}
-                aria-label={t.wishlist}
+                aria-label={`${t.wishlist}: ${localized.title}`}
+                aria-pressed={Boolean(isWishlisted)}
               >
                 <Heart
                   aria-hidden="true"

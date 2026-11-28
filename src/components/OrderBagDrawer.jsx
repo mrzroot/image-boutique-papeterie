@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   X,
   Trash2,
@@ -101,22 +101,57 @@ export default function OrderBagDrawer({
   const [confirmedRef, setConfirmedRef] = useState(null);
   const [confirmedSummary, setConfirmedSummary] = useState("");
   const [copiedRef, setCopiedRef] = useState(false);
+  const [copiedSummary, setCopiedSummary] = useState(false);
+  const [address, setAddress] = useState("");
+  const dialogRef = useRef(null);
+  const closeBtnRef = useRef(null);
 
-  const resetAndClose = () => {
+  const resetAndClose = useCallback(() => {
     setConfirmedRef(null);
     setCheckoutMode(false);
     setCopiedRef(false);
+    setCopiedSummary(false);
     onClose();
-  };
+  }, [onClose]);
 
+  // Escape closes; Tab stays inside the dialog.
   useEffect(() => {
     if (!isOpen) return;
     const onKeyDown = (e) => {
-      if (e.key === "Escape") resetAndClose();
+      if (e.key === "Escape") return resetAndClose();
+      const root = dialogRef.current;
+      if (e.key !== "Tab" || !root) return;
+      const f = root.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (!f.length) return;
+      const first = f[0];
+      const last = f[f.length - 1];
+      const active = document.activeElement;
+      if (!root.contains(active) || (!e.shiftKey && active === last)) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  });
+  }, [isOpen, resetAndClose]);
+
+  // Focus into the dialog and lock page scroll while open; restore both on close.
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevFocus = document.activeElement;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeBtnRef.current?.focus();
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      prevFocus?.focus?.();
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -124,27 +159,38 @@ export default function OrderBagDrawer({
     (sum, item) => sum + item.unitPrice * item.qty,
     0
   );
+  // Gift cards are cash value: never discounted, never shipped.
+  const physicalItems = items.filter((item) => item.kind !== "giftcard");
+  const promoBase = physicalItems.reduce(
+    (sum, item) => sum + item.unitPrice * item.qty,
+    0
+  );
   const promoDiscount = appliedPromo
-    ? Math.round((itemsSubtotal * Number(appliedPromo.percent || 0)) / 100)
+    ? Math.round((promoBase * Number(appliedPromo.percent || 0)) / 100)
     : 0;
   const giftWrapPrice = shipping?.giftWrapPrice ?? t.bagDrawer.giftWrapPrice;
-  const giftPrice = giftWrap && items.length > 0 ? giftWrapPrice : 0;
+  const giftPrice = giftWrap && physicalItems.length > 0 ? giftWrapPrice : 0;
   const beforeShipping = Math.max(0, itemsSubtotal - promoDiscount + giftPrice);
 
-  const threshold = shipping?.freeThreshold ?? t.bagDrawer.freeShippingThreshold ?? 2500000;
+  const threshold = Number(shipping?.freeThreshold ?? t.bagDrawer.freeShippingThreshold ?? 2500000) || 0;
+  const hasFreeOffer = threshold > 0; // 0 or less = no free-shipping offer
   const isPickup = deliveryMethod === 2;
   const baseShippingFee = shipping?.fee ?? t.bagDrawer.shippingFee ?? 95000;
+  // free shipping is earned by goods, not by gift-card credit
+  const physicalTotal = Math.max(0, promoBase - promoDiscount + giftPrice);
   const shippingCost =
-    items.length === 0 || isPickup || beforeShipping >= threshold
+    physicalItems.length === 0 || isPickup || (hasFreeOffer && physicalTotal >= threshold)
       ? 0
       : baseShippingFee;
   const grandTotal = beforeShipping + shippingCost;
+  const totalLabel = lang === "fa" ? "مبلغ کل" : "Total";
+  const addressLabel = lang === "fa" ? "نشانی کامل تحویل" : "Delivery address";
+  const shippingText = shippingCost === 0 ? t.bagDrawer.shippingFree : formatPrice(shippingCost, lang);
 
-  const remaining = Math.max(0, threshold - beforeShipping);
-  const shippingProgress = Math.min(
-    100,
-    Math.round((beforeShipping / threshold) * 100)
-  );
+  const remaining = hasFreeOffer ? Math.max(0, threshold - physicalTotal) : 0;
+  const shippingProgress = hasFreeOffer
+    ? Math.min(100, Math.round((physicalTotal / threshold) * 100))
+    : 0;
 
   const handlePromoApply = (e) => {
     e.preventDefault();
@@ -164,8 +210,11 @@ export default function OrderBagDrawer({
   const handleConfirm = (e) => {
     e.preventDefault();
     if (!customerName.trim() || !customerPhone.trim()) return;
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const refId = `IB-1405-${randomNum}`;
+    if (!isPickup && !address.trim()) return;
+    const persianYear = new Intl.DateTimeFormat("fa-IR-u-ca-persian-nu-latn", { year: "numeric" })
+      .format(new Date())
+      .replace(/\D/g, "");
+    const refId = `IB-${persianYear}-${Date.now().toString(36).toUpperCase()}`;
     const lineSummaries = items.map((item) => {
       const disp = resolveBagDisplay(item, lang, t, products, bundles);
       return {
@@ -180,6 +229,7 @@ export default function OrderBagDrawer({
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
       deliveryMethod: t.bagDrawer.deliveryOptions[deliveryMethod] || "",
+      address: isPickup ? "" : address.trim(),
       notes: notes.trim(),
       giftWrap,
       promoCode: appliedPromo?.code || null,
@@ -197,10 +247,14 @@ export default function OrderBagDrawer({
         `${B.nameLabel}: ${customerName.trim()}`,
         `${B.phoneLabel}: ${customerPhone.trim()}`,
         `${B.deliveryLabel}: ${B.deliveryOptions[deliveryMethod] || ""}`,
+        isPickup ? "" : `${addressLabel}: ${address.trim()}`,
         "",
-        ...lineSummaries.map((l) => `• ${l.title}${l.meta ? ` (${l.meta})` : ""} × ${l.qty} — ${formatPrice(l.unitPrice * l.qty, lang)}`),
+        ...lineSummaries.map((l) => `• ${l.title}${l.meta ? ` (${l.meta})` : ""} × ${formatNumber(l.qty, lang)} — ${formatPrice(l.unitPrice * l.qty, lang)}`),
         "",
-        `${B.subtotal}: ${formatPrice(grandTotal, lang)}`,
+        appliedPromo ? `${lang === "fa" ? "کد تخفیف" : "Promo code"}: ${appliedPromo.code} (-${formatPrice(promoDiscount, lang)})` : "",
+        giftPrice > 0 ? `${B.giftWrapTitle}: ${formatPrice(giftPrice, lang)}` : "",
+        `${B.shippingLabel}: ${shippingText}`,
+        `${totalLabel}: ${formatPrice(grandTotal, lang)}`,
         notes.trim() ? `${B.notesLabel}: ${notes.trim()}` : "",
       ].filter((line, i, arr) => line !== "" || arr[i - 1] !== "").join("\n")
     );
@@ -209,6 +263,7 @@ export default function OrderBagDrawer({
     setGiftWrap(false);
     setAppliedPromo(null);
     setPromoInput("");
+    setAddress("");
     setCheckoutMode(false);
   };
 
@@ -232,6 +287,7 @@ export default function OrderBagDrawer({
         role="dialog"
         aria-modal="true"
         aria-label={t.bagDrawer.title}
+        ref={dialogRef}
         className="animate-drawer-in flex h-full w-full max-w-md flex-col bg-[var(--bg-page)] text-[var(--ink-main)] shadow-2xl border-s border-[var(--border-subtle)]"
         onClick={(e) => e.stopPropagation()}
       >
@@ -245,6 +301,7 @@ export default function OrderBagDrawer({
               </h2>
             </div>
             <button
+              ref={closeBtnRef}
               type="button"
               onClick={resetAndClose}
               aria-label={t.modal.close}
@@ -254,9 +311,11 @@ export default function OrderBagDrawer({
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-1.5 rounded-[3px] bg-[var(--bg-soft)] p-1 text-xs font-bold">
+          <div role="tablist" className="grid grid-cols-2 gap-1.5 rounded-[3px] bg-[var(--bg-soft)] p-1 text-xs font-bold">
             <button
               type="button"
+              role="tab"
+              aria-selected={tab === "bag"}
               onClick={() => setTab("bag")}
               className={`rounded-[2px] py-2 transition ${
                 tab === "bag"
@@ -268,6 +327,8 @@ export default function OrderBagDrawer({
             </button>
             <button
               type="button"
+              role="tab"
+              aria-selected={tab === "history"}
               onClick={() => setTab("history")}
               className={`inline-flex items-center justify-center gap-1.5 rounded-[2px] py-2 transition ${
                 tab === "history"
@@ -315,8 +376,8 @@ export default function OrderBagDrawer({
                     <span className="tabular-nums text-[var(--accent-pine)] font-bold">
                       {formatPrice(ord.total, lang)}
                     </span>
-                    <span className="rounded-[2px] bg-[var(--accent-pine)]/15 px-2.5 py-0.5 text-[11px] font-semibold text-[var(--accent-pine)]">
-                      {lang === "fa" ? "ثبت‌شده" : "Confirmed"}
+                    <span className="rounded-[2px] bg-[var(--bg-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--ink-sub)]">
+                      {lang === "fa" ? "ذخیره در این دستگاه" : "Saved on this device"}
                     </span>
                   </div>
                 </div>
@@ -326,7 +387,7 @@ export default function OrderBagDrawer({
         ) : (
           <>
             {/* Complimentary Shipping Progress Bar */}
-            {items.length > 0 && !confirmedRef && (
+            {hasFreeOffer && physicalItems.length > 0 && !confirmedRef && (
               <div className="border-b border-[var(--border-subtle)] bg-[var(--bg-soft)] px-5 py-3 space-y-2">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[var(--accent-pine)]">
                   <Truck className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -374,7 +435,7 @@ export default function OrderBagDrawer({
                       type="button"
                       onClick={copyTrackingId}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-[3px] bg-[var(--bg-surface)] border border-[var(--border-strong)] text-[var(--ink-main)] hover:border-[var(--accent-pine)]"
-                      aria-label="Copy"
+                      aria-label={lang === "fa" ? "کپی شماره سفارش" : "Copy order number"}
                     >
                       {copiedRef ? (
                         <Check className="h-4 w-4 text-[var(--accent-pine)]" aria-hidden="true" />
@@ -396,7 +457,7 @@ export default function OrderBagDrawer({
                     {contact?.phone && (
                       <a
                         className="btn-quiet !min-h-12"
-                        href={`sms:${contact.phone.replace(/[^d+]/g, "")}?body=${encodeURIComponent(confirmedSummary)}`}
+                        href={`sms:${contact.phone.replace(/[^\d+]/g, "")}?body=${encodeURIComponent(confirmedSummary)}`}
                       >
                         <MessageSquare className="h-4 w-4" aria-hidden="true" />
                         <span>{t.bagDrawer.sendBySms}</span>
@@ -408,14 +469,15 @@ export default function OrderBagDrawer({
                     onClick={async () => {
                       try {
                         await navigator.clipboard.writeText(confirmedSummary);
-                        setCopiedRef(true);
+                        setCopiedSummary(true);
+                        setTimeout(() => setCopiedSummary(false), 2000);
                       } catch {
-                        setCopiedRef(false);
+                        setCopiedSummary(false);
                       }
                     }}
                     className="text-sm text-[var(--ink-sub)] underline underline-offset-4 hover:text-[var(--ink-main)]"
                   >
-                    {copiedRef ? t.bagDrawer.summaryCopied : t.bagDrawer.copySummary}
+                    {copiedSummary ? t.bagDrawer.summaryCopied : t.bagDrawer.copySummary}
                   </button>
                   <button
                     type="button"
@@ -469,6 +531,7 @@ export default function OrderBagDrawer({
                       id="checkout-name"
                       type="text"
                       required
+                      autoComplete="name"
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm text-[var(--ink-main)]"
@@ -487,7 +550,9 @@ export default function OrderBagDrawer({
                       type="tel"
                       required
                       dir="ltr"
-                      placeholder="09353834393"
+                      autoComplete="tel"
+                      inputMode="tel"
+                      placeholder="09xx xxx xxxx"
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm text-[var(--ink-main)] font-latin-ui"
@@ -516,6 +581,26 @@ export default function OrderBagDrawer({
                     </div>
                   </div>
 
+                  {!isPickup && (
+                    <div>
+                      <label
+                        htmlFor="checkout-address"
+                        className="mb-1.5 block text-xs font-semibold text-[var(--ink-main)]"
+                      >
+                        {addressLabel}
+                      </label>
+                      <textarea
+                        id="checkout-address"
+                        rows={2}
+                        required
+                        autoComplete="street-address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="w-full rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3.5 py-2 text-sm text-[var(--ink-main)]"
+                      />
+                    </div>
+                  )}
+
                   <div>
                     <label
                       htmlFor="checkout-notes"
@@ -532,6 +617,17 @@ export default function OrderBagDrawer({
                     />
                   </div>
 
+                  <div className="space-y-1.5 rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3.5 py-3">
+                    <div className="flex items-center justify-between text-xs text-[var(--ink-sub)]">
+                      <span>{t.bagDrawer.shippingLabel}</span>
+                      <span className="tabular-nums font-semibold text-[var(--accent-pine)]">{shippingText}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-[var(--ink-sub)]">{totalLabel}</span>
+                      <span className="tabular-nums font-bold text-[var(--ink-main)]">{formatPrice(grandTotal, lang)}</span>
+                    </div>
+                  </div>
+
                   <div className="flex gap-2 pt-2">
                     <button
                       type="button"
@@ -544,7 +640,7 @@ export default function OrderBagDrawer({
                       type="submit"
                       className="flex-1 rounded-[3px] bg-[var(--accent-crimson)] px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
                     >
-                      {t.bagDrawer.confirmOrder}
+                      {t.bagDrawer.confirmOrder} · {formatPrice(grandTotal, lang)}
                     </button>
                   </div>
                 </form>
@@ -568,7 +664,7 @@ export default function OrderBagDrawer({
                           <div>
                             <div className="flex items-start justify-between gap-2">
                               <span
-                                className={`inline-flex rounded-[2px] px-2 py-0.5 text-[11px] font-semibold ${
+                                className={`inline-flex rounded-[2px] px-2 py-0.5 text-xs font-semibold ${
                                   item.kind === "service"
                                     ? "bg-[var(--accent-crimson)]/15 text-[var(--accent-crimson)]"
                                     : "bg-[var(--accent-pine)]/15 text-[var(--accent-pine)]"
@@ -586,7 +682,7 @@ export default function OrderBagDrawer({
                                 type="button"
                                 aria-label={lang === "fa" ? "حذف" : "Remove"}
                                 onClick={() => onRemoveItem(item.key)}
-                                className="text-[var(--ink-sub)] hover:text-[var(--accent-crimson)]"
+                                className="-m-3 p-3 text-[var(--ink-sub)] hover:text-[var(--accent-crimson)]"
                               >
                                 <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                               </button>
@@ -607,7 +703,7 @@ export default function OrderBagDrawer({
                               <div className="inline-flex items-center rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-page)] px-1 py-0.5">
                                 <button
                                   type="button"
-                                  aria-label="Decrease quantity"
+                                  aria-label={lang === "fa" ? "کم کردن تعداد" : "Decrease quantity"}
                                   onClick={() =>
                                     onUpdateQty(item.key, item.qty - 1)
                                   }
@@ -616,11 +712,11 @@ export default function OrderBagDrawer({
                                   <Minus className="h-3 w-3" aria-hidden="true" />
                                 </button>
                                 <span className="tabular-nums w-6 text-center text-xs font-semibold">
-                                  {item.qty}
+                                  {formatNumber(item.qty, lang)}
                                 </span>
                                 <button
                                   type="button"
-                                  aria-label="Increase quantity"
+                                  aria-label={lang === "fa" ? "افزایش تعداد" : "Increase quantity"}
                                   onClick={() =>
                                     onUpdateQty(item.key, item.qty + 1)
                                   }
@@ -636,7 +732,8 @@ export default function OrderBagDrawer({
                     );
                   })}
 
-                  {/* Optional Florentine Wax-Seal Gift Wrap Toggle */}
+                  {/* Optional Florentine Wax-Seal Gift Wrap Toggle (nothing to wrap when the bag holds only gift cards) */}
+                  {physicalItems.length > 0 && (
                   <button
                     type="button"
                     onClick={() => setGiftWrap((g) => !g)}
@@ -676,20 +773,21 @@ export default function OrderBagDrawer({
                       {giftWrap && <Check className="h-3 w-3" aria-hidden="true" />}
                     </span>
                   </button>
+                  )}
 
                   {/* Live Promo Code Form */}
                   <form onSubmit={handlePromoApply} className="space-y-1.5">
                     <div className="flex items-center gap-2 rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] px-3 py-1.5">
                       <Tag className="h-3.5 w-3.5 text-[var(--accent-gold)]" aria-hidden="true" />
                       <label htmlFor="bag-promo-code" className="sr-only">
-                        {t.bagDrawer.promoPlaceholder}
+                        {lang === "fa" ? "کد تخفیف" : "Promo code"}
                       </label>
                       <input
                         id="bag-promo-code"
                         type="text"
                         value={promoInput}
                         onChange={(e) => setPromoInput(e.target.value)}
-                        placeholder={t.bagDrawer.promoPlaceholder}
+                        placeholder={lang === "fa" ? "کد تخفیف" : "Promo code"}
                         className="flex-1 bg-transparent text-xs text-[var(--ink-main)] placeholder:text-[var(--ink-sub)]"
                       />
                       <button
@@ -706,7 +804,7 @@ export default function OrderBagDrawer({
                     )}
                     {promoError && (
                       <p className="text-xs text-[var(--accent-crimson)] px-1">
-                        {t.bagDrawer.promoInvalid}
+                        {lang === "fa" ? "این کد معتبر نیست" : "This code is not valid"}
                       </p>
                     )}
                   </form>
@@ -720,13 +818,11 @@ export default function OrderBagDrawer({
                 <div className="flex items-center justify-between text-xs text-[var(--ink-sub)]">
                   <span>{t.bagDrawer.shippingLabel}</span>
                   <span className="tabular-nums font-semibold text-[var(--accent-pine)]">
-                    {shippingCost === 0
-                      ? t.bagDrawer.shippingFree
-                      : formatPrice(shippingCost, lang)}
+                    {shippingText}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-[var(--ink-sub)]">{t.bagDrawer.subtotal}</span>
+                  <span className="text-[var(--ink-sub)]">{totalLabel}</span>
                   <span className="tabular-nums text-lg font-bold text-[var(--ink-main)]">
                     {formatPrice(grandTotal, lang)}
                   </span>

@@ -85,6 +85,7 @@ export async function hashPasscode(plain) {
 }
 
 const DEFAULT_PASSCODE_HASH = sha256Sync(DEFAULT_ADMIN_PASSCODE);
+export const isDefaultPasscodeHash = (hash) => hash === DEFAULT_PASSCODE_HASH;
 
 function clone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -184,57 +185,64 @@ export function buildDefaultSiteContent() {
   };
 }
 
+// Imported / published JSON is untrusted: list items that would crash a renderer are dropped
+const isObj = (x) => Boolean(x) && typeof x === "object" && !Array.isArray(x);
+const hasFa = (x) => isObj(x) && isObj(x.fa);
+const ITEM_VALIDATORS = {
+  products: (p) => isObj(p) && typeof p.id === "string" && p.id.trim() !== "" && isObj(p.fa) && typeof p.fa.title === "string",
+  heroSlides: hasFa,
+  valueStrip: hasFa,
+  bundles: hasFa,
+  socialGallery: (g) => isObj(g) && typeof g.image === "string",
+  servicesList: hasFa,
+  tieredPriceRows: (r) => isObj(r) && isObj(r.tier),
+  servicesFaq: hasFa,
+  promoCodes: (c) => isObj(c) && typeof c.code === "string" && Number.isFinite(c.percent),
+  pricingRow: (r) => isObj(r) && typeof r.id === "string",
+};
+const validList = (list, kind) => (Array.isArray(list) ? list.filter(ITEM_VALIDATORS[kind]) : null);
+// Only same-typed scalar overrides: a string "fee" must not replace a number
+const pickTyped = (base, over) =>
+  Object.fromEntries(Object.entries(over).filter(([k, v]) => typeof v === typeof base[k] && (typeof v !== "number" || Number.isFinite(v))));
+
 export function mergeSiteContent(base, override) {
-  if (!override || typeof override !== "object") return base;
+  if (!isObj(override)) return base;
   const next = clone(base);
+  const list = (kind) => validList(override[kind], kind);
 
   if (override.version) next.version = override.version;
   if (override.updatedAt !== undefined) next.updatedAt = override.updatedAt;
-  if (override.announcement && typeof override.announcement === "object") {
+  if (isObj(override.announcement)) {
     next.announcement = { ...next.announcement, ...override.announcement };
   }
-  if (Array.isArray(override.heroSlides) && override.heroSlides.length > 0) {
-    next.heroSlides = override.heroSlides;
-  }
-  if (Array.isArray(override.valueStrip) && override.valueStrip.length > 0) {
-    next.valueStrip = override.valueStrip;
-  }
-  if (override.story && typeof override.story === "object") {
+  const heroSlides = list("heroSlides");
+  if (heroSlides?.length) next.heroSlides = heroSlides;
+  const valueStrip = list("valueStrip");
+  if (valueStrip?.length) next.valueStrip = valueStrip;
+  if (isObj(override.story)) {
     next.story = {
-      fa: { ...next.story.fa, ...(override.story.fa || {}) },
-      en: { ...next.story.en, ...(override.story.en || {}) },
+      fa: { ...next.story.fa, ...(isObj(override.story.fa) ? override.story.fa : {}) },
+      en: { ...next.story.en, ...(isObj(override.story.en) ? override.story.en : {}) },
     };
   }
-  if (Array.isArray(override.products)) {
-    next.products = override.products.map(normalizeProduct);
+  const products = list("products");
+  if (products) next.products = products.map(normalizeProduct);
+  for (const key of ["bundles", "socialGallery", "servicesList", "tieredPriceRows", "servicesFaq", "promoCodes"]) {
+    const items = list(key);
+    if (items) next[key] = items;
   }
-  if (Array.isArray(override.bundles)) next.bundles = override.bundles;
-  if (Array.isArray(override.socialGallery)) next.socialGallery = override.socialGallery;
-  if (Array.isArray(override.servicesList)) next.servicesList = override.servicesList;
-  if (Array.isArray(override.tieredPriceRows)) next.tieredPriceRows = override.tieredPriceRows;
-  if (Array.isArray(override.servicesFaq)) next.servicesFaq = override.servicesFaq;
-  if (override.pricing && typeof override.pricing === "object") {
-    next.pricing = {
-      printTypes: Array.isArray(override.pricing.printTypes)
-        ? override.pricing.printTypes
-        : next.pricing.printTypes,
-      paperStocks: Array.isArray(override.pricing.paperStocks)
-        ? override.pricing.paperStocks
-        : next.pricing.paperStocks,
-      bindings: Array.isArray(override.pricing.bindings)
-        ? override.pricing.bindings
-        : next.pricing.bindings,
-    };
+  if (isObj(override.pricing)) {
+    for (const key of ["printTypes", "paperStocks", "bindings"]) {
+      const rows = validList(override.pricing[key], "pricingRow");
+      if (rows) next.pricing[key] = rows;
+    }
   }
-  if (Array.isArray(override.promoCodes)) next.promoCodes = override.promoCodes;
-  if (override.shipping && typeof override.shipping === "object") {
-    next.shipping = { ...next.shipping, ...override.shipping };
-  }
-  if (override.contact && typeof override.contact === "object") {
-    next.contact = { ...next.contact, ...override.contact };
-  }
-  if (override.settings && typeof override.settings === "object") {
-    next.settings = { ...next.settings, ...override.settings };
+  if (isObj(override.shipping)) next.shipping = { ...next.shipping, ...pickTyped(next.shipping, override.shipping) };
+  if (isObj(override.contact)) next.contact = { ...next.contact, ...pickTyped(next.contact, override.contact) };
+  // A missing or malformed hash keeps the current one rather than falling back to the public default
+  const hash = override.settings?.adminPasscodeHash;
+  if (typeof hash === "string" && /^[0-9a-f]{64}$/.test(hash)) {
+    next.settings = { ...next.settings, adminPasscodeHash: hash };
   }
 
   return next;
@@ -329,6 +337,8 @@ async function githubRequest(url, token, options = {}) {
   return res.json();
 }
 
+const IMAGE_EXT = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+
 async function getRepoFileSha(owner, repo, path, branch, token) {
   try {
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
@@ -351,12 +361,17 @@ export async function publishSiteContentToGitHub({
   if (!token?.trim()) throw new Error("GitHub token is required");
   if (!owner?.trim() || !repo?.trim()) throw new Error("Repository owner and name are required");
 
-  const cleanOwner = owner.trim();
-  const cleanRepo = repo.trim();
   const cleanBranch = (branch || "main").trim();
+  if (!/^[\w.-]+$/.test(owner.trim()) || !/^[\w.-]+$/.test(repo.trim())) throw new Error("Invalid repository owner or name");
+  if (!/^[\w./-]+$/.test(cleanBranch)) throw new Error("Invalid branch name");
+  const cleanOwner = encodeURIComponent(owner.trim());
+  const cleanRepo = encodeURIComponent(repo.trim());
   const cleanToken = token.trim();
 
   const dataUrls = Array.from(collectDataUrls(content));
+  const extOf = (dataUrl) => IMAGE_EXT[dataUrl.slice(5, dataUrl.indexOf(";"))];
+  // Checked before any upload so a bad file never leaves a half-finished publish
+  if (dataUrls.some((u) => !extOf(u))) throw new Error("Unsupported image type (use JPEG, PNG or WebP)");
   const urlMap = new Map();
   let uploadedImages = 0;
 
@@ -365,9 +380,10 @@ export async function publishSiteContentToGitHub({
     onProgress?.({ stage: "image", current: i + 1, total: dataUrls.length });
     const base64Part = dataUrl.split(",")[1];
     if (!base64Part) continue;
+    const ext = extOf(dataUrl);
     const digest = sha256Sync(base64Part).slice(0, 12);
-    const repoPath = `public/images/cms/img-${digest}.jpg`;
-    const publicPath = `./images/cms/img-${digest}.jpg`;
+    const repoPath = `public/images/cms/img-${digest}.${ext}`;
+    const publicPath = `./images/cms/img-${digest}.${ext}`;
 
     const existingSha = await getRepoFileSha(cleanOwner, cleanRepo, repoPath, cleanBranch, cleanToken);
     if (!existingSha) {

@@ -48,7 +48,7 @@ export default function ProductCard({
 
         {(product.badge === "new" || product.badge === "limited") && (
           <span
-            className={`pointer-events-none absolute top-3 start-3 rounded-[2px] px-2 py-0.5 text-[11px] font-semibold ${
+            className={`pointer-events-none absolute top-3 start-3 rounded-[2px] px-2 py-0.5 text-xs font-semibold ${
               product.badge === "new"
                 ? "bg-[var(--accent-crimson)] text-white"
                 : "bg-[var(--accent-deep)] text-[#F3E4BD]"
@@ -62,7 +62,7 @@ export default function ProductCard({
           <button
             type="button"
             onClick={() => onToggleWishlist(product.id)}
-            aria-label={t.wishlist}
+            aria-label={`${t.wishlist}: ${loc.title}`}
             aria-pressed={isWished}
             className={`icon-chip ${isWished ? "text-[var(--accent-crimson)]" : "text-[var(--ink-sub)] hover:text-[var(--accent-crimson)]"}`}
           >
@@ -71,7 +71,7 @@ export default function ProductCard({
           <button
             type="button"
             onClick={() => onQuickView(product, variantIdx)}
-            aria-label={quickLabel}
+            aria-label={`${quickLabel}: ${loc.title}`}
             title={quickLabel}
             className="icon-chip product-card__reveal text-[var(--ink-sub)] hover:text-[var(--ink-main)]"
           >
@@ -103,13 +103,12 @@ export default function ProductCard({
       <div className="mt-3 flex flex-col items-stretch gap-2.5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-h-5 min-w-0 items-center gap-2">
           {product.swatches?.length > 1 && (
-            <div className="flex shrink-0 items-center gap-1.5" role="radiogroup" aria-label={t.modal?.selectVariant || "Variant"}>
+            <div className="flex shrink-0 items-center gap-1.5" role="group" aria-label={t.modal?.selectVariant || "Variant"}>
               {product.swatches.map((hex, idx) => (
                 <button
                   key={hex + idx}
                   type="button"
-                  role="radio"
-                  aria-checked={variantIdx === idx}
+                  aria-pressed={variantIdx === idx}
                   aria-label={variants[idx] || hex}
                   title={variants[idx] || hex}
                   onClick={() => setVariantIdx(idx)}

@@ -96,8 +96,13 @@ export default function MaterialSampler({ products, lang, onOpenProduct }) {
           className="material-sampler__toggle"
           aria-pressed={showDepth && !depthUnavailable}
           onClick={() => {
-            setDepthUnavailable(false);
-            setShowDepth(!showDepth || Boolean(depthUnavailable));
+            // after a failure the click dismisses the note; the failed stage is cached, so retrying would only fail again
+            if (depthUnavailable) {
+              setDepthUnavailable(false);
+              setShowDepth(false);
+            } else {
+              setShowDepth(!showDepth);
+            }
           }}
         >
           {isPersian ? "نمایش سه‌بعدی عکس محصول" : "Show the product photo in 3D"}

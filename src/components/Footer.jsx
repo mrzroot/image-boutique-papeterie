@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Phone, Mail, CheckCircle2, ArrowUpRight, LayoutDashboard } from "lucide-react";
+import { CATEGORIES } from "../data/catalog";
 
 export default function Footer({ t, lang, contact, onNavigate, onSelectCategory, showNewsletter = true }) {
   const [email, setEmail] = useState("");
@@ -93,12 +94,11 @@ export default function Footer({ t, lang, contact, onNavigate, onSelectCategory,
           </div>
 
           <div className="space-y-3 md:col-span-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#D6B36A]">
+            <h4 className="text-sm font-bold text-[#D6B36A]">
               {t.footerCols.boutique}
             </h4>
             <ul className="space-y-2 text-xs text-[#DFEAE3]">
-              {["notebooks", "papers", "pens", "stickers", "packaging"].map(
-                (catId) => (
+              {CATEGORIES.filter((c) => c.id !== "all").map(({ id: catId }) => (
                   <li key={catId}>
                     <button
                       type="button"
@@ -117,7 +117,7 @@ export default function Footer({ t, lang, contact, onNavigate, onSelectCategory,
           </div>
 
           <div className="space-y-3 md:col-span-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#D6B36A]">
+            <h4 className="text-sm font-bold text-[#D6B36A]">
               {t.footerCols.services}
             </h4>
             <ul className="space-y-2 text-xs text-[#DFEAE3]">
@@ -144,7 +144,7 @@ export default function Footer({ t, lang, contact, onNavigate, onSelectCategory,
           </div>
 
           <div className="space-y-3 md:col-span-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#D6B36A]">
+            <h4 className="text-sm font-bold text-[#D6B36A]">
               {t.footerCols.contact}
             </h4>
             <div className="space-y-2.5 text-xs text-[#DFEAE3]">
@@ -172,7 +172,7 @@ export default function Footer({ t, lang, contact, onNavigate, onSelectCategory,
         <div className="border-t border-white/10">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-[#B8C8BE] sm:px-6">
             <span>
-              © {lang === "fa" ? "۱۴۰۵" : "2026"} {t.brandMain} · La Boutique
+              © {new Intl.DateTimeFormat(lang === "fa" ? "fa-IR-u-ca-persian" : "en-US", { year: "numeric" }).format(new Date())} {t.brandMain} · La Boutique
               Papeterie
             </span>
             <div className="flex items-center gap-4">
@@ -184,9 +184,6 @@ export default function Footer({ t, lang, contact, onNavigate, onSelectCategory,
                 <LayoutDashboard className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{lang === "fa" ? "پنل مدیریت سایت" : "Admin Dashboard"}</span>
               </button>
-              <span className="font-latin-ui hidden sm:inline">
-                FA / EN · Archival Paper & Print Atelier
-              </span>
             </div>
           </div>
         </div>

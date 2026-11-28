@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Search, Eye, EyeOff, Copy, Trash2, Pencil } from "lucide-react";
 import { CATEGORIES } from "../../data/catalog";
-import { formatPrice } from "../../utils/pricing";
+import { formatPrice, formatNumber } from "../../utils/pricing";
 import { cls, useAdmin, ImgPreview, Tag, photoIssue } from "./ui";
 
 export default function ProductsPanel({ products, onEdit, onNew, onUpdateContent }) {
@@ -56,7 +56,7 @@ export default function ProductsPanel({ products, onEdit, onNew, onUpdateContent
           </select>
         </div>
         <p className={`${cls.hint} tabular-nums`}>
-          {s.showingCount.replace("{n}", filtered.length).replace("{total}", products.length)}
+          {s.showingCount.replace("{n}", formatNumber(filtered.length, lang)).replace("{total}", formatNumber(products.length, lang))}
         </p>
       </div>
 
@@ -82,8 +82,8 @@ export default function ProductsPanel({ products, onEdit, onNew, onUpdateContent
                     {prod.visible === false && <Tag tone="crimson">{s.hidden}</Tag>}
                     {prod.inStock === false && <Tag tone="gold">{s.outOfStock}</Tag>}
                     {issue && <Tag tone="crimson">{s[`issue_${issue}`]}</Tag>}
-                    {prod.gallery?.length > 0 && <Tag>{s.galleryCount.replace("{n}", prod.gallery.length)}</Tag>}
-                    {spin > 0 && <Tag tone={spin >= 8 ? "pine" : "neutral"}>360° {spin}/8</Tag>}
+                    {prod.gallery?.length > 0 && <Tag>{s.galleryCount.replace("{n}", formatNumber(prod.gallery.length, lang))}</Tag>}
+                    {spin > 0 && <Tag tone={spin >= 8 ? "pine" : "neutral"}>360° {formatNumber(spin, lang)}/{formatNumber(8, lang)}</Tag>}
                     {prod.model3dUrl && <Tag tone="pine">GLB</Tag>}
                   </div>
                 </div>
@@ -106,8 +106,10 @@ export default function ProductsPanel({ products, onEdit, onNew, onUpdateContent
                     aria-label={s.duplicate}
                     onClick={() => {
                       const copy = JSON.parse(JSON.stringify(prod));
-                      copy.id = `${prod.id}-${Date.now().toString(36).slice(-4)}`;
-                      copy.sku = `${prod.sku}-COPY`;
+                      const stamp = Date.now().toString(36);
+                      copy.id = `${prod.id}-${stamp}`;
+                      copy.sku = `${prod.sku}-${stamp.toUpperCase()}`;
+                      copy.visible = false; // stays out of the store until the owner reviews it
                       update((list) => [copy, ...list]);
                       notify(s.toastDuplicated);
                     }}
@@ -115,7 +117,7 @@ export default function ProductsPanel({ products, onEdit, onNew, onUpdateContent
                   >
                     <Copy className="h-4 w-4" aria-hidden="true" />
                   </button>
-                  <button type="button" onClick={() => onEdit(prod)} className={cls.btnPrimary}>
+                  <button type="button" onClick={() => onEdit(prod)} aria-label={`${s.edit}: ${titleOf(prod)}`} className={cls.btnPrimary}>
                     <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>{s.edit}</span>
                   </button>

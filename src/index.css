@@ -21,11 +21,9 @@
   --accent-pine: #183e30;
   --accent-deep: #123126;
   --accent-gold: #a68243;
-  --accent-gold-bright: #e7d19f;
   --accent-crimson: #ae3322;
   --header-bg: rgba(247, 243, 235, 0.94);
   --topbar-bg: #123126;
-  --strip-bg: #183e30;
   --footer-bg: #123126;
 }
 
@@ -43,11 +41,9 @@
   --accent-pine: #2a6b53;
   --accent-deep: #070808;
   --accent-gold: #d6b36a;
-  --accent-gold-bright: #f0d79d;
   --accent-crimson: #d84b38;
   --header-bg: rgba(13, 14, 13, 0.94);
   --topbar-bg: #050606;
-  --strip-bg: #141716;
   --footer-bg: #060707;
 }
 
@@ -103,23 +99,30 @@ select {
   font-variant-numeric: normal;
 }
 
-/* Accessibility & interactive affordances (R-32, R-39) */
-a[href],
-button:not(:disabled),
-select,
-summary,
-label[for] {
-  cursor: pointer;
-}
+/* Accessibility & interactive affordances (R-32, R-39); in the base layer so utilities like cursor-zoom-in can override */
+@layer base {
+  a[href],
+  button:not(:disabled),
+  select,
+  summary,
+  label[for] {
+    cursor: pointer;
+  }
 
-button:disabled,
-select:disabled {
-  cursor: not-allowed;
-}
+  button:disabled,
+  select:disabled {
+    cursor: not-allowed;
+  }
 
-:is(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--accent-gold);
-  outline-offset: 2px;
+  :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--accent-gold);
+    outline-offset: 2px;
+  }
+
+  /* in-page jumps land below the sticky header */
+  [id] {
+    scroll-margin-top: 8rem;
+  }
 }
 
 /* Clean archival ground without dot-grid pattern (R-07) */
@@ -132,25 +135,6 @@ select:disabled {
   box-shadow:
     0 20px 44px -16px rgba(0, 0, 0, 0.2),
     0 4px 12px -4px rgba(0, 0, 0, 0.08);
-}
-
-/* Hero slide progress fill bar */
-@keyframes progressFill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-.animate-slide-progress {
-  transform-origin: left center;
-  animation: progressFill 6.5s linear forwards;
-}
-
-[dir="rtl"] .animate-slide-progress {
-  transform-origin: right center;
 }
 
 /* View Fade-Up Transition */
@@ -356,7 +340,7 @@ h1[class*="text-[2.5rem]"] {
   transition: box-shadow 0.15s ease;
 }
 button.swatch { position: relative; }
-button.swatch::after { content: ""; position: absolute; inset: -8px; } /* 30px touch target */
+button.swatch::after { content: ""; position: absolute; inset: -3px; } /* bigger hit area without overlapping the neighbouring swatch (gap is 6px) */
 .swatch--on { box-shadow: inset 0 0 0 1px #0000002e, 0 0 0 2px var(--bg-page), 0 0 0 3px var(--ink-main); }
 
 .variant-pill {
@@ -408,7 +392,6 @@ button.swatch::after { content: ""; position: absolute; inset: -8px; } /* 30px t
   justify-content: space-between;
   gap: 1rem;
 }
-.section-head.items-center { flex-direction: column; align-items: center; }
 
 .category-row {
   display: flex;
@@ -488,6 +471,8 @@ html[dir="ltr"] .category-row__name { line-height: 1.2; }
 .eyebrow.text-\[var\(--accent-gold\)\] { color: var(--accent-gold-ink); }
 /* dark: pine as a text colour is lifted above; keep filled pine surfaces deep enough for white text */
 [data-theme="dark"] .bg-\[var\(--accent-pine\)\] { background-color: #2a6b53; }
+/* dark: crimson as a text colour on near-black grounds needs a lighter tint for AA; filled crimson buttons keep the deep tone */
+[data-theme="dark"] .text-\[var\(--accent-crimson\)\] { color: #f08a78; }
 
 /* copy half of a full-bleed split band, aligned with the 80rem content column */
 .atelier-copy {

@@ -1,8 +1,9 @@
 import { Plus } from "lucide-react";
-import { cls, useAdmin, Card, JumpNav, TextField, LocFields, RowControls } from "./ui";
+import { formatNumber } from "../../utils/pricing";
+import { cls, useAdmin, Card, JumpNav, TextField, NumberInput, LocFields, RowControls } from "./ui";
 
 export default function ServicesPanel({ cmsContent, onUpdateContent }) {
-  const { s, t, notify } = useAdmin();
+  const { s, t, lang, notify } = useAdmin();
   const pricing = cmsContent.pricing || {};
   const servicesList = cmsContent.servicesList || [];
   const tieredRows = cmsContent.tieredPriceRows || [];
@@ -22,6 +23,8 @@ export default function ServicesPanel({ cmsContent, onUpdateContent }) {
     ["bindings", "flatFee", s.bindingFees, t.bindingNames],
   ];
   const numCell = "w-28 rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] px-2 py-1.5 text-end text-sm";
+  // Catalog rows store discountRate as a fraction (0.1); the table edits it as a percent
+  const hasDiscount = tieredRows.some((r) => typeof r.discountRate === "number");
 
   return (
     <section className="space-y-4">
@@ -48,13 +51,7 @@ export default function ServicesPanel({ cmsContent, onUpdateContent }) {
               {(pricing[group] || []).map((row, idx) => (
                 <label key={row.id} className="flex items-center justify-between gap-2 text-sm">
                   <span className="min-w-0 truncate">{names?.[row.id] || row.id}</span>
-                  <input
-                    type="number"
-                    dir="ltr"
-                    value={row[field]}
-                    onChange={(e) => patchPricing(group, idx, field)(Number(e.target.value) || 0)}
-                    className={numCell}
-                  />
+                  <NumberInput min={0} value={row[field]} onChange={patchPricing(group, idx, field)} className={numCell} />
                 </label>
               ))}
             </div>
@@ -67,12 +64,14 @@ export default function ServicesPanel({ cmsContent, onUpdateContent }) {
           <div key={srv.id || idx} className="space-y-3 border-t border-[var(--border-subtle)] pt-4 first:border-t-0 first:pt-0">
             <div className="flex flex-wrap items-end justify-between gap-2">
               <h3 className={cls.h3}>
-                <span className="text-[var(--accent-gold)]" dir="ltr">{srv.code}</span> · {srv.fa?.title}
+                <span className="text-[var(--accent-gold-ink)]">{/^\d+$/.test(srv.code) ? formatNumber(Number(srv.code), lang) : srv.code}</span> ·{" "}
+                {(srv[lang] || srv.fa)?.title}
               </h3>
               <div className="w-40">
                 <TextField
                   label={s.startingPrice}
                   type="number"
+                  min={0}
                   value={srv.startingPrice}
                   onChange={(v) => patchItem("servicesList", idx, (x) => ({ ...x, startingPrice: v }))}
                 />
@@ -94,6 +93,7 @@ export default function ServicesPanel({ cmsContent, onUpdateContent }) {
       </Card>
 
       <Card id="sv-tiers" title={s.tieredTable}>
+        <p className={cls.hint}>{s.tiersSyncHint}</p>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[560px] text-sm">
             <thead>
@@ -102,6 +102,7 @@ export default function ServicesPanel({ cmsContent, onUpdateContent }) {
                 <th className="p-1.5 text-start font-semibold">{s.tier} ({s.english})</th>
                 <th className="p-1.5 text-start font-semibold">{s.bwA4}</th>
                 <th className="p-1.5 text-start font-semibold">{s.colorA4}</th>
+                {hasDiscount && <th className="p-1.5 text-start font-semibold">{s.discountPercent}</th>}
               </tr>
             </thead>
             <tbody>
@@ -120,16 +121,27 @@ export default function ServicesPanel({ cmsContent, onUpdateContent }) {
                   ))}
                   {["bwA4", "colorA4"].map((field) => (
                     <td key={field} className="p-1.5">
-                      <input
-                        type="number"
-                        dir="ltr"
-                        aria-label={`${s[field]} ${idx + 1}`}
+                      <NumberInput
+                        min={0}
+                        aria-label={`${s[field]} ${formatNumber(idx + 1, lang)}`}
                         value={row[field]}
-                        onChange={(e) => patchItem("tieredPriceRows", idx, (r) => ({ ...r, [field]: Number(e.target.value) || 0 }))}
+                        onChange={(v) => patchItem("tieredPriceRows", idx, (r) => ({ ...r, [field]: v }))}
                         className={numCell}
                       />
                     </td>
                   ))}
+                  {hasDiscount && (
+                    <td className="p-1.5">
+                      <NumberInput
+                        min={0}
+                        max={100}
+                        aria-label={`${s.discountPercent} ${formatNumber(idx + 1, lang)}`}
+                        value={Math.round((row.discountRate || 0) * 10000) / 100}
+                        onChange={(v) => patchItem("tieredPriceRows", idx, (r) => ({ ...r, discountRate: v / 100 }))}
+                        className={numCell}
+                      />
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -161,7 +173,7 @@ export default function ServicesPanel({ cmsContent, onUpdateContent }) {
           <div key={idx} className="space-y-3 border-t border-[var(--border-subtle)] pt-4 first:border-t-0 first:pt-0">
             <div className="flex items-center justify-between gap-2">
               <h3 className={`${cls.h3} min-w-0 truncate`}>
-                {idx + 1}. {item.fa?.q}
+                {formatNumber(idx + 1, lang)}. {(item[lang] || item.fa)?.q}
               </h3>
               <RowControls
                 index={idx}

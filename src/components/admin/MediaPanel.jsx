@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatNumber } from "../../utils/pricing";
 import { cls, useAdmin, Card, ImgPreview, Tag, photoIssue } from "./ui";
 
 // Every image path used anywhere in the content -> Set of human-readable places it is used
@@ -42,7 +43,7 @@ export default function MediaPanel({ cmsContent, onEditProduct }) {
         <p className={cls.hint}>{s.photoHealthHint}</p>
         <p className="text-sm font-semibold">
           {issueCount ? (
-            <span className="text-[var(--accent-crimson)]">{s.productsNeedPhotos.replace("{n}", issueCount)}</span>
+            <span className="text-[var(--accent-crimson)]">{s.productsNeedPhotos.replace("{n}", formatNumber(issueCount, lang))}</span>
           ) : (
             <span className="text-[var(--accent-pine)]">{s.allProductsHavePhotos}</span>
           )}
@@ -56,7 +57,9 @@ export default function MediaPanel({ cmsContent, onEditProduct }) {
                 <th className="p-2 text-start font-semibold">{s.gallery}</th>
                 <th className="p-2 text-start font-semibold">360°</th>
                 <th className="p-2 text-start font-semibold">3D</th>
-                <th className="p-2" />
+                <th className="p-2">
+                  <span className="sr-only">{s.actions}</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -69,13 +72,15 @@ export default function MediaPanel({ cmsContent, onEditProduct }) {
                     </div>
                   </td>
                   <td className="p-2">{issue ? <Tag tone="crimson">{s[`issue_${issue}`]}</Tag> : <Tag tone="pine">{s.ok}</Tag>}</td>
-                  <td className="tabular-nums p-2">{p.gallery?.length || 0}</td>
+                  <td className="tabular-nums p-2">{formatNumber(p.gallery?.length || 0, lang)}</td>
                   <td className="tabular-nums p-2">
-                    <Tag tone={(p.spinImages?.length || 0) >= 8 ? "pine" : "neutral"}>{p.spinImages?.length || 0}/8</Tag>
+                    <Tag tone={(p.spinImages?.length || 0) >= 8 ? "pine" : "neutral"}>
+                      {formatNumber(p.spinImages?.length || 0, lang)}/{formatNumber(8, lang)}
+                    </Tag>
                   </td>
                   <td className="p-2">{p.model3dUrl ? <Tag tone="pine">GLB</Tag> : "—"}</td>
                   <td className="p-2 text-end">
-                    <button type="button" onClick={() => onEditProduct(p)} className={cls.btn}>
+                    <button type="button" onClick={() => onEditProduct(p)} aria-label={`${s.edit}: ${(p[lang] || p.fa)?.title || p.sku}`} className={cls.btn}>
                       {s.edit}
                     </button>
                   </td>
@@ -86,9 +91,9 @@ export default function MediaPanel({ cmsContent, onEditProduct }) {
         </div>
       </Card>
 
-      <Card title={`${s.allImages} (${refs.length})`}>
+      <Card title={`${s.allImages} (${formatNumber(refs.length, lang)})`}>
         <p className={cls.hint}>{s.allImagesHint}</p>
-        {brokenRefs > 0 && <p className="text-sm font-semibold text-[var(--accent-crimson)]">{s.brokenCount.replace("{n}", brokenRefs)}</p>}
+        {brokenRefs > 0 && <p className="text-sm font-semibold text-[var(--accent-crimson)]">{s.brokenCount.replace("{n}", formatNumber(brokenRefs, lang))}</p>}
         <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
           {refs
             .filter(([src]) => !onlyIssues || broken.has(src))

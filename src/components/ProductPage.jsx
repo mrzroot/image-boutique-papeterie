@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, Heart, Minus, Plus, ShoppingBag } from "lucide-react";
-import { formatPrice } from "../utils/pricing";
+import { formatPrice, formatNumber } from "../utils/pricing";
 import ProductMedia from "./ProductMedia";
 import { ProductRail } from "./StorefrontSections";
 
@@ -61,7 +61,7 @@ export default function ProductPage({
 
   return (
     <main className="animate-page-in">
-      <nav aria-label="breadcrumb" className="mx-auto max-w-7xl px-4 pt-6 sm:px-6">
+      <nav aria-label={lang === "fa" ? "مسیر صفحه" : "Breadcrumb"} className="mx-auto max-w-7xl px-4 pt-6 sm:px-6">
         <ol className="flex flex-wrap items-center gap-2 text-xs text-[var(--ink-sub)]">
           <li>
             <button type="button" onClick={onBack} className="inline-flex items-center gap-1.5 hover:text-[var(--ink-main)]">
@@ -70,7 +70,7 @@ export default function ProductPage({
             </button>
           </li>
           <li aria-hidden="true">/</li>
-          <li>{t.categoryNames[product.category]}</li>
+          <li aria-current="page">{t.categoryNames[product.category]}</li>
         </ol>
       </nav>
 
@@ -80,14 +80,13 @@ export default function ProductPage({
         </div>
 
         <div className="lg:col-span-6 lg:sticky lg:top-28 lg:self-start">
-          <p className="eyebrow text-[var(--accent-gold)]">{t.categoryNames[product.category]}</p>
-          <h1 className="mt-1 text-3xl sm:text-[2.5rem] font-bold leading-[1.35] text-[var(--ink-main)]">{loc.title}</h1>
+          <h1 className="text-3xl sm:text-[2.5rem] font-bold leading-[1.35] text-[var(--ink-main)]">{loc.title}</h1>
           <p className="mt-2 text-[15px] text-[var(--ink-sub)]">{loc.subtitle}</p>
 
           <p className="tabular-nums mt-6 text-2xl font-semibold text-[var(--accent-pine)]">{formatPrice(product.price * qty, lang)}</p>
           {qty > 1 && (
             <p className="tabular-nums mt-1 text-xs text-[var(--ink-sub)]">
-              {formatPrice(product.price, lang)} × {qty}
+              {formatPrice(product.price, lang)} × {formatNumber(qty, lang)}
             </p>
           )}
 
@@ -116,11 +115,11 @@ export default function ProductPage({
 
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <div className="qty-stepper" role="group" aria-label={P.quantity}>
-              <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="−" disabled={qty <= 1}>
+              <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label={lang === "fa" ? "کم کردن تعداد" : "Decrease quantity"} disabled={qty <= 1}>
                 <Minus className="h-4 w-4" aria-hidden="true" />
               </button>
-              <output className="tabular-nums" aria-live="polite">{qty}</output>
-              <button type="button" onClick={() => setQty((q) => Math.min(99, q + 1))} aria-label="+">
+              <output className="tabular-nums" aria-live="polite">{formatNumber(qty, lang)}</output>
+              <button type="button" onClick={() => setQty((q) => Math.min(99, q + 1))} aria-label={lang === "fa" ? "افزایش تعداد" : "Increase quantity"} disabled={qty >= 99}>
                 <Plus className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
@@ -137,7 +136,7 @@ export default function ProductPage({
               type="button"
               onClick={() => onToggleWishlist(product.id)}
               aria-pressed={isWished}
-              aria-label={t.wishlist}
+              aria-label={`${t.wishlist}: ${loc.title}`}
               className={`icon-btn ${isWished ? "text-[var(--accent-crimson)]" : ""}`}
             >
               <Heart className={`h-4 w-4 ${isWished ? "fill-current" : ""}`} aria-hidden="true" />
@@ -166,7 +165,7 @@ export default function ProductPage({
             )}
             <div>
               <dt>{P.sku}</dt>
-              <dd dir="ltr" className="tabular-nums text-start">{product.sku}</dd>
+              <dd className="tabular-nums"><bdi dir="ltr">{product.sku}</bdi></dd>
             </div>
           </dl>
         </div>

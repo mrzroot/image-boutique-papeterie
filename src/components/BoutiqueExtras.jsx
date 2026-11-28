@@ -28,11 +28,9 @@ const CARD_FINISHES = {
 export default function BoutiqueExtras({
   t,
   lang,
-  products = [],
   bundles = [],
   onAddBundle,
   onAddGiftCard,
-  onQuickView,
 }) {
   const [cardAmount, setCardAmount] = useState(1000000);
   const [cardDesign, setCardDesign] = useState("pine");
@@ -86,15 +84,15 @@ export default function BoutiqueExtras({
                         height="450"
                         className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                       />
-                      <span className="absolute top-2.5 start-2.5 rounded-[2px] bg-[var(--accent-crimson)] px-2.5 py-1 text-[11px] font-bold text-white">
+                      <span className="absolute top-2.5 start-2.5 rounded-[2px] bg-[var(--accent-crimson)] px-2.5 py-1 text-xs font-bold text-white">
                         {t.bundles.saveLabel}
                       </span>
                     </div>
 
                     <div className="pt-4 space-y-2">
-                      <div className="flex items-center justify-between gap-2 text-[11px] font-semibold tracking-wider text-[var(--ink-sub)]">
+                      <div className="flex items-center justify-between gap-2 text-xs font-semibold tracking-wider text-[var(--ink-sub)]">
                         <span className="font-latin-ui">{bundle.sku}</span>
-                        <span className="text-[var(--accent-gold)]">{loc.tag}</span>
+                        <span className="text-[var(--accent-gold-ink)]">{loc.tag}</span>
                       </div>
                       <h3 className="text-base font-bold text-[var(--ink-main)]">
                         {loc.title}
@@ -160,7 +158,7 @@ export default function BoutiqueExtras({
                     </p>
                   </div>
                   <span
-                    className="inline-flex items-center gap-1 rounded-[2px] px-2.5 py-0.5 text-[11px] font-bold"
+                    className="inline-flex items-center gap-1 rounded-[2px] px-2.5 py-0.5 text-xs font-bold"
                     style={{
                       backgroundColor: `${finish.border}22`,
                       color: finish.accent,
@@ -187,7 +185,7 @@ export default function BoutiqueExtras({
                   )}
                 </div>
 
-                <div className="relative z-10 flex items-center justify-between text-[11px] font-latin-ui opacity-75">
+                <div className="relative z-10 flex items-center justify-between text-xs font-latin-ui opacity-75">
                   <span>DIGITAL GIFT CARD</span>
                   <span>LA BOUTIQUE PAPETERIE</span>
                 </div>
@@ -218,6 +216,7 @@ export default function BoutiqueExtras({
                       key={amt}
                       type="button"
                       onClick={() => setCardAmount(amt)}
+                      aria-pressed={cardAmount === amt}
                       className={`tabular-nums rounded-[3px] border px-3 py-2.5 text-xs font-bold transition ${
                         cardAmount === amt
                           ? "border-[var(--accent-pine)] bg-[var(--accent-pine)] text-white"
@@ -242,6 +241,7 @@ export default function BoutiqueExtras({
                         key={key}
                         type="button"
                         onClick={() => setCardDesign(key)}
+                        aria-pressed={selected}
                         className={`inline-flex items-center gap-2 rounded-[3px] border px-3.5 py-2 text-xs font-semibold transition ${
                           selected
                             ? "border-[var(--accent-gold)] bg-[var(--accent-deep)] text-[#FAF6EE]"
@@ -249,7 +249,7 @@ export default function BoutiqueExtras({
                         }`}
                       >
                         <span
-                          className="h-3 w-3 rounded-full border border-white/40"
+                          className="h-3 w-3 rounded-full border border-[var(--border-strong)]"
                           style={{ backgroundColor: CARD_FINISHES[key].bg }}
                         />
                         <span>{t.giftCard.designs[key]}</span>

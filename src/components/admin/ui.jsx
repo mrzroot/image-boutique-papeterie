@@ -1,7 +1,8 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import { Upload, Plus, Trash2, ArrowUp, ArrowDown, ImageOff } from "lucide-react";
 import { CATEGORIES, STUDIO_IMAGE_PRESETS } from "../../data/catalog";
 import { compressImageFile } from "../../utils/cmsStore";
+import { formatNumber } from "../../utils/pricing";
 
 // { lang, s (strings), t (site translations), broken (Set of failed image srcs), markBroken, notify }
 export const AdminCtx = createContext(null);
@@ -64,7 +65,7 @@ export function Card({ id, title, actions, children, className = "" }) {
 const TONES = {
   neutral: "border-[var(--border-strong)] text-[var(--ink-sub)]",
   pine: "border-[var(--accent-pine)] text-[var(--accent-pine)]",
-  gold: "border-[var(--accent-gold)] text-[var(--accent-gold)]",
+  gold: "border-[var(--accent-gold)] text-[var(--accent-gold-ink)]",
   crimson: "border-[var(--accent-crimson)] text-[var(--accent-crimson)]",
 };
 
@@ -93,20 +94,54 @@ export function JumpNav({ items, label }) {
   );
 }
 
+// Keeps the typed text while focused (so it can be cleared, retyped or hold a decimal);
+// valid numbers are passed up as typed, clamped to min/max, and an empty field becomes min (or 0) on blur
+export function NumberInput({ value, onChange, min, max, ...rest }) {
+  const [raw, setRaw] = useState(null);
+  const clamp = (n) => Math.min(max ?? Infinity, Math.max(min ?? -Infinity, n));
+  const commit = (n) => n !== value && onChange(n);
+  return (
+    <input
+      type="number"
+      dir="ltr"
+      step="any"
+      min={min}
+      max={max}
+      {...rest}
+      value={raw ?? value ?? ""}
+      onChange={(e) => {
+        const text = e.target.value;
+        setRaw(text);
+        if (text.trim() !== "" && Number.isFinite(Number(text))) commit(clamp(Number(text)));
+      }}
+      onBlur={() => {
+        if (raw === null) return;
+        const n = Number(raw);
+        commit(raw.trim() !== "" && Number.isFinite(n) ? clamp(n) : clamp(min ?? 0));
+        setRaw(null);
+      }}
+    />
+  );
+}
+
 export function TextField({ label, value, onChange, dir, type = "text", multiline = false, ...rest }) {
   const Tagname = multiline ? "textarea" : "input";
   return (
     <label className="block min-w-0">
       <span className={cls.label}>{label}</span>
-      <Tagname
-        type={multiline ? undefined : type}
-        rows={multiline ? 3 : undefined}
-        dir={dir ?? (type === "number" ? "ltr" : undefined)}
-        value={value ?? ""}
-        onChange={(e) => onChange(type === "number" ? Number(e.target.value) || 0 : e.target.value)}
-        className={cls.input}
-        {...rest}
-      />
+      {type === "number" ? (
+        <NumberInput value={value} onChange={onChange} className={cls.input} {...rest} />
+      ) : (
+        <Tagname
+          type={multiline ? undefined : type}
+          rows={multiline ? 3 : undefined}
+          dir={dir}
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          className={cls.input}
+          {...rest}
+        />
+      )}
     </label>
   );
 }
@@ -235,11 +270,21 @@ export function ImageField({ label, value, onChange, compact = false }) {
   );
 }
 
-// Ordered list of image paths (gallery, 360° spin frames) with add / upload / reorder / remove
+// Ordered list of image paths (gallery, 360° spin frames) with add / upload / reorder / remove.
+// onChange receives the next list or an updater fn(prevList) (used after async uploads).
 export function ImageListField({ label, hint, value, onChange }) {
-  const { s } = useAdmin();
+  const { s, lang, notify } = useAdmin();
   const [busy, setBusy] = useState(false);
   const list = Array.isArray(value) ? value : [];
+  // Stable row keys that follow rows through reorder / remove (paths can repeat or be edited)
+  const ids = useRef([]);
+  const seq = useRef(0);
+  while (ids.current.length < list.length) ids.current.push(seq.current++);
+  ids.current.length = list.length;
+  const apply = (nextIds, nextList) => {
+    ids.current = nextIds;
+    onChange(nextList);
+  };
 
   const addFiles = async (e) => {
     const files = Array.from(e.target.files || []);
@@ -251,21 +296,23 @@ export function ImageListField({ label, hint, value, onChange }) {
       try {
         added.push(await compressImageFile(file, 900, 0.84));
       } catch {
-        // Skip unreadable files; the count below tells the owner what was added
+        // Counted below so the owner knows which share of the files was skipped
       }
     }
     setBusy(false);
-    onChange([...list, ...added]);
+    if (added.length) onChange((prev) => [...(Array.isArray(prev) ? prev : []), ...added]);
+    const failed = files.length - added.length;
+    if (failed) notify(s.uploadSomeFailed.replace("{n}", formatNumber(failed, lang)));
   };
 
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className={cls.h3}>
-          {label} <span className="tabular-nums text-[var(--ink-sub)]">({list.length})</span>
+          {label} <span className="tabular-nums text-[var(--ink-sub)]">({formatNumber(list.length, lang)})</span>
         </span>
         <div className="flex flex-wrap gap-1.5">
-          <button type="button" onClick={() => onChange([...list, ""])} className={cls.btn}>
+          <button type="button" onClick={() => apply([...ids.current, seq.current++], [...list, ""])} className={cls.btn}>
             <Plus className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{s.addPath}</span>
           </button>
@@ -284,19 +331,19 @@ export function ImageListField({ label, hint, value, onChange }) {
       ) : (
         <ol className="space-y-2">
           {list.map((src, i) => (
-            <li key={i} className={`${cls.sub} flex items-start gap-2`}>
-              <span className="tabular-nums w-5 shrink-0 pt-3 text-center text-xs text-[var(--ink-sub)]">{i + 1}</span>
+            <li key={ids.current[i]} className={`${cls.sub} flex items-start gap-2`}>
+              <span className="tabular-nums w-5 shrink-0 pt-3 text-center text-xs text-[var(--ink-sub)]">{formatNumber(i + 1, lang)}</span>
               <div className="min-w-0 flex-1">
                 <ImageField compact value={src} onChange={(v) => onChange(list.map((x, j) => (j === i ? v : x)))} />
               </div>
               <div className="flex shrink-0 flex-col gap-1">
-                <button type="button" disabled={i === 0} onClick={() => onChange(move(list, i, -1))} className={cls.icon} aria-label={s.moveUp}>
+                <button type="button" disabled={i === 0} onClick={() => apply(move(ids.current, i, -1), move(list, i, -1))} className={cls.icon} aria-label={s.moveUp}>
                   <ArrowUp className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
-                <button type="button" disabled={i === list.length - 1} onClick={() => onChange(move(list, i, 1))} className={cls.icon} aria-label={s.moveDown}>
+                <button type="button" disabled={i === list.length - 1} onClick={() => apply(move(ids.current, i, 1), move(list, i, 1))} className={cls.icon} aria-label={s.moveDown}>
                   <ArrowDown className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
-                <button type="button" onClick={() => onChange(list.filter((_, j) => j !== i))} className={cls.iconDanger} aria-label={s.remove}>
+                <button type="button" onClick={() => apply(ids.current.filter((_, j) => j !== i), list.filter((_, j) => j !== i))} className={cls.iconDanger} aria-label={s.remove}>
                   <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
               </div>

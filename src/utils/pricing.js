@@ -46,11 +46,24 @@ export const BINDING_OPTIONS = [
   { id: "hardcover", flatFee: 260000 },
 ];
 
-export function getVolumeDiscountRate(totalSheets) {
-  if (totalSheets >= 1000) return 0.3;
-  if (totalSheets >= 500) return 0.2;
-  if (totalSheets >= 100) return 0.1;
+export function getVolumeDiscountRate(totalImpressions) {
+  if (totalImpressions >= 1000) return 0.3;
+  if (totalImpressions >= 500) return 0.2;
+  if (totalImpressions >= 100) return 0.1;
   return 0;
+}
+
+// Whole number in [1, max]; decimals floor, junk becomes 1.
+export function clampCount(value, max) {
+  return Math.max(1, Math.min(max, Math.floor(Number(value)) || 1));
+}
+
+// Published override rows win by id; ids the override omits keep their defaults.
+function mergeById(defaults, rows) {
+  if (!rows?.length) return defaults;
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  const merged = defaults.map((d) => ({ ...d, ...byId.get(d.id) }));
+  return merged.concat(rows.filter((r) => !defaults.some((d) => d.id === r.id)));
 }
 
 export function getNextVolumeTier(totalImpressions) {
@@ -72,12 +85,12 @@ export function calculatePrintQuote(
   },
   overrides = null
 ) {
-  const safePages = Math.max(1, Math.min(5000, Number(pages) || 1));
-  const safeCopies = Math.max(1, Math.min(2000, Number(copies) || 1));
+  const safePages = clampCount(pages, 5000);
+  const safeCopies = clampCount(copies, 2000);
 
-  const printTypes = overrides?.printTypes?.length ? overrides.printTypes : PRINT_TYPES;
-  const paperStocks = overrides?.paperStocks?.length ? overrides.paperStocks : PAPER_STOCKS;
-  const bindings = overrides?.bindings?.length ? overrides.bindings : BINDING_OPTIONS;
+  const printTypes = mergeById(PRINT_TYPES, overrides?.printTypes);
+  const paperStocks = mergeById(PAPER_STOCKS, overrides?.paperStocks);
+  const bindings = mergeById(BINDING_OPTIONS, overrides?.bindings);
 
   const typeCfg = printTypes.find((t) => t.id === printType) || printTypes[1] || PRINT_TYPES[1];
   const sizeCfg = PAPER_SIZES.find((s) => s.id === size) || PAPER_SIZES[1];

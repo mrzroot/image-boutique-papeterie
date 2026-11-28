@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -18,10 +18,25 @@ import {
   PAPER_STOCKS,
   BINDING_OPTIONS,
   calculatePrintQuote,
+  clampCount,
   formatPrice,
   formatNumber,
 } from "../utils/pricing";
 import Live3DPreview, { COVER_THEMES } from "./Live3DPreview";
+
+// Service cards with a preset prefill the calculator; others are information only.
+const SERVICE_PRESETS = {
+  "bw-digital": { printType: "bw", size: "A4", sides: "double", paperStock: "tahrir80", binding: "spiral" },
+  "color-laser": { printType: "color", size: "A4", sides: "double", paperStock: "glossy135", binding: "saddle" },
+  "binding-thesis": { printType: "bw", size: "A4", sides: "single", paperStock: "tahrir100", binding: "hardcover" },
+  "arch-plot": { printType: "plot", size: "A3", sides: "single", paperStock: "cotton240", binding: "none" },
+  "stickers-labels": { printType: "sticker", size: "A4", sides: "single", paperStock: "glossy135", binding: "none" },
+  "corp-packaging": { printType: "color", size: "A4", sides: "single", paperStock: "kraft", binding: "hardcover" },
+};
+
+// Selected option fill: --accent-pine is remapped to the #2a6b53 fill in dark (index.css); white text is AA in both.
+const SELECTED = "border-[var(--accent-pine)] bg-[var(--accent-pine)] text-white";
+const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
 
 export default function ServicesPortal({
   t,
@@ -50,6 +65,11 @@ export default function ServicesPortal({
   const [uploadedFile, setUploadedFile] = useState(null);
   const [openFaqIdx, setOpenFaqIdx] = useState(0);
   const [justAdded, setJustAdded] = useState(false);
+  const [countDrafts, setCountDrafts] = useState({}); // raw pages/copies text while typing
+  const toastTimer = useRef(null);
+  const pct = (rate) => `${formatNumber(Math.round(rate * 100), lang)}${isRtl ? "٪" : "%"}`;
+
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
 
   const quote = calculatePrintQuote(config, pricingOverrides);
   const duplexDisabled =
@@ -67,18 +87,26 @@ export default function ServicesPortal({
     const file = e.target.files?.[0];
     if (!file) return;
     if (uploadedFile?.previewUrl) URL.revokeObjectURL(uploadedFile.previewUrl);
-    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
     const previewUrl = file.type.startsWith("image/")
       ? URL.createObjectURL(file)
       : null;
-    setUploadedFile({
-      name: file.name,
-      previewUrl,
-      sizeLabel:
-        file.size > 1024 * 1024
-          ? `${sizeMB} MB`
-          : `${Math.max(1, Math.round(file.size / 1024))} KB`,
-    });
+    setUploadedFile({ name: file.name, previewUrl, size: file.size });
+  };
+
+  const fileSizeLabel = (bytes) =>
+    bytes > 1024 * 1024
+      ? `${formatNumber(Number((bytes / (1024 * 1024)).toFixed(2)), lang)} ${isRtl ? "مگابایت" : "MB"}`
+      : `${formatNumber(Math.max(1, Math.round(bytes / 1024)), lang)} ${isRtl ? "کیلوبایت" : "KB"}`;
+
+  const setCount = (field, max, value) => {
+    setConfig((prev) => ({ ...prev, [field]: clampCount(value, max) }));
+  };
+
+  // Rows published before discountRate existed only carry a Persian-digit string.
+  const tierDiscount = (row) => {
+    if (typeof row.discountRate === "number") return row.discountRate > 0 ? pct(row.discountRate) : "-";
+    const legacy = String(row.discount || "-");
+    return isRtl ? legacy : legacy.replace(/[۰-۹]/g, (d) => PERSIAN_DIGITS.indexOf(d)).replace("٪", "%");
   };
 
   const handlePrintTypeChange = (typeId) => {
@@ -92,59 +120,13 @@ export default function ServicesPortal({
   };
 
   const applyServicePreset = (serviceId) => {
-    const presets = {
-      "bw-digital": {
-        printType: "bw",
-        size: "A4",
-        sides: "double",
-        paperStock: "tahrir80",
-        binding: "spiral",
-      },
-      "color-laser": {
-        printType: "color",
-        size: "A4",
-        sides: "double",
-        paperStock: "glossy135",
-        binding: "saddle",
-      },
-      "binding-thesis": {
-        printType: "bw",
-        size: "A4",
-        sides: "single",
-        paperStock: "tahrir100",
-        binding: "hardcover",
-      },
-      "arch-plot": {
-        printType: "plot",
-        size: "A3",
-        sides: "single",
-        paperStock: "cotton240",
-        binding: "none",
-      },
-      "stickers-labels": {
-        printType: "sticker",
-        size: "A4",
-        sides: "single",
-        paperStock: "glossy135",
-        binding: "none",
-      },
-      "corp-packaging": {
-        printType: "color",
-        size: "A4",
-        sides: "single",
-        paperStock: "kraft",
-        binding: "hardcover",
-      },
-    };
-    if (presets[serviceId]) {
-      setConfig((prev) => ({ ...prev, ...presets[serviceId] }));
-      if (serviceId === "binding-thesis") setCoverTheme("pine");
-      else if (serviceId === "corp-packaging") setCoverTheme("kraft");
-      else setCoverTheme("ivory");
-      document
-        .getElementById("quote-calculator")
-        ?.scrollIntoView({ behavior: "smooth" });
-    }
+    setConfig((prev) => ({ ...prev, ...SERVICE_PRESETS[serviceId] }));
+    if (serviceId === "binding-thesis") setCoverTheme("pine");
+    else if (serviceId === "corp-packaging") setCoverTheme("kraft");
+    else setCoverTheme("ivory");
+    document
+      .getElementById("quote-calculator")
+      ?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleAddToBag = () => {
@@ -153,7 +135,7 @@ export default function ServicesPortal({
     const bindingName = t.bindingNames[config.binding];
     const metaParts = [
       `${config.size}`,
-      `${config.pages} ${lang === "fa" ? "صفحه" : "p"} × ${config.copies} ${
+      `${formatNumber(config.pages, lang)} ${lang === "fa" ? "صفحه" : "p"} × ${formatNumber(config.copies, lang)} ${
         lang === "fa" ? "نسخه" : "copies"
       }`,
       stockName,
@@ -177,7 +159,8 @@ export default function ServicesPortal({
       image: "./images/atelier-services.jpg",
     });
     setJustAdded(true);
-    setTimeout(() => setJustAdded(false), 3000);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setJustAdded(false), 3000);
   };
 
   return (
@@ -188,13 +171,13 @@ export default function ServicesPortal({
           <button
             type="button"
             onClick={onBackToStore}
-            className="inline-flex items-center gap-2 rounded-[3px] bg-[var(--bg-surface)] px-4 py-2 text-xs font-bold text-[var(--accent-pine)] border border-[var(--border-strong)] transition hover:bg-[var(--accent-pine)] hover:text-white"
+            className="inline-flex items-center gap-2 rounded-[3px] bg-[var(--bg-surface)] px-4 py-2 text-xs font-bold text-[var(--accent-pine)] border border-[var(--border-strong)] transition hover:bg-[#2a6b53] hover:text-white"
           >
             <BackArrow className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{t.backToStorefront}</span>
           </button>
-          <span className="font-latin-ui text-xs font-semibold tracking-wider text-[var(--ink-sub)]">
-            IMAGE BOUTIQUE · PRINT & BINDERY PORTAL
+          <span className="text-xs font-semibold text-[var(--ink-sub)]">
+            {isRtl ? "ایمیج بوتیک · آتلیه چاپ و صحافی" : "Image Boutique · Print & bindery atelier"}
           </span>
         </div>
       </div>
@@ -204,9 +187,6 @@ export default function ServicesPortal({
         <div className="overflow-hidden rounded-[4px] border border-[#C8A258]/40 bg-[#123126] text-[#FAF6EE]">
           <div className="grid items-stretch md:grid-cols-12">
             <div className="space-y-4 p-7 sm:p-9 md:col-span-7">
-              <p className="eyebrow text-[#E7D19F]">
-                {t.servicesHeroEyebrow}
-              </p>
               <h1
                 className={`text-2xl sm:text-3xl lg:text-4xl font-bold leading-snug text-white ${
                   isRtl ? "" : "font-editorial"
@@ -253,10 +233,7 @@ export default function ServicesPortal({
         className="mx-auto max-w-7xl px-4 py-8 sm:px-6"
       >
         <div className="mb-6">
-          <p className="eyebrow text-[var(--accent-crimson)]">
-            {t.calcEyebrow}
-          </p>
-          <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
             {t.calcTitle}
           </h2>
         </div>
@@ -274,10 +251,11 @@ export default function ServicesPortal({
                   <button
                     key={pt.id}
                     type="button"
+                    aria-pressed={config.printType === pt.id}
                     onClick={() => handlePrintTypeChange(pt.id)}
                     className={`rounded-[3px] border px-2.5 py-2.5 text-start text-xs font-semibold transition ${
                       config.printType === pt.id
-                        ? "border-[#183E30] bg-[#183E30] text-white"
+                        ? SELECTED
                         : "border-[var(--border-subtle)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
                     }`}
                   >
@@ -298,12 +276,13 @@ export default function ServicesPortal({
                     <button
                       key={s.id}
                       type="button"
+                      aria-pressed={config.size === s.id}
                       onClick={() =>
                         setConfig((prev) => ({ ...prev, size: s.id }))
                       }
                       className={`font-latin-ui rounded-[3px] border py-1.5 text-center text-xs font-bold transition ${
                         config.size === s.id
-                          ? "border-[#14201A] bg-[#14201A] text-[#E7D19F]"
+                          ? SELECTED
                           : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
                       }`}
                     >
@@ -323,13 +302,14 @@ export default function ServicesPortal({
                       key={side}
                       type="button"
                       disabled={duplexDisabled && side === "double"}
+                      aria-pressed={config.sides === side && !(duplexDisabled && side === "double")}
                       onClick={() =>
                         setConfig((prev) => ({ ...prev, sides: side }))
                       }
                       className={`rounded-[3px] border px-3 py-1.5 text-xs font-semibold transition disabled:opacity-40 ${
                         config.sides === side &&
                         !(duplexDisabled && side === "double")
-                          ? "border-[#183E30] bg-[#183E30] text-white"
+                          ? SELECTED
                           : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)]"
                       }`}
                     >
@@ -411,15 +391,16 @@ export default function ServicesPortal({
                     <button
                       key={theme.id}
                       type="button"
+                      aria-pressed={selected}
                       onClick={() => setCoverTheme(theme.id)}
                       className={`inline-flex items-center gap-1.5 rounded-[3px] border px-2.5 py-1 text-xs font-semibold transition ${
                         selected
-                          ? "border-[#14201A] bg-[#14201A] text-white"
+                          ? SELECTED
                           : "border-[var(--border-strong)] bg-[var(--bg-page)] text-[var(--ink-main)] hover:border-[var(--accent-gold)]"
                       }`}
                     >
                       <span
-                        className="h-3 w-3 rounded-full border border-white/40"
+                        className="h-3 w-3 rounded-full border border-[var(--border-strong)]"
                         style={{ backgroundColor: theme.bg }}
                       />
                       <span>{lang === "fa" ? theme.labelFa : theme.labelEn}</span>
@@ -445,14 +426,9 @@ export default function ServicesPortal({
                   <div className="flex items-center justify-between rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-page)] p-1">
                     <button
                       type="button"
-                      aria-label={`Decrease ${field}`}
-                      onClick={() =>
-                        setConfig((prev) => ({
-                          ...prev,
-                          [field]: Math.max(1, prev[field] - 1),
-                        }))
-                      }
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-[2px] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:bg-[#183E30] hover:text-white"
+                      aria-label={`${isRtl ? "کاهش" : "Decrease"}: ${label}`}
+                      onClick={() => setCount(field, max, config[field] - 1)}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-[2px] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:bg-[#2a6b53] hover:text-white"
                     >
                       <Minus className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
@@ -461,28 +437,23 @@ export default function ServicesPortal({
                       type="number"
                       min={1}
                       max={max}
-                      value={config[field]}
-                      onChange={(e) =>
-                        setConfig((prev) => ({
-                          ...prev,
-                          [field]: Math.max(
-                            1,
-                            Math.min(max, Number(e.target.value) || 1)
-                          ),
-                        }))
-                      }
-                      className="tabular-nums w-20 bg-transparent text-center font-latin-ui text-sm font-bold text-[var(--ink-main)]"
+                      step={1}
+                      inputMode="numeric"
+                      value={countDrafts[field] ?? config[field]}
+                      onChange={(e) => {
+                        // Keep the raw text (even empty) while typing; the quote uses the last valid count.
+                        const raw = e.target.value;
+                        setCountDrafts((d) => ({ ...d, [field]: raw }));
+                        if (raw !== "") setCount(field, max, raw);
+                      }}
+                      onBlur={() => setCountDrafts((d) => ({ ...d, [field]: undefined }))}
+                      className="tabular-nums w-20 bg-transparent text-center text-sm font-bold text-[var(--ink-main)]"
                     />
                     <button
                       type="button"
-                      aria-label={`Increase ${field}`}
-                      onClick={() =>
-                        setConfig((prev) => ({
-                          ...prev,
-                          [field]: Math.min(max, prev[field] + 1),
-                        }))
-                      }
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-[2px] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:bg-[#183E30] hover:text-white"
+                      aria-label={`${isRtl ? "افزایش" : "Increase"}: ${label}`}
+                      onClick={() => setCount(field, max, config[field] + 1)}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-[2px] bg-[var(--bg-surface)] text-[var(--ink-main)] hover:bg-[#2a6b53] hover:text-white"
                     >
                       <Plus className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
@@ -534,8 +505,8 @@ export default function ServicesPortal({
                       <p className="truncate text-xs sm:text-sm font-bold text-[var(--ink-main)] font-latin-ui">
                         {uploadedFile.name}
                       </p>
-                      <p className="text-xs text-[var(--ink-sub)] font-latin-ui">
-                        {uploadedFile.sizeLabel}
+                      <p className="text-xs text-[var(--ink-sub)]">
+                        {fileSizeLabel(uploadedFile.size)}
                       </p>
                     </div>
                   </div>
@@ -570,17 +541,11 @@ export default function ServicesPortal({
 
           {/* Sticky Dark Order Summary + Live Bindery 3D Preview */}
           <aside className="min-w-0 rounded-[4px] border border-[#C8A258]/40 bg-[#123126] p-4 sm:p-5 text-[#FAF6EE] md:col-span-5 lg:col-span-4 md:sticky md:top-[96px] md:max-h-[calc(100vh-112px)] md:overflow-y-auto space-y-3">
-            <div>
-              <p className="eyebrow text-[#E7D19F]">
-                {t.orderSummary.eyebrow}
-              </p>
-              <h3 className="mt-0.5 text-lg font-bold text-white">
-                {t.orderSummary.title}
-              </h3>
-            </div>
+            <h3 className="text-lg font-bold text-white">
+              {t.orderSummary.title}
+            </h3>
 
             <Live3DPreview
-              mode="print"
               config={config}
               customTitle={customTitle}
               coverTheme={coverTheme}
@@ -612,7 +577,7 @@ export default function ServicesPortal({
                 <div className="flex justify-between text-[#9BD4B8]">
                   <span>{t.orderSummary.discount}</span>
                   <span className="tabular-nums font-bold">
-                    −{formatNumber(Math.round(quote.discountRate * 100), lang)}{lang === "fa" ? "٪" : "%"} (−
+                    −{pct(quote.discountRate)} (−
                     {formatPrice(quote.discountAmount, lang)})
                   </span>
                 </div>
@@ -628,13 +593,15 @@ export default function ServicesPortal({
 
             {quote.nextTier && (
               <div className="rounded-[3px] bg-white/10 px-3 py-2 text-xs space-y-1">
-                <div className="flex justify-between text-[#E7D19F]">
+                <div className="flex justify-between gap-3 text-[#E7D19F]">
                   <span>
-                    {lang === "fa"
-                      ? `تا تخفیف ${formatNumber(Math.round(quote.nextTier.rate * 100), lang)}٪ پلکانی`
-                      : `Next ${Math.round(quote.nextTier.rate * 100)}% tier`}
+                    {t.orderSummary.nextTierHint
+                      ? `${t.orderSummary.nextTierHint} ${pct(quote.nextTier.rate)}`
+                      : isRtl
+                        ? `تا تخفیف ${pct(quote.nextTier.rate)} پلکانی`
+                        : `Next ${pct(quote.nextTier.rate)} tier`}
                   </span>
-                  <span className="tabular-nums font-bold font-latin-ui">
+                  <span className="tabular-nums shrink-0 font-bold">
                     {formatNumber(quote.totalImpressions, lang)} /{" "}
                     {formatNumber(quote.nextTier.minImpressions, lang)}
                   </span>
@@ -690,23 +657,23 @@ export default function ServicesPortal({
       {/* 6 Numbered Services Catalog (Semantic Buttons) */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="mb-6">
-          <p className="eyebrow text-[var(--accent-pine)]">
-            {t.servicesSectionEyebrow}
-          </p>
-          <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
             {t.servicesSectionTitle}
           </h2>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {servicesList.map((srv, idx) => {
+          {servicesList.map((srv) => {
             const loc = srv[lang] || srv.fa;
+            const hasPreset = Boolean(SERVICE_PRESETS[srv.id]);
+            const Card = hasPreset ? "button" : "div";
             return (
               <div key={srv.id}>
-                <button
-                  type="button"
-                  onClick={() => applyServicePreset(srv.id)}
-                  className="group flex h-full w-full flex-col justify-between rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 text-start transition-colors hover:border-[var(--accent-gold)]"
+                <Card
+                  {...(hasPreset ? { type: "button", onClick: () => applyServicePreset(srv.id) } : {})}
+                  className={`group flex h-full w-full flex-col justify-between rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 text-start transition-colors ${
+                    hasPreset ? "hover:border-[var(--accent-gold)]" : ""
+                  }`}
                 >
                   <div className="w-full">
                     <div className="flex items-center justify-start">
@@ -724,7 +691,7 @@ export default function ServicesPortal({
                   <span className="mt-4 block w-full border-t border-[var(--border-subtle)] pt-3 text-xs font-semibold text-[var(--accent-pine)]">
                     {loc.unit}
                   </span>
-                </button>
+                </Card>
               </div>
             );
           })}
@@ -767,11 +734,11 @@ export default function ServicesPortal({
                     <td className="tabular-nums py-3.5">
                       {row.best ? (
                         <span className="inline-flex rounded-[2px] bg-[var(--accent-crimson)] px-2.5 py-0.5 text-xs font-bold text-white">
-                          {row.discount}
+                          {tierDiscount(row)}
                         </span>
                       ) : (
                         <span className="text-[var(--accent-pine)] font-semibold">
-                          {row.discount}
+                          {tierDiscount(row)}
                         </span>
                       )}
                     </td>
@@ -786,9 +753,6 @@ export default function ServicesPortal({
         <div className="rounded-[4px] border border-[#C8A258]/35 bg-[#123126] p-7 sm:p-10 text-[#FAF6EE]">
           <div className="grid gap-8 lg:grid-cols-12 items-center">
             <div className="space-y-3 lg:col-span-6">
-              <p className="eyebrow text-[#E7D19F]">
-                {t.wholesaleEyebrow}
-              </p>
               <h3 className="text-2xl font-bold text-white">
                 {t.wholesaleTitle}
               </h3>

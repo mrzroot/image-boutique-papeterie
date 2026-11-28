@@ -44,7 +44,7 @@ export const MEDIA_STRINGS = {
     front: "روبه‌رو",
     back: "پشت",
     top: "بالا",
-    dragHint: "برای چرخاندن بکشید · چرخ ماوس یا دو انگشت برای زوم",
+    dragHint: "برای چرخاندن بکشید · Ctrl + چرخ ماوس یا دو انگشت برای زوم",
     spinHint: "برای چرخاندن محصول بکشید یا از کلیدهای جهت استفاده کنید",
   },
   en: {
@@ -69,7 +69,7 @@ export const MEDIA_STRINGS = {
     front: "Front",
     back: "Back",
     top: "Top",
-    dragHint: "Drag to tilt · wheel or pinch to zoom",
+    dragHint: "Drag to tilt · Ctrl + wheel or pinch to zoom",
     spinHint: "Drag or use arrow keys to turn the product",
   },
 };

@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { Store, LayoutGrid, Printer, ShoppingBag, ArrowUp } from "lucide-react";
 import { TRANSLATIONS } from "./data/translations";
+import { formatNumber, formatPrice } from "./utils/pricing";
 import {
   buildDefaultSiteContent,
   mergeSiteContent,
@@ -40,7 +41,12 @@ function viewFromHash() {
 }
 
 export default function App() {
-  const [lang, setLang] = useState(() => readStorage("ib_lang", "fa"));
+  // a shared link with ?lang=fa|en wins over the language saved in this browser; anything else falls back to Persian
+  const [lang, setLang] = useState(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("lang");
+    if (fromUrl === "fa" || fromUrl === "en") return fromUrl;
+    return readStorage("ib_lang", "fa") === "en" ? "en" : "fa";
+  });
   const [theme, setTheme] = useState(() => readStorage("ib_theme", "light"));
   const [view, setView] = useState(viewFromHash);
   const [productRoute, setProductRoute] = useState(() => ({ id: productIdFromHash(), variantIdx: 0 }));
@@ -101,16 +107,25 @@ export default function App() {
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === "fa" ? "rtl" : "ltr";
-    document.title =
-      lang === "fa"
-        ? "ایمیج بوتیک | Image Boutique · La Boutique Papeterie"
-        : "Image Boutique | La Boutique Papeterie · Fine Stationery & Print Atelier";
+    // the product page owns the title while it is open
+    if (view !== "product") {
+      document.title =
+        lang === "fa"
+          ? "ایمیج بوتیک | Image Boutique · La Boutique Papeterie"
+          : "Image Boutique | La Boutique Papeterie · Fine Stationery & Print Atelier";
+    }
+    // keep an existing ?lang= in step, otherwise a refresh after toggling would switch back
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("lang") && url.searchParams.get("lang") !== lang) {
+      url.searchParams.set("lang", lang);
+      window.history.replaceState(window.history.state, "", url);
+    }
     try {
       localStorage.setItem("ib_lang", JSON.stringify(lang));
     } catch {
       // Ignore storage quota errors
     }
-  }, [lang]);
+  }, [lang, view]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -194,8 +209,25 @@ export default function App() {
     setActiveVariantIdx(variantIdx);
   };
 
+  // set by AdminDashboard while the product form has unsaved edits; any way out of the admin asks first
+  const adminDirty = useRef(false);
+  const handleAdminDirty = useCallback((d) => {
+    adminDirty.current = d;
+  }, []);
+  const confirmLeaveAdmin = () =>
+    !adminDirty.current ||
+    window.confirm(
+      document.documentElement.lang === "fa"
+        ? "تغییرات ذخیره‌نشده محصول از بین می‌رود. ادامه می‌دهید؟"
+        : "Your unsaved product changes will be lost. Continue?"
+    );
+
   useEffect(() => {
     const handleHashChange = () => {
+      if (viewFromHash() !== "admin" && !confirmLeaveAdmin()) {
+        window.history.pushState(null, "", "#/admin"); // stay; pushState does not fire hashchange
+        return;
+      }
       setView(viewFromHash());
       const id = productIdFromHash();
       if (id) setProductRoute((prev) => (prev.id === id ? prev : { id, variantIdx: 0 }));
@@ -208,12 +240,15 @@ export default function App() {
     window.scrollTo({ top: 0 });
   }, [view]);
 
+  const toastTimer = useRef(null);
   const showToast = useCallback((msg) => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(""), 2600);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToastMsg(""), 2600);
   }, []);
 
   const handleNavigate = useCallback((targetView, scrollId) => {
+    if (targetView !== "admin" && !confirmLeaveAdmin()) return;
     // the catalog is its own page now; old "store#catalog" callers land there
     if (targetView === "store" && scrollId === "catalog") {
       targetView = "shop";
@@ -258,6 +293,7 @@ export default function App() {
   };
 
   const handleAddProductToBag = (product, variantIdx = 0, qty = 1) => {
+    if (product.inStock === false) return;
     const key = `${product.id}::${variantIdx}`;
     const loc = product[lang] || product.fa;
     const variants = loc.variants || [];
@@ -334,7 +370,7 @@ export default function App() {
         key,
         kind: "giftcard",
         spec: { amount, design, recipient, message },
-        title: `${t.giftCard.cardBadge} (${amount})`,
+        title: `${t.giftCard.cardBadge} (${formatPrice(amount, lang)})`,
         meta: finishLabel,
         unitPrice: amount,
         qty: 1,
@@ -382,7 +418,7 @@ export default function App() {
         cartCount={totalBagCount}
         wishlistCount={wishlist.length}
         onOpenBag={() => setBagOpen(true)}
-        onToggleWishlistFilter={() => setWishlistOnly((w) => !w)}
+        onToggleWishlistFilter={() => setWishlistOnly((w) => (view === "shop" ? !w : true))}
         wishlistOnly={wishlistOnly}
         onQuickView={handleOpenQuickView}
         products={cmsContent.products}
@@ -407,6 +443,7 @@ export default function App() {
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
             searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
             wishlist={wishlist}
             wishlistOnly={wishlistOnly}
             onToggleWishlistOnly={() => setWishlistOnly((w) => !w)}
@@ -465,6 +502,7 @@ export default function App() {
               onUpdateOrders={setOrderHistory}
               onNavigate={handleNavigate}
               showToast={showToast}
+              onDirtyChange={handleAdminDirty}
             />
           </Suspense>
         )}
@@ -488,30 +526,32 @@ export default function App() {
         <button
           type="button"
           onClick={() => handleNavigate("store")}
-          className={`flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold ${
+          aria-current={view === "store" ? "page" : undefined}
+          className={`flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-xs font-semibold ${
             view === "store" ? "text-[var(--accent-pine)] font-bold" : "text-[var(--ink-sub)]"
           }`}
         >
           <Store className="h-4 w-4" aria-hidden="true" />
-          <span>{lang === "fa" ? "فروشگاه" : "Boutique"}</span>
+          <span>{t.nav.home}</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleNavigate("shop")}
           aria-current={view === "shop" ? "page" : undefined}
-          className={`flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold ${
+          className={`flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-xs font-semibold ${
             view === "shop" ? "text-[var(--accent-pine)] font-bold" : "text-[var(--ink-sub)]"
           }`}
         >
           <LayoutGrid className="h-4 w-4" aria-hidden="true" />
-          <span>{lang === "fa" ? "دسته‌ها" : "Catalog"}</span>
+          <span>{lang === "fa" ? "همه محصولات" : "Shop"}</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleNavigate("services")}
-          className={`flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold ${
+          aria-current={view === "services" ? "page" : undefined}
+          className={`flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-xs font-semibold ${
             view === "services" ? "text-[var(--accent-crimson)] font-bold" : "text-[var(--ink-sub)]"
           }`}
         >
@@ -522,13 +562,13 @@ export default function App() {
         <button
           type="button"
           onClick={() => setBagOpen(true)}
-          className="relative flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-[var(--ink-main)]"
+          className="relative flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-xs font-semibold text-[var(--ink-main)]"
         >
           <ShoppingBag className="h-4 w-4 text-[var(--accent-gold)]" aria-hidden="true" />
-          <span>{lang === "fa" ? "سبد خرید" : "Bag"}</span>
+          <span>{t.bag}</span>
           {totalBagCount > 0 && (
-            <span className="tabular-nums absolute top-1.5 end-4 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent-crimson)] px-1 text-[9px] font-bold text-white font-latin-ui">
-              {totalBagCount}
+            <span className="tabular-nums absolute top-1.5 end-4 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent-crimson)] px-1 text-xs font-bold text-white font-latin-ui">
+              {formatNumber(totalBagCount, lang)}
             </span>
           )}
         </button>
@@ -574,7 +614,7 @@ export default function App() {
         <button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Scroll to top"
+          aria-label={lang === "fa" ? "بازگشت به بالای صفحه" : "Back to top"}
           className="fixed bottom-18 end-3 z-30 inline-flex h-9 w-9 items-center justify-center rounded-[3px] border border-[var(--accent-gold)]/50 bg-[var(--accent-deep)] text-[#E7D19F] shadow-md transition hover:bg-[var(--accent-pine)] md:bottom-5 md:end-5"
         >
           <ArrowUp className="h-4 w-4" aria-hidden="true" />
@@ -582,15 +622,14 @@ export default function App() {
       )}
 
       {/* Toast Feedback */}
-      {toastMsg && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="fixed bottom-18 left-1/2 z-50 -translate-x-1/2 rounded-[4px] bg-[#14201A] px-5 py-2.5 text-xs font-semibold text-white shadow-xl border border-[#C8A258]/45 md:bottom-6"
-        >
-          {toastMsg}
-        </div>
-      )}
+      {/* Live region stays mounted so screen readers announce each new message */}
+      <div
+        role="status"
+        aria-live="polite"
+        className={toastMsg ? "fixed bottom-18 left-1/2 z-50 -translate-x-1/2 rounded-[4px] bg-[#14201A] px-5 py-2.5 text-sm font-semibold text-white shadow-xl border border-[#C8A258]/45 md:bottom-6" : "sr-only"}
+      >
+        {toastMsg}
+      </div>
     </div>
   );
 }

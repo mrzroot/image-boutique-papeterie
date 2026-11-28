@@ -127,7 +127,7 @@ function makeShadowTexture() {
 }
 
 const btn =
-  "inline-flex h-8 items-center justify-center gap-1 rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-2 text-xs text-[var(--ink-main)] transition hover:border-[var(--accent-gold)] focus-visible:outline-2 focus-visible:outline-[var(--accent-pine)] aria-pressed:bg-[var(--accent-pine)] aria-pressed:text-white aria-pressed:border-[var(--accent-pine)]";
+  "inline-flex h-8 items-center justify-center gap-1 rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-2 text-xs text-[var(--ink-main)] transition hover:border-[var(--accent-gold)] focus-visible:outline-2 focus-visible:outline-[var(--accent-pine)] aria-pressed:bg-[#2a6b53] aria-pressed:text-white aria-pressed:border-[#2a6b53]"; // #2a6b53: pine fill that keeps white text AA in both themes
 
 /** Mode 2: the real photo on a thin board, true aspect ratio, rotation clamped so no invented sides show. */
 export function PhotoStage3D({ src, lang, onFail, heightClass }) {
@@ -214,10 +214,11 @@ export function PhotoStage3D({ src, lang, onFail, heightClass }) {
     [src]
   );
 
-  // Non-passive wheel listener so the page doesn't scroll while zooming.
+  // Ctrl/Cmd + wheel (and trackpad pinch) zooms; a plain wheel scrolls the page.
   useEffect(() => {
     const el = mountRef.current;
     const onWheel = (e) => {
+      if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
       view.current.tz = clamp(view.current.tz * Math.exp(e.deltaY * 0.001), 2.4, 6);
     };
@@ -319,7 +320,7 @@ export function PhotoStage3D({ src, lang, onFail, heightClass }) {
             <span>{s.sway}</span>
           </button>
         )}
-        <span className="ms-auto text-[11px] text-[var(--ink-sub)]">{s.dragHint}</span>
+        <span className="ms-auto text-xs text-[var(--ink-sub)]">{s.dragHint}</span>
       </div>
     </div>
   );
@@ -357,7 +358,24 @@ export function ModelStage3D({ url, lang, onFail, heightClass }) {
         controls.target.set(0, 0, 0);
         controls.update();
       };
-      api.current = { setView };
+      // Plain arrows orbit (OrbitControls' own keys only rotate with a modifier when pan is off).
+      const sph = new THREE.Spherical();
+      const offset = new THREE.Vector3();
+      const orbit = (dTheta, dPhi, scale = 1) => {
+        offset.copy(camera.position).sub(controls.target);
+        sph.setFromVector3(offset);
+        sph.theta += dTheta;
+        sph.phi = clamp(sph.phi + dPhi, 0.01, Math.PI - 0.01);
+        sph.radius *= scale;
+        camera.position.copy(controls.target).add(offset.setFromSpherical(sph));
+        controls.update();
+      };
+      api.current = { setView, orbit };
+      const mount = mountRef.current;
+      controls.listenToKeyEvents(mount);
+      // Let a plain wheel scroll the page: OrbitControls (on the canvas) only sees Ctrl/Cmd + wheel.
+      const passWheel = (e) => !e.ctrlKey && !e.metaKey && e.stopPropagation();
+      mount.addEventListener("wheel", passWheel, { capture: true });
 
       new GLTFLoader().load(
         url,
@@ -390,6 +408,8 @@ export function ModelStage3D({ url, lang, onFail, heightClass }) {
         dispose() {
           disposed = true;
           api.current = null;
+          mount.removeEventListener("wheel", passWheel, { capture: true });
+          controls.stopListenToKeyEvents();
           controls.dispose();
         },
       };
@@ -397,12 +417,38 @@ export function ModelStage3D({ url, lang, onFail, heightClass }) {
     [url]
   );
 
+  const onKeyDown = (e) => {
+    if (e.shiftKey || e.ctrlKey || e.metaKey) return; // OrbitControls handles modified arrows
+    const step = 0.15;
+    const actions = {
+      ArrowLeft: [step, 0],
+      ArrowRight: [-step, 0],
+      ArrowUp: [0, step],
+      ArrowDown: [0, -step],
+      "+": [0, 0, 0.9],
+      "=": [0, 0, 0.9],
+      "-": [0, 0, 1.1],
+    };
+    if (actions[e.key]) {
+      e.preventDefault();
+      setAutoRotate(false);
+      api.current?.orbit(...actions[e.key]);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      api.current?.setView("front");
+    }
+  };
+
   return (
     <div className="space-y-2">
       <p className="text-xs font-semibold text-[var(--ink-main)]">{s.accurateLabel}</p>
       <div
         ref={mountRef}
-        className={`relative w-full overflow-hidden rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-soft)] cursor-grab active:cursor-grabbing touch-none select-none ${heightClass}`}
+        tabIndex={0}
+        role="application"
+        aria-label={`${s.accurateLabel}. ${s.dragHint}`}
+        onKeyDown={onKeyDown}
+        className={`relative w-full overflow-hidden rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-soft)] cursor-grab active:cursor-grabbing touch-none select-none focus-visible:outline-2 focus-visible:outline-[var(--accent-pine)] ${heightClass}`}
       >
         {loading && (
           <span className="absolute inset-0 flex items-center justify-center text-xs text-[var(--ink-sub)]">

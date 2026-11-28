@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { STUDIO_IMAGE_PRESETS } from "../../data/catalog";
+import { formatNumber } from "../../utils/pricing";
 import { cls, useAdmin, Card, JumpNav, TextField, LocFields, ImageField, RowControls, move } from "./ui";
 
 export default function SiteContentPanel({ cmsContent, onUpdateContent }) {
@@ -82,8 +83,8 @@ export default function SiteContentPanel({ cmsContent, onUpdateContent }) {
                   {
                     id: `slide-${Date.now()}`,
                     image: STUDIO_IMAGE_PRESETS[0],
-                    fa: { eyebrow: "NEW COLLECTION", title: "عنوان بنر جدید", desc: "توضیح کوتاه بنر", ctaPrimary: "مشاهده محصولات" },
-                    en: { eyebrow: "NEW COLLECTION", title: "New Banner Title", desc: "Short banner subtitle", ctaPrimary: "Shop Collection" },
+                    fa: { eyebrow: "", title: "عنوان بنر جدید", desc: "توضیح کوتاه بنر", ctaPrimary: "مشاهده محصولات" },
+                    en: { eyebrow: "", title: "New Banner Title", desc: "Short banner subtitle", ctaPrimary: "Shop Collection" },
                   },
                 ],
               }));
@@ -99,13 +100,13 @@ export default function SiteContentPanel({ cmsContent, onUpdateContent }) {
           <div key={slide.id || idx} className="space-y-3 border-t border-[var(--border-subtle)] pt-4 first:border-t-0 first:pt-0">
             <div className="flex items-center justify-between gap-2">
               <h3 className={cls.h3}>
-                {s.slide} {idx + 1}
+                {s.slide} {formatNumber(idx + 1, lang)}
               </h3>
               <RowControls
                 index={idx}
                 length={heroSlides.length}
                 onMove={reorder("heroSlides", idx)}
-                onDelete={heroSlides.length > 1 ? removeItem("heroSlides", idx, `${s.slide} ${idx + 1}`) : undefined}
+                onDelete={heroSlides.length > 1 ? removeItem("heroSlides", idx, `${s.slide} ${formatNumber(idx + 1, lang)}`) : undefined}
               />
             </div>
             <ImageField label={s.image} value={slide.image} onChange={(v) => patchItem("heroSlides", idx, (x) => ({ ...x, image: v }))} />
@@ -159,7 +160,6 @@ export default function SiteContentPanel({ cmsContent, onUpdateContent }) {
                     sku: `IB-SET-0${prev.bundles.length + 1}`,
                     originalPrice: 2000000,
                     price: 1700000,
-                    savePercent: 15,
                     image: STUDIO_IMAGE_PRESETS[0],
                     fa: { title: "پک هدیه جدید", items: "توضیح اقلام پک", tag: "پک ویژه" },
                     en: { title: "New Gift Coffret", items: "Bundle items", tag: "Special Set" },
@@ -184,9 +184,8 @@ export default function SiteContentPanel({ cmsContent, onUpdateContent }) {
               <ImageField label={s.image} value={b.image} onChange={(v) => patchItem("bundles", idx, (x) => ({ ...x, image: v }))} />
               <div className="grid grid-cols-2 gap-2">
                 <TextField label="SKU" dir="ltr" value={b.sku} onChange={(v) => patchItem("bundles", idx, (x) => ({ ...x, sku: v }))} />
-                <TextField label={s.savePercent} type="number" value={b.savePercent} onChange={(v) => patchItem("bundles", idx, (x) => ({ ...x, savePercent: v }))} />
-                <TextField label={s.priceToman} type="number" value={b.price} onChange={(v) => patchItem("bundles", idx, (x) => ({ ...x, price: v }))} />
-                <TextField label={s.originalPrice} type="number" value={b.originalPrice} onChange={(v) => patchItem("bundles", idx, (x) => ({ ...x, originalPrice: v }))} />
+                <TextField label={s.priceToman} type="number" min={0} value={b.price} onChange={(v) => patchItem("bundles", idx, (x) => ({ ...x, price: v }))} />
+                <TextField label={s.originalPrice} type="number" min={0} value={b.originalPrice} onChange={(v) => patchItem("bundles", idx, (x) => ({ ...x, originalPrice: v }))} />
               </div>
             </div>
             <div className="grid gap-3 lg:grid-cols-2">
@@ -205,10 +204,11 @@ export default function SiteContentPanel({ cmsContent, onUpdateContent }) {
               <label className="block">
                 <span className={cls.label}>{s.linkedProduct}</span>
                 <select
-                  value={tile.productId}
+                  value={products.some((p) => p.id === tile.productId) ? tile.productId : ""}
                   onChange={(e) => patchItem("socialGallery", idx, (x) => ({ ...x, productId: e.target.value }))}
                   className={cls.input}
                 >
+                  <option value="">{s.chooseProduct}</option>
                   {products.map((p) => (
                     <option key={p.id} value={p.id}>
                       {(p[lang] || p.fa).title}
@@ -216,6 +216,12 @@ export default function SiteContentPanel({ cmsContent, onUpdateContent }) {
                   ))}
                 </select>
               </label>
+              {/* A tile whose product was deleted links nowhere on the storefront */}
+              {tile.productId && !products.some((p) => p.id === tile.productId) && (
+                <p className="text-xs font-semibold text-[var(--accent-crimson)]">
+                  {s.missingProduct.replace("{id}", tile.productId)}
+                </p>
+              )}
             </div>
           ))}
         </div>
