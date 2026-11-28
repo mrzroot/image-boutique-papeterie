@@ -470,14 +470,15 @@ export default function App() {
         )}
       </div>
 
-      <Footer
-        showNewsletter={view !== "admin"}
-        t={t}
-        lang={lang}
-        contact={cmsContent.contact}
-        onNavigate={handleNavigate}
-        onSelectCategory={setSelectedCategory}
-      />
+      {view !== "admin" && (
+        <Footer
+          t={t}
+          lang={lang}
+          contact={cmsContent.contact}
+          onNavigate={handleNavigate}
+          onSelectCategory={setSelectedCategory}
+        />
+      )}
 
       {/* Flush Mobile Bottom Navigation (< 768px phones only) */}
       <nav

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Gift, Plus } from "lucide-react";
 import { formatPrice } from "../utils/pricing";
-import Reveal from "./Reveal";
 
 const GIFT_AMOUNTS = [500000, 1000000, 2000000, 5000000];
 
@@ -56,16 +55,13 @@ export default function BoutiqueExtras({
     <div className="space-y-14 pb-12">
       {/* 1. Curated Gift Coffrets ("COFFRETS & LOTS") */}
       <section id="coffrets" className="mx-auto max-w-7xl px-4 sm:px-6">
-        <Reveal>
+        <div>
           <div className="mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--border-subtle)] pb-4">
             <div>
-              <p className="eyebrow text-[var(--accent-gold)]">
-                {t.bundles.eyebrow}
-              </p>
-              <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
+              <h2 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
                 {t.bundles.title}
               </h2>
-              <p className="mt-1 text-xs sm:text-sm text-[var(--ink-sub)]">
+              <p className="mt-2 text-sm text-[var(--ink-sub)]">
                 {t.bundles.subtitle}
               </p>
             </div>
@@ -132,12 +128,12 @@ export default function BoutiqueExtras({
               );
             })}
           </div>
-        </Reveal>
+        </div>
       </section>
 
       {/* 2. Interactive Digital Gift Card ("CARTE-CADEAU") */}
       <section id="gift-card" className="mx-auto max-w-7xl px-4 sm:px-6">
-        <Reveal>
+        <div>
           <div className="grid items-center gap-10 border-y border-[var(--border-subtle)] py-12 lg:grid-cols-12">
             {/* Live Metallic-Foil Card Preview */}
             <div className="lg:col-span-5 flex flex-col items-center justify-center">
@@ -204,13 +200,10 @@ export default function BoutiqueExtras({
               className="space-y-5 lg:col-span-7"
             >
               <div>
-                <p className="eyebrow text-[var(--accent-gold)]">
-                  {t.giftCard.eyebrow}
-                </p>
-                <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
+                <h2 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
                   {t.giftCard.title}
                 </h2>
-                <p className="mt-1.5 text-xs sm:text-sm text-[var(--ink-sub)]">
+                <p className="mt-2 text-sm text-[var(--ink-sub)]">
                   {t.giftCard.desc}
                 </p>
               </div>
@@ -312,7 +305,7 @@ export default function BoutiqueExtras({
               </button>
             </form>
           </div>
-        </Reveal>
+        </div>
       </section>
     </div>
   );

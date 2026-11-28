@@ -5,7 +5,7 @@
 ## Dials & Intent
 - **ENERGY 2 (Balanced)**: Confident editorial typography paired with calm gallery framing rather than loud gradients or neon effects.
 - **RHYTHM 3 (Varied)**: Sections shift deliberately between full-bleed split hero, hairline numbered manifesto, clean square favorites, borderless category strip, interactive desk lookbook, structured product gallery with sidebar filter, editorial heritage split, and print atelier gateway.
-- **MOTION 1 (Calm)**: Micro-transitions on hover/focus and slide switcher with an explicit Play/Pause control (`prefers-reduced-motion` honored globally); zero endless background marquee or pulsing loops.
+- **MOTION 1 (Calm)**: Micro-transitions on hover/focus only. The hero never autoplays (manual prev/next), content is never hidden waiting for a scroll-reveal, no marquees or pulsing loops (`prefers-reduced-motion` honored globally). Section headings have no kicker label above them.
 
 ## Palette (R-29 Compliant)
 - **Core Ground (Light)**: Archival Ivory `#F7F3EB` (`--bg-page`), Warm Paper Surface `#FFFFFF` (`--bg-surface`), Soft Linen `#EFEAE0` (`--bg-soft`).

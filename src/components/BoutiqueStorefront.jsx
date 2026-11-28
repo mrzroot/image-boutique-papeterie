@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -7,12 +7,9 @@ import {
   Heart,
   SlidersHorizontal,
   ShoppingBag,
-  Pause,
-  Play,
 } from "lucide-react";
 import { CATEGORIES } from "../data/catalog";
 import { formatPrice, formatNumber } from "../utils/pricing";
-import Reveal from "./Reveal";
 import ProductCard from "./ProductCard";
 import { CategoryIndex, ProductRail, GalleryMosaic, AtelierIntro, TrustSection } from "./StorefrontSections";
 import BoutiqueExtras from "./BoutiqueExtras";
@@ -45,7 +42,6 @@ export default function BoutiqueStorefront({
   page = "home",
 }) {
   const [slideIdx, setSlideIdx] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const [sortBy, setSortBy] = useState("featured");
   const [activePinIdx, setActivePinIdx] = useState(0);
   const isRtl = lang === "fa";
@@ -58,14 +54,6 @@ export default function BoutiqueStorefront({
     : t.heroSlides;
   const safeSlideIdx = slideIdx < slides.length ? slideIdx : 0;
   const activeSlide = slides[safeSlideIdx] || slides[0];
-
-  useEffect(() => {
-    if (isPaused || slides.length <= 1) return;
-    const timer = setInterval(() => {
-      setSlideIdx((prev) => (prev + 1) % slides.length);
-    }, 6500);
-    return () => clearInterval(timer);
-  }, [slides.length, isPaused]);
 
   const ArrowForward = isRtl ? ArrowLeft : ArrowRight;
   const PrevIcon = isRtl ? ChevronRight : ChevronLeft;
@@ -261,16 +249,16 @@ export default function BoutiqueStorefront({
                 {activeSlide.title}
               </h1>
 
-              <p className="max-w-lg text-xs sm:text-sm lg:text-[15px] leading-relaxed text-[var(--ink-sub)]">
+              <p className="max-w-lg text-sm lg:text-base leading-relaxed text-[var(--ink-sub)]">
                 {activeSlide.desc}
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-4">
                 <a
                   href="#/shop"
-                  className="inline-flex items-center gap-2 rounded-[3px] bg-[var(--accent-crimson)] px-5 py-2.5 text-xs lg:text-sm font-semibold text-white transition hover:opacity-90"
+                  className="inline-flex items-center gap-2 rounded-[3px] bg-[var(--accent-crimson)] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
                 >
                   <span>{activeSlide.ctaPrimary}</span>
                   <ArrowForward className="h-4 w-4" aria-hidden="true" />
@@ -278,56 +266,15 @@ export default function BoutiqueStorefront({
 
                 <a
                   href="#favorites"
-                  className="text-xs lg:text-sm font-semibold text-[var(--ink-main)] underline underline-offset-4 transition hover:text-[var(--accent-gold)] py-1.5"
+                  className="text-sm font-semibold text-[var(--ink-main)] underline underline-offset-4 transition hover:text-[var(--accent-gold)] py-1.5"
                 >
                   {t.nav.newArrivals}
                 </a>
               </div>
 
-              {/* Slide Progress & Play/Pause Controls */}
-              <div className="space-y-2 border-t border-[var(--border-subtle)] pt-3">
-                <div className="h-[2px] w-full overflow-hidden bg-[var(--border-subtle)]">
-                  <div
-                    key={`${safeSlideIdx}-${isPaused}`}
-                    className={`h-full w-full bg-[var(--accent-pine)] ${
-                      isPaused ? "opacity-35" : "animate-slide-progress"
-                    }`}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {slides.map((_, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setSlideIdx(idx)}
-                        aria-label={`Slide ${idx + 1}`}
-                        className={`h-2 rounded-[2px] transition-all ${
-                          idx === safeSlideIdx
-                            ? "w-8 bg-[var(--accent-pine)]"
-                            : "w-2 bg-[var(--border-strong)] hover:opacity-80"
-                        }`}
-                      />
-                    ))}
-                    <span className="tabular-nums ms-2 font-latin-ui text-xs font-semibold text-[var(--ink-sub)]">
-                      0{safeSlideIdx + 1} / 0{slides.length}
-                    </span>
-                  </div>
-
+              {/* Manual only: no autoplay, the customer decides when the picture changes */}
+              {slides.length > 1 && (
                   <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setIsPaused((p) => !p)}
-                      aria-label={isPaused ? "Play slides" : "Pause slides"}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--ink-main)] transition hover:border-[var(--accent-gold)]"
-                    >
-                      {isPaused ? (
-                        <Play className="h-3.5 w-3.5" aria-hidden="true" />
-                      ) : (
-                        <Pause className="h-3.5 w-3.5" aria-hidden="true" />
-                      )}
-                    </button>
                     <button
                       type="button"
                       onClick={() =>
@@ -351,8 +298,7 @@ export default function BoutiqueStorefront({
                       <NextIcon className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
@@ -378,23 +324,20 @@ export default function BoutiqueStorefront({
       <MaterialSampler products={visibleProducts} lang={lang} onOpenProduct={onOpenProduct} />
 
       {/* 3. Bestsellers & new arrivals */}
-      <ProductRail id="favorites" eyebrow={t.favoritesEyebrow} title={t.favoritesTitle} subtitle={t.favoritesSubtitle} products={favorites} cardProps={cardProps} />
-      <ProductRail id="new-arrivals" tone="surface" eyebrow={t.newArrivals.eyebrow} title={t.newArrivals.title} subtitle={t.newArrivals.subtitle} products={newArrivals} cardProps={cardProps} columns={newArrivals.length === 3 ? 3 : 4} />
+      <ProductRail id="favorites" title={t.favoritesTitle} subtitle={t.favoritesSubtitle} products={favorites} cardProps={cardProps} />
+      <ProductRail id="new-arrivals" tone="surface" title={t.newArrivals.title} subtitle={t.newArrivals.subtitle} products={newArrivals} cardProps={cardProps} columns={newArrivals.length === 3 ? 3 : 4} />
 
       {/* 5. Interactive "Shop the Desk" Editorial Lookbook Band */}
       {t.lookbook && activePinProduct && (
         <section className="border-y border-[var(--border-subtle)] bg-[var(--bg-surface)] py-12">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <Reveal>
+            <div>
               <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                  <p className="eyebrow text-[var(--accent-gold)]">
-                    {t.lookbook.eyebrow}
-                  </p>
-                  <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">
                     {t.lookbook.title}
                   </h2>
-                  <p className="mt-1 text-xs sm:text-sm text-[var(--ink-sub)]">
+                  <p className="mt-1.5 text-sm text-[var(--ink-sub)]">
                     {t.lookbook.desc}
                   </p>
                 </div>
@@ -410,7 +353,7 @@ export default function BoutiqueStorefront({
                           : "bg-[var(--bg-soft)] text-[var(--ink-sub)] border border-[var(--border-subtle)] hover:text-[var(--ink-main)]"
                       }`}
                     >
-                      0{idx + 1} · {pin.label}
+                      {formatNumber(idx + 1, lang)} · {pin.label}
                     </button>
                   ))}
                 </div>
@@ -461,10 +404,8 @@ export default function BoutiqueStorefront({
                   className="animate-modal-in flex flex-col justify-between rounded-[4px] border border-[var(--border-subtle)] bg-[var(--bg-soft)] p-5 sm:p-6 md:col-span-5 lg:col-span-4 space-y-4"
                 >
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between text-xs font-bold tracking-wider text-[var(--accent-gold)] font-latin-ui">
-                      <span>
-                        0{activePinIdx + 1} / {activePinProduct.sku}
-                      </span>
+                    <div className="flex items-center justify-between text-xs font-semibold text-[var(--ink-sub)] font-latin-ui">
+                      <span dir="ltr">{activePinProduct.sku}</span>
                       <span className="rounded-[2px] bg-[var(--accent-pine)]/15 px-2.5 py-0.5 text-[var(--accent-pine)]">
                         {t.categoryNames[activePinProduct.category]}
                       </span>
@@ -526,7 +467,7 @@ export default function BoutiqueStorefront({
                   </div>
                 </div>
               </div>
-            </Reveal>
+            </div>
           </div>
         </section>
       )}
@@ -552,7 +493,7 @@ export default function BoutiqueStorefront({
         id="heritage"
         className="border-y border-[var(--border-subtle)] bg-[var(--bg-soft)]"
       >
-        <Reveal>
+        <div>
           <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-12 sm:px-6 md:grid-cols-12">
             <div className="md:col-span-5">
               <div className="overflow-hidden">
@@ -575,12 +516,12 @@ export default function BoutiqueStorefront({
               <h2 className="text-2xl sm:text-3xl font-bold leading-snug text-[var(--ink-main)]">
                 {activeStory.title}
               </h2>
-              <p className="text-sm sm:text-base leading-loose text-[var(--ink-body)]">
+              <p className="max-w-prose text-sm sm:text-base leading-loose text-[var(--ink-body)]">
                 {activeStory.body}
               </p>
             </div>
           </div>
-        </Reveal>
+        </div>
       </section>
 
       <TrustSection t={t} lang={lang} values={activeValueStrip} shipping={shipping} contact={contact} />

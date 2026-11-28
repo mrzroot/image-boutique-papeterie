@@ -1,17 +1,15 @@
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Truck, PhoneCall, Feather, PenTool, Gem } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { CATEGORIES } from "../data/catalog";
 import { formatNumber, formatPrice } from "../utils/pricing";
 import ProductCard from "./ProductCard";
-import Reveal from "./Reveal";
 
-export function SectionHead({ eyebrow, title, subtitle, align = "start", action = null }) {
+export function SectionHead({ title, subtitle, align = "start", action = null }) {
   return (
     <div className={`section-head ${align === "center" ? "items-center text-center" : ""}`}>
       <div className="min-w-0">
-        {eyebrow && <p className="eyebrow text-[var(--accent-gold)]">{eyebrow}</p>}
-        <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">{title}</h2>
-        {subtitle && <p className="mt-1.5 max-w-xl text-sm text-[var(--ink-sub)]">{subtitle}</p>}
+        <h2 className="text-2xl sm:text-3xl font-bold text-[var(--ink-main)]">{title}</h2>
+        {subtitle && <p className="mt-2 max-w-xl text-sm text-[var(--ink-sub)]">{subtitle}</p>}
       </div>
       {action}
     </div>
@@ -27,10 +25,10 @@ export function CategoryIndex({ t, lang, counts, onSelectCategory }) {
 
   return (
     <section id="categories" className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-      <SectionHead eyebrow={t.categoriesEyebrow} title={t.categoriesTitle} subtitle={t.categoriesSubtitle} />
+      <SectionHead title={t.categoriesTitle} subtitle={t.categoriesSubtitle} />
       <div className="mt-8 grid gap-8 md:grid-cols-12 md:items-center">
         <ol className="md:col-span-7 border-t border-[var(--border-subtle)]">
-          {cats.map((cat, i) => (
+          {cats.map((cat) => (
             <li key={cat.id}>
               <a
                 href="#/shop"
@@ -39,9 +37,7 @@ export function CategoryIndex({ t, lang, counts, onSelectCategory }) {
                 onFocus={() => setActive(cat.id)}
                 className={`category-row group ${active === cat.id ? "is-active" : ""}`}
               >
-                <img src={cat.image} alt="" aria-hidden="true" loading="lazy" decoding="async" width="56" height="56" className="category-row__thumb md:hidden" />
-                <span className="tabular-nums w-7 text-xs text-[var(--ink-sub)]">{formatNumber(i + 1, lang)}</span>
-                <span className="category-row__name">{t.categoryNames[cat.id]}</span>
+                <img src={cat.image} alt="" aria-hidden="true" loading="lazy" decoding="async" width="56" height="56" className="category-row__thumb md:hidden" />                <span className="category-row__name">{t.categoryNames[cat.id]}</span>
                 <span className="tabular-nums ms-auto shrink-0 whitespace-nowrap text-xs text-[var(--ink-sub)]">
                   {formatNumber(counts(cat.id), lang)} {lang === "fa" ? "محصول" : "items"}
                 </span>
@@ -70,12 +66,12 @@ export function CategoryIndex({ t, lang, counts, onSelectCategory }) {
 }
 
 /** A titled row of product cards (bestsellers, new arrivals, related). */
-export function ProductRail({ id, eyebrow, title, subtitle, products, cardProps, columns = 4, tone = "page" }) {
+export function ProductRail({ id, title, subtitle, products, cardProps, columns = 4, tone = "page" }) {
   if (!products.length) return null;
   return (
     <section id={id} className={tone === "surface" ? "border-y border-[var(--border-subtle)] bg-[var(--bg-surface)]" : ""}>
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <SectionHead eyebrow={eyebrow} title={title} subtitle={subtitle} />
+        <SectionHead title={title} subtitle={subtitle} />
         <div className={`mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 ${columns === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4"}`}>
           {products.map((p) => (
             <ProductCard key={p.id} product={p} showSubtitle={false} {...cardProps} isWished={cardProps.wishlist.includes(p.id)} />
@@ -95,7 +91,7 @@ export function GalleryMosaic({ t, lang, tiles, products, onQuickView }) {
   if (!items.length) return null;
   return (
     <section id="gallery" className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-      <SectionHead eyebrow={t.socialSection.eyebrow} title={t.socialSection.title} subtitle={t.socialSection.hint} />
+      <SectionHead title={t.socialSection.title} subtitle={t.socialSection.hint} />
       <div className="gallery-mosaic mt-8">
         {items.map(({ tile, product }, i) => {
           const label = product ? (product[lang] || product.fa).title : t.socialSection.title;
@@ -127,7 +123,7 @@ export function AtelierIntro({ t, lang, onEnterServices }) {
         <div className="relative min-h-[240px] md:min-h-[420px]">
           <img src="./images/atelier-services.jpg" alt={t.atelierIntro.eyebrow} loading="lazy" decoding="async" width="1376" height="768" className="absolute inset-0 h-full w-full object-cover" />
         </div>
-        <Reveal className="flex items-center">
+        <div className="flex items-center">
           <div className="atelier-copy py-12 lg:py-16">
             <p className="eyebrow text-[#E7D19F]">{t.atelierIntro.eyebrow}</p>
             <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-white">{t.gatewayTitle}</h2>
@@ -145,7 +141,7 @@ export function AtelierIntro({ t, lang, onEnterServices }) {
               <Arrow className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
-        </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -153,26 +149,22 @@ export function AtelierIntro({ t, lang, onEnterServices }) {
 
 /** Trust & service promises — only facts the shop already states (CMS value strip, shipping threshold, contact). */
 export function TrustSection({ t, lang, values, shipping, contact }) {
-  const icons = [Feather, PenTool, Gem];
   return (
     <section id="trust" className="border-t border-[var(--border-subtle)]">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <SectionHead eyebrow={t.trust.eyebrow} title={t.trust.title} />
+        <SectionHead title={t.trust.title} />
         <div className="trust-grid mt-8">
           {values.map((v, i) => {
-            const Icon = icons[i % icons.length];
             return (
               <div key={i} className="trust-item">
-                <Icon className="h-5 w-5 text-[var(--accent-gold)]" aria-hidden="true" />
-                <h3 className="mt-3 text-[15px] font-semibold text-[var(--ink-main)]">{v.title}</h3>
+                <h3 className="text-[15px] font-semibold text-[var(--ink-main)]">{v.title}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-[var(--ink-sub)]">{v.desc}</p>
               </div>
             );
           })}
           {shipping?.freeThreshold > 0 && (
             <div className="trust-item">
-              <Truck className="h-5 w-5 text-[var(--accent-gold)]" aria-hidden="true" />
-              <h3 className="mt-3 text-[15px] font-semibold text-[var(--ink-main)]">{t.trust.shippingTitle}</h3>
+              <h3 className="text-[15px] font-semibold text-[var(--ink-main)]">{t.trust.shippingTitle}</h3>
               <p className="tabular-nums mt-1 text-sm leading-relaxed text-[var(--ink-sub)]">
                 {t.trust.shipping} {formatPrice(shipping.freeThreshold, lang)}
               </p>
@@ -180,8 +172,7 @@ export function TrustSection({ t, lang, values, shipping, contact }) {
           )}
           {contact?.phone && (
             <div className="trust-item">
-              <PhoneCall className="h-5 w-5 text-[var(--accent-gold)]" aria-hidden="true" />
-              <h3 className="mt-3 text-[15px] font-semibold text-[var(--ink-main)]">{t.trust.contactTitle}</h3>
+              <h3 className="text-[15px] font-semibold text-[var(--ink-main)]">{t.trust.contactTitle}</h3>
               <p className="mt-1 text-sm leading-relaxed text-[var(--ink-sub)]">
                 <a href={`tel:${contact.phone.replace(/[^\d+]/g, "")}`} dir="ltr" className="tabular-nums underline-offset-4 hover:underline">
                   {contact.phone}

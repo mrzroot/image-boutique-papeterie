@@ -214,15 +214,7 @@ export default function AdminDashboard({
     return (
       <main className="mx-auto max-w-md px-4 py-14 sm:px-6 animate-page-in">
         <div className={`${cls.card} space-y-5`}>
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-[4px] border border-[var(--border-strong)] bg-[var(--bg-soft)] text-[var(--accent-pine)]">
-              <Lock className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-[var(--accent-gold)]">Image Boutique CMS</p>
-              <h1 className="text-lg font-bold text-[var(--ink-main)]">{s.loginTitle}</h1>
-            </div>
-          </div>
+          <h1 className="text-lg font-bold text-[var(--ink-main)]">{s.loginTitle}</h1>
           <p className="text-sm leading-relaxed text-[var(--ink-sub)]">{s.loginHelp}</p>
           <form onSubmit={handleUnlock} className="space-y-3">
             <label htmlFor="admin-passcode-input" className={cls.label}>
@@ -299,47 +291,51 @@ export default function AdminDashboard({
       default:
         return (
           <section className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              {[
-                [s.kpiActive, `${formatNumber(products.filter((p) => p.visible !== false).length, lang)} / ${formatNumber(products.length, lang)}`],
-                [s.kpiNeedPhotos, formatNumber(needPhotos, lang)],
-                [s.kpiOrders, formatNumber(orderHistory.length, lang)],
-                [s.kpiVolume, formatPrice(totalRevenue, lang)],
-              ].map(([label, val]) => (
-                <div key={label} className={`${cls.card} space-y-1`}>
-                  <p className="text-xs font-semibold text-[var(--ink-sub)]">{label}</p>
-                  <p className="tabular-nums text-lg font-bold text-[var(--ink-main)]">{val}</p>
-                </div>
-              ))}
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card title={s.quickActions}>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <button type="button" onClick={() => openEditor(createEmptyProduct(), true)} className={cls.btnPrimary}>
-                    <Plus className="h-4 w-4" aria-hidden="true" />
-                    <span>{s.addProduct}</span>
-                  </button>
-                  {[
-                    ["media", needPhotos ? s.fixPhotos.replace("{n}", needPhotos) : s.navMedia],
-                    ["orders", s.navOrders],
-                    ["content", s.editHero],
-                    ["services", s.navServices],
-                    ["publish", s.navPublish],
-                  ].map(([id, label]) => (
-                    <button key={id} type="button" onClick={() => setSection(id)} className={cls.btn}>
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </Card>
-              <Card title={s.howItWorks}>
-                <ol className="list-decimal space-y-1.5 ps-5 text-sm leading-relaxed text-[var(--ink-sub)]">
-                  <li>{s.how1}</li>
-                  <li>{s.how2}</li>
-                  <li>{s.how3}</li>
-                </ol>
-              </Card>
-            </div>
+            <Card
+              title={s.quickActions}
+              actions={
+                <button type="button" onClick={() => openEditor(createEmptyProduct(), true)} className={cls.btnPrimary}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span>{s.addProduct}</span>
+                </button>
+              }
+            >
+              {/* Only what needs the owner's attention; nothing is listed when there is nothing to do */}
+              <ul className="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]">
+                {needPhotos > 0 && (
+                  <li className="flex flex-wrap items-center justify-between gap-3 py-3">
+                    <span className="text-sm text-[var(--ink-body)]">{s.kpiNeedPhotos}: {formatNumber(needPhotos, lang)}</span>
+                    <button type="button" onClick={() => setSection("media")} className={cls.btn}>{s.navMedia}</button>
+                  </li>
+                )}
+                {hasLocalDraft && (
+                  <li className="flex flex-wrap items-center justify-between gap-3 py-3">
+                    <span className="text-sm text-[var(--ink-body)]">{s.draftPending}</span>
+                    <button type="button" onClick={() => setSection("publish")} className={cls.btn}>{s.navPublish}</button>
+                  </li>
+                )}
+                {!needPhotos && !hasLocalDraft && <li className="py-3 text-sm text-[var(--ink-sub)]">{s.nothingToDo}</li>}
+              </ul>
+              <dl className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
+                {[
+                  [s.kpiActive, `${formatNumber(products.filter((p) => p.visible !== false).length, lang)} / ${formatNumber(products.length, lang)}`],
+                  [s.kpiOrders, formatNumber(orderHistory.length, lang)],
+                  [s.kpiVolume, formatPrice(totalRevenue, lang)],
+                ].map(([label, val]) => (
+                  <div key={label} className="flex items-baseline gap-2">
+                    <dt className="text-[var(--ink-sub)]">{label}</dt>
+                    <dd className="tabular-nums font-semibold text-[var(--ink-main)]">{val}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Card>
+            <Card title={s.howItWorks}>
+              <ol className="list-decimal max-w-prose space-y-1.5 ps-5 text-sm leading-relaxed text-[var(--ink-sub)]">
+                <li>{s.how1}</li>
+                <li>{s.how2}</li>
+                <li>{s.how3}</li>
+              </ol>
+            </Card>
           </section>
         );
     }

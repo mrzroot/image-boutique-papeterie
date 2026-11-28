@@ -21,7 +21,6 @@ import {
   formatPrice,
   formatNumber,
 } from "../utils/pricing";
-import Reveal from "./Reveal";
 import Live3DPreview, { COVER_THEMES } from "./Live3DPreview";
 
 export default function ServicesPortal({
@@ -703,7 +702,7 @@ export default function ServicesPortal({
           {servicesList.map((srv, idx) => {
             const loc = srv[lang] || srv.fa;
             return (
-              <Reveal key={srv.id} delayMs={idx * 50}>
+              <div key={srv.id}>
                 <button
                   type="button"
                   onClick={() => applyServicePreset(srv.id)}
@@ -726,7 +725,7 @@ export default function ServicesPortal({
                     {loc.unit}
                   </span>
                 </button>
-              </Reveal>
+              </div>
             );
           })}
         </div>
